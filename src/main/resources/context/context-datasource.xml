@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- properties 맵핑 시킴 -->
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:/app.properties"></property>
+    </bean>
+
+    <!-- dataSource 초기화 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${db.driver.class}" />
+        <property name="url" value="${db.url}" />
+        <property name="username" value="${db.user}" />
+        <property name="password" value="${db.password}" />
+        <property name="initialSize" value="10" />
+        <property name="maxActive" value="10" />
+        <property name="maxIdle" value="10" />
+        <property name="minIdle" value="10" />
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxOpenPreparedStatements" value="10" />
+        <property name="validationQuery" value="select 1 from dual" />
+        <property name="testWhileIdle" value="true" />
+        <property name="timeBetweenEvictionRunsMillis" value="60000" /> <!-- 1분 -->
+    </bean>
+</beans>
