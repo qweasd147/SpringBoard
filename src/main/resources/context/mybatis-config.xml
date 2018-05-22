@@ -19,6 +19,12 @@
         <setting name="jdbcTypeForNull" value="VARCHAR"></setting>
     </settings>
 
+    <typeAliases>
+        <typeAlias alias="BoardSearchVo" type="com.joo.api.board.vo.BoardSearchVo"/>
+        <typeAlias alias="BoardVo" type="com.joo.api.board.vo.BoardVo"/>
+        <typeAlias alias="FileVo" type="com.joo.api.board.vo.FileVo"/>
+    </typeAliases>
+
     <typeHandlers>
         <!--  java.sql.Timestamp 를 java.util.Date 형으로 반환 -->
         <typeHandler javaType="java.sql.Timestamp" handler="org.apache.ibatis.type.DateTypeHandler"/>

@@ -1,7 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.joo.api.board.mapper.BoardMapper">
-    <select id="testValue" resultType="hashMap">
-        SELECT 1 FROM dual
+
+    <sql id="TB_BOARD">TB_BOARD</sql>
+    <sql id="TB_BOARD_FILE">TB_BOARD_FILE</sql>
+    <sql id="TB_BOARD_FILE_MAP">TB_BOARD_FILE_MAP</sql>
+
+    <select id="selectBoardList" parameterType="BoardSearchVo" resultType="BoardVo">
+        SELECT
+          IDX
+          , SUBJECT
+          , HITS
+          , WRITER
+          , REG_DATE
+        FROM <include refid="TB_BOARD" />
+        WHERE STATE = 1
     </select>
+
+    <select id="selectBoardListTotCount" parameterType="BoardSearchVo" resultType="int">
+        SELECT
+          COUNT(*)
+        FROM <include refid="TB_BOARD" />
+        WHERE STATE = 1
+    </select>
+
+    <select id="selectBoard" parameterType="BoardSearchVo" resultType="BoardVo">
+        SELECT
+        IDX
+        , SUBJECT
+        , HITS
+        , WRITER
+        , REG_DATE
+        FROM <include refid="TB_BOARD" />
+        WHERE STATE = 1
+          AND IDX=#{idx}
+    </select>
+
+    <insert id="insertBoard" parameterType="BoardVo">
+        <selectKey keyProperty="idx" order="BEFORE" resultType="int">
+            SELECT SQ_BOARD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO <include refid="TB_BOARD" /> (
+          IDX
+          , SUBJECT
+          , CONTENTS
+          , HITS
+          , STATE
+          , WRITER
+          , REG_DATE
+        )
+        VALUES (
+            #{idx}
+            , #{subject}
+            , #{contents}
+            , 0
+            , 1
+            , "USER_01"
+            , SYSDATE
+        )
+    </insert>
+
+    <update id="updateBoard" parameterType="BoardVo">
+        UPDATE	<include refid="TB_BOARD" />
+            SUBJECT			= #{subject}
+            , CONTENTS		= #{contents}
+        WHERE IDX = #{idx}
+          AND STATE != 0
+    </update>
+
+    <update id="deleteBoardById" parameterType="int">
+        UPDATE	<include refid="TB_BOARD" />
+          STATE = 0
+        WHERE IDX = #{idx}
+          AND STATE != 0
+    </update>
+
 </mapper>
