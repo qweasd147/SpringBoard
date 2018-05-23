@@ -13,7 +13,7 @@ public interface BoardServce {
 
     int selectBoardListTotCount(BoardSearchVo searchVo);
 
-    BoardVo selectBoard(BoardSearchVo searchVo);
+    BoardVo selectBoardOne(BoardSearchVo searchVo);
 
     int insertBoard(BoardVo boardVo);
 

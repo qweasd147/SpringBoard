@@ -5,7 +5,6 @@ import com.joo.api.board.vo.BoardVo;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 @Repository(value = "boardMapper")
 public interface BoardMapper {
@@ -29,7 +28,7 @@ public interface BoardMapper {
      * @param boardVo
      * @return
      */
-    BoardVo selectBoard(BoardSearchVo boardVo);
+    BoardVo selectBoardOne(BoardSearchVo boardVo);
 
     /**
      * 게시물 한건을 등록한다.

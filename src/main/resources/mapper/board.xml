@@ -8,23 +8,47 @@
 
     <select id="selectBoardList" parameterType="BoardSearchVo" resultType="BoardVo">
         SELECT
-          IDX
-          , SUBJECT
-          , HITS
-          , WRITER
-          , REG_DATE
-        FROM <include refid="TB_BOARD" />
-        WHERE STATE = 1
+          *
+        FROM (
+            SELECT
+                ROWNUM AS NUM
+                , TB.*
+            FROM (
+                SELECT
+                IDX
+                , SUBJECT
+                , HITS
+                , WRITER
+                , REG_DATE
+            FROM <include refid="TB_BOARD" />
+            WHERE STATE = 1
+            ORDER BY IDX
+            ) TB
+            WHERE NUM <![CDATA[<=]]> #{pageIdx * rowsPerPage + rowsPerPage}
+        )
+        WHERE NUM <![CDATA[>=]]> #{pageIdx * rowsPerPage + 1}
     </select>
 
     <select id="selectBoardListTotCount" parameterType="BoardSearchVo" resultType="int">
         SELECT
-          COUNT(*)
-        FROM <include refid="TB_BOARD" />
-        WHERE STATE = 1
+        COUNT (*)
+        FROM (
+            SELECT
+                ROWNUM AS NUM
+                , TB.*
+            FROM (
+                SELECT
+                    IDX
+                FROM <include refid="TB_BOARD" />
+                WHERE STATE = 1
+                ORDER BY IDX
+            ) TB
+            WHERE NUM <![CDATA[<=]]> #{pageIdx * rowsPerPage + rowsPerPage}
+        )
+        WHERE NUM <![CDATA[>=]]> #{pageIdx * rowsPerPage + 1}
     </select>
 
-    <select id="selectBoard" parameterType="BoardSearchVo" resultType="BoardVo">
+    <select id="selectBoardOne" parameterType="BoardSearchVo" resultType="BoardVo">
         SELECT
         IDX
         , SUBJECT
@@ -33,7 +57,7 @@
         , REG_DATE
         FROM <include refid="TB_BOARD" />
         WHERE STATE = 1
-          AND IDX=#{idx}
+          AND IDX=#{boardIdx}
     </select>
 
     <insert id="insertBoard" parameterType="BoardVo">

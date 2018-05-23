@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class BoardServceImpl implements BoardServce{
@@ -26,8 +25,8 @@ public class BoardServceImpl implements BoardServce{
     }
 
     @Override
-    public BoardVo selectBoard(BoardSearchVo searchVo) {
-        return boardMapper.selectBoard(searchVo);
+    public BoardVo selectBoardOne(BoardSearchVo searchVo) {
+        return boardMapper.selectBoardOne(searchVo);
     }
 
     @Override
