@@ -112,3 +112,14 @@
  
   ALTER TABLE "TB_BOARD_FILE_MAP" ADD CONSTRAINT "FK_BOARD_IDX" FOREIGN KEY ("BOARD_IDX")
 	  REFERENCES "TB_BOARD" ("IDX") ENABLE
+
+--------------------------------------------------------
+--  DDL for Sequence SQ_BOARD
+--------------------------------------------------------
+
+   CREATE SEQUENCE  "SQ_BOARD"  MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 1 NOCACHE  NOORDER  NOCYCLE
+--------------------------------------------------------
+--  DDL for Sequence SQ_BOARD_FILE
+--------------------------------------------------------
+
+   CREATE SEQUENCE  "SQ_BOARD_FILE"  MINVALUE 1 MAXVALUE 999999999999999999999999999 INCREMENT BY 1 START WITH 1 NOCACHE  NOORDER  NOCYCLE

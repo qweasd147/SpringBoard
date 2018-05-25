@@ -3,15 +3,17 @@ package com.joo.api.board.controller;
 import com.joo.api.board.service.BoardServce;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
+import com.joo.api.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/")
-public class BoardController extends BaseController{
+@CrossOrigin(origins = "*")
+public class BoardController extends BaseController {
 
     @Autowired
     BoardServce boardServce;
@@ -19,9 +21,9 @@ public class BoardController extends BaseController{
     @RequestMapping(value = "/board", method = RequestMethod.GET)
     public ResponseEntity selectBoardList(@ModelAttribute BoardSearchVo searchVo){
 
-        List<?> list = boardServce.selectBoardList(searchVo);
+        Map<String, ?> listData = boardServce.selectBoardList(searchVo);
 
-        return successResult(list);
+        return successResult(listData);
     }
 
     @RequestMapping(value = "/board/{boardId}", method = RequestMethod.GET)

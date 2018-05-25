@@ -4,12 +4,12 @@ package com.joo.api.board.service;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
 
-import java.util.List;
+import java.util.Map;
 
 public interface BoardServce {
 
 
-    List selectBoardList(BoardSearchVo searchVo);
+    Map selectBoardList(BoardSearchVo searchVo);
 
     int selectBoardListTotCount(BoardSearchVo searchVo);
 

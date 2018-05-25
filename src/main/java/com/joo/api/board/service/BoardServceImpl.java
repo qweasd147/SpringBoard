@@ -6,7 +6,9 @@ import com.joo.api.board.vo.BoardVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BoardServceImpl implements BoardServce{
@@ -15,8 +17,19 @@ public class BoardServceImpl implements BoardServce{
     BoardMapper boardMapper;
 
     @Override
-    public List<BoardVo> selectBoardList(BoardSearchVo searchVo) {
-        return boardMapper.selectBoardList(searchVo);
+    public Map<String, ?> selectBoardList(BoardSearchVo searchVo) {
+
+
+        Map<String, Object> listData = new HashMap<>();
+
+        List<BoardVo> boardList = boardMapper.selectBoardList(searchVo);
+        int listCount = boardMapper.selectBoardListTotCount(searchVo);
+
+        listData.put("boardList", boardList);
+        listData.put("count", listCount);
+        listData.put("page", searchVo.getPageIdx());
+
+        return listData;
     }
 
     @Override

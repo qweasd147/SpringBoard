@@ -24,9 +24,9 @@
             WHERE STATE = 1
             ORDER BY IDX
             ) TB
-            WHERE NUM <![CDATA[<=]]> #{pageIdx * rowsPerPage + rowsPerPage}
+            WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage} + #{rowsPerPage}
         )
-        WHERE NUM <![CDATA[>=]]> #{pageIdx * rowsPerPage + 1}
+        WHERE NUM <![CDATA[>=]]> (#{pageIdx} - 1) * #{rowsPerPage} + 1
     </select>
 
     <select id="selectBoardListTotCount" parameterType="BoardSearchVo" resultType="int">
@@ -43,9 +43,9 @@
                 WHERE STATE = 1
                 ORDER BY IDX
             ) TB
-            WHERE NUM <![CDATA[<=]]> #{pageIdx * rowsPerPage + rowsPerPage}
+            WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage} + #{rowsPerPage}
         )
-        WHERE NUM <![CDATA[>=]]> #{pageIdx * rowsPerPage + 1}
+        WHERE NUM <![CDATA[>=]]> (#{pageIdx} - 1) * #{rowsPerPage} + 1
     </select>
 
     <select id="selectBoardOne" parameterType="BoardSearchVo" resultType="BoardVo">
@@ -79,7 +79,7 @@
             , #{contents}
             , 0
             , 1
-            , "USER_01"
+            , 'USER_01'
             , SYSDATE
         )
     </insert>

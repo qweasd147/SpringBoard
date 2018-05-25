@@ -6,7 +6,10 @@
 	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
 		<layout class="org.apache.log4j.PatternLayout">
+			<!--
 			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+			-->
+			<param name="ConversionPattern" value="%d %5p [%c] %m%n" />
 		</layout>
 	</appender>
 	
@@ -37,5 +40,21 @@
 		<priority value="warn" />
 		<appender-ref ref="console" />
 	</root>
-	
+
+	<!-- Query Loggers -->
+	<logger name="jdbc.sqlonly" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="console"/>
+	</logger>
+
+	<logger name="jdbc.sqltiming" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="console"/>
+	</logger>
+
+	<logger name="jdbc.resultsettable" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="console"/>
+	</logger>
+
 </log4j:configuration>
