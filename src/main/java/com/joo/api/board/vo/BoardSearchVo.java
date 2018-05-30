@@ -1,7 +1,11 @@
 package com.joo.api.board.vo;
 
-public class BoardSearchVo {
+import java.io.Serializable;
 
+public class BoardSearchVo implements Serializable{
+
+    private static final long serialVersionUID = -8216665660181770998L;
+    
     private int pageIdx = 1;
     private int boardIdx;
     private String searchCondition = "";

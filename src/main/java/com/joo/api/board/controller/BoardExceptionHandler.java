@@ -1,6 +1,7 @@
 package com.joo.api.board.controller;
 
 import com.joo.api.common.Result;
+import com.joo.api.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -31,6 +32,17 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
         logger.error(ex.getMessage());
 
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
+
+        return new ResponseEntity(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = { BusinessException.class })
+    public ResponseEntity handleBusinessException(BusinessException ex){
+
+        logger.error("Business EXCEPTION!!!");
+        logger.error(ex.getMessage());
+
+        Result<?> failResult = Result.getFailResult(ex.getCode(), ex.getMessage(), ex.getData());
 
         return new ResponseEntity(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }

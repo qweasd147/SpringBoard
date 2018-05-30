@@ -22,7 +22,7 @@
                 , REG_DATE
             FROM <include refid="TB_BOARD" />
             WHERE STATE = 1
-            ORDER BY IDX
+            ORDER BY IDX DESC
             ) TB
             WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage} + #{rowsPerPage}
         )
@@ -31,27 +31,16 @@
 
     <select id="selectBoardListTotCount" parameterType="BoardSearchVo" resultType="int">
         SELECT
-        COUNT (*)
-        FROM (
-            SELECT
-                ROWNUM AS NUM
-                , TB.*
-            FROM (
-                SELECT
-                    IDX
-                FROM <include refid="TB_BOARD" />
-                WHERE STATE = 1
-                ORDER BY IDX
-            ) TB
-            WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage} + #{rowsPerPage}
-        )
-        WHERE NUM <![CDATA[>=]]> (#{pageIdx} - 1) * #{rowsPerPage} + 1
+          COUNT (*)
+        FROM <include refid="TB_BOARD" />
+        WHERE STATE = 1
     </select>
 
     <select id="selectBoardOne" parameterType="BoardSearchVo" resultType="BoardVo">
         SELECT
         IDX
         , SUBJECT
+        , CONTENTS
         , HITS
         , WRITER
         , REG_DATE
@@ -86,15 +75,25 @@
 
     <update id="updateBoard" parameterType="BoardVo">
         UPDATE	<include refid="TB_BOARD" />
-            SUBJECT			= #{subject}
-            , CONTENTS		= #{contents}
+        SET
+            SUBJECT     = #{subject}
+            , CONTENTS   = #{contents}
         WHERE IDX = #{idx}
           AND STATE != 0
     </update>
 
+    <update id="updateBoardHits" parameterType="int">
+        UPDATE	<include refid="TB_BOARD" />
+        SET
+            HITS  = HITS + 1
+        WHERE IDX = #{idx}
+        AND STATE != 0
+    </update>
+
     <update id="deleteBoardById" parameterType="int">
         UPDATE	<include refid="TB_BOARD" />
-          STATE = 0
+        SET
+            STATE = 0
         WHERE IDX = #{idx}
           AND STATE != 0
     </update>

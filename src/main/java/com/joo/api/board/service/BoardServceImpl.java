@@ -39,6 +39,7 @@ public class BoardServceImpl implements BoardServce{
 
     @Override
     public BoardVo selectBoardOne(BoardSearchVo searchVo) {
+        boardMapper.updateBoardHits(searchVo.getBoardIdx());
         return boardMapper.selectBoardOne(searchVo);
     }
 

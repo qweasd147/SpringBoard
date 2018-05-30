@@ -1,9 +1,12 @@
 package com.joo.api.board.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class BoardVo {
+public class BoardVo implements Serializable {
+
+    private static final long serialVersionUID = 6348958289640869735L;
 
     private int idx;
     private String subject;
@@ -13,6 +16,7 @@ public class BoardVo {
     private String writer;
     private Date regDate;
     private List<FileVo> fileList;
+    private List<?> tagList;
 
     public int getIdx() {
         return idx;
@@ -78,6 +82,14 @@ public class BoardVo {
         this.fileList = fileList;
     }
 
+    public List<?> getTagList() {
+        return tagList;
+    }
+
+    public void setTagList(List<?> tagList) {
+        this.tagList = tagList;
+    }
+
     @Override
     public String toString() {
         return "BoardVo{" +
@@ -89,6 +101,7 @@ public class BoardVo {
                 ", writer='" + writer + '\'' +
                 ", regDate=" + regDate +
                 ", fileList=" + fileList +
+                ", tagList=" + tagList +
                 '}';
     }
 }

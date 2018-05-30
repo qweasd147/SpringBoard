@@ -50,4 +50,11 @@ public interface BoardMapper {
      * @return
      */
     int deleteBoardById(int boardId);
+
+    /**
+     * 게시판 조회수를 증가 시킨다.
+     * @param boardId
+     * @return
+     */
+    int updateBoardHits(int boardId);
 }

@@ -4,14 +4,16 @@ import com.joo.api.board.service.BoardServce;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
 import com.joo.api.common.BaseController;
+import com.joo.api.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/api/")
+@RequestMapping(value = "/api")
 @CrossOrigin(origins = "*")
 public class BoardController extends BaseController {
 
@@ -34,6 +36,10 @@ public class BoardController extends BaseController {
 
         BoardVo boardOne = boardServce.selectBoardOne(searchVo);
 
+        if(boardOne == null){
+            throw new BusinessException("99","데이터가 존재하지 않습니다.", null);
+        }
+
         return successResult(boardOne);
     }
 
@@ -45,9 +51,8 @@ public class BoardController extends BaseController {
         return createResult();
     }
 
-    @RequestMapping(value = "/board/{boardId}", method = RequestMethod.PUT)
-    public ResponseEntity updateBoard(@ModelAttribute BoardVo boardVo,
-                                      @PathVariable int boardId){
+    @RequestMapping(value = "/board/{boardId}", method = RequestMethod.POST)
+    public ResponseEntity updateBoard(@ModelAttribute BoardVo boardVo, @PathVariable int boardId){
 
         boardVo.setIdx(boardId);
 

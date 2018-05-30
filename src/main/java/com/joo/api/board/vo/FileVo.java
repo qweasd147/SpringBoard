@@ -1,8 +1,11 @@
 package com.joo.api.board.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class FileVo {
+public class FileVo implements Serializable{
+
+    private static final long serialVersionUID = 2956026631315470683L;
 
     private int idx;
     private String contentType;
