@@ -1,13 +1,20 @@
 package com.joo.api.board.vo;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class BoardVo implements Serializable {
+@Document(indexName = "cmnBoard", type = "board")
+public class BoardEsVo implements Serializable{
 
-    private static final long serialVersionUID = 6348958289640869735L;
-
+    private static final long serialVersionUID = 3588196752802751105L;
+    
+    @Id
     private int idx;
     private String subject;
     private String contents;
@@ -15,21 +22,36 @@ public class BoardVo implements Serializable {
     private int state;
     private String writer;
     private Date regDate;
+
+    @Field( type = FieldType.Nested)
     private List<FileVo> fileList;
+    @Field( type = FieldType.Nested)
     private List<?> tagList;
 
-    public BoardVo() {}
+    public BoardEsVo() {}
 
-    public BoardVo(BoardEsVo esVo) {
-        this.idx = esVo.getIdx();
-        this.subject = esVo.getSubject();
-        this.contents = esVo.getContents();
-        this.hits = esVo.getHits();
-        this.state = esVo.getState();
-        this.writer = esVo.getWriter();
-        this.regDate = esVo.getRegDate();
-        this.fileList = esVo.getFileList();
-        this.tagList = esVo.getTagList();
+    public BoardEsVo(int idx, String subject, String contents, int hits, int state, String writer, Date regDate, List<FileVo> fileList, List<?> tagList) {
+        this.idx = idx;
+        this.subject = subject;
+        this.contents = contents;
+        this.hits = hits;
+        this.state = state;
+        this.writer = writer;
+        this.regDate = regDate;
+        this.fileList = fileList;
+        this.tagList = tagList;
+    }
+
+    public BoardEsVo(BoardVo vo){
+        this.idx = vo.getIdx();
+        this.subject = vo.getSubject();
+        this.contents = vo.getContents();
+        this.hits = vo.getHits();
+        this.state = vo.getState();
+        this.writer = vo.getWriter();
+        this.regDate = vo.getRegDate();
+        this.fileList = vo.getFileList();
+        this.tagList = vo.getTagList();
     }
 
     public int getIdx() {
@@ -106,7 +128,7 @@ public class BoardVo implements Serializable {
 
     @Override
     public String toString() {
-        return "BoardVo{" +
+        return "BoardEsVo{" +
                 "idx=" + idx +
                 ", subject='" + subject + '\'' +
                 ", contents='" + contents + '\'' +

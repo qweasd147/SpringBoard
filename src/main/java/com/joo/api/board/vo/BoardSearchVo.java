@@ -5,6 +5,10 @@ import java.io.Serializable;
 public class BoardSearchVo implements Serializable{
 
     private static final long serialVersionUID = -8216665660181770998L;
+
+    public enum searchKeyWord{
+        subject, contents, tag
+    }
     
     private int pageIdx = 1;
     private int boardIdx;

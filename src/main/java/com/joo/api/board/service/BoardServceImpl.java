@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Service(value = "boardServiceImpl")
 public class BoardServceImpl implements BoardServce{
 
     @Autowired

@@ -2,6 +2,7 @@ package com.joo.api.board.controller;
 
 import com.joo.api.common.Result;
 import com.joo.api.exception.BusinessException;
+import org.mybatis.spring.MyBatisSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -29,6 +30,17 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
     public ResponseEntity handleSQLException(SQLException ex){
 
         logger.error("SQL EXCEPTION!!!");
+        logger.error(ex.getMessage());
+
+        Result<?> failResult = Result.getFailResult("99", "에러남", null);
+
+        return new ResponseEntity(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = { RuntimeException.class })
+    public ResponseEntity handleRuntimeException(RuntimeException ex){
+
+        logger.error("RuntimeException!!!");
         logger.error(ex.getMessage());
 
         Result<?> failResult = Result.getFailResult("99", "에러남", null);

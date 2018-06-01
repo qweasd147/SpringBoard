@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.annotation.Resource;
 import java.util.Map;
 
 @RestController
@@ -17,8 +17,8 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class BoardController extends BaseController {
 
-    @Autowired
-    BoardServce boardServce;
+    @Resource(name = "boardServiceImpl")
+    private BoardServce boardServce;
 
     @RequestMapping(value = "/board", method = RequestMethod.GET)
     public ResponseEntity selectBoardList(@ModelAttribute BoardSearchVo searchVo){

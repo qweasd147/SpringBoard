@@ -1,0 +1,27 @@
+{
+  "mappings" : {
+    "board" : {
+      "properties" : {
+        "IDX" : {"type" : "integer", "index":"not_analyzed"}
+      , "SUBJECT" : {"type" : "keyword", "index":"analyzed"}
+      , "CONTENTS" : {"type" : "text", "index":"analyzed"}
+      , "HITS" : {"type" : "integer", "index":"not_analyzed"}
+      , "STATE" : {"type" : "integer", "index":"not_analyzed"}
+      , "WRITER" : {"type" : "keyword", "index":"analyzed"}
+      , "REG_DATE" : {"type" : "date", "format":"yyyy-MM-dd"}
+      , "FILE" : {
+          "properties" : {
+            "IDX" : {"type" : "integer", "index":"not_analyzed"}
+            , "CONTENT_TYPE" : {"type" : "keyword", "index":"not_analyzed"}
+            , "FILE_PATH" : {"type" : "text", "index":"not_analyzed"}
+            , "ORIGIN_FILE_NAME" : {"type" : "text", "index":"not_analyzed"}
+            , "SAVE_FILE_NAME" : {"type" : "text", "index":"not_analyzed"}
+            , "FILE_SIZE" : {"type" : "text", "index":"not_analyzed"}
+            , "WRITER" : {"type" : "text", "index":"not_analyzed"}
+            , "REG_DATE" : {"type" : "date", "format":"yyyy-MM-dd"}
+          }
+        }
+      }
+    }
+  }
+}

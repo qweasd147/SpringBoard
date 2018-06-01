@@ -226,6 +226,13 @@
 			<version>0.2.7</version>
 		</dependency>
 
+		<!-- elastic search -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-elasticsearch</artifactId>
+			<version>3.0.1.RELEASE</version>
+		</dependency>
+
 		<!-- //사용자 지정  -->
 	</dependencies>
     <build>
