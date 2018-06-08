@@ -1,6 +1,6 @@
 package com.joo.api.board.service;
 
-import com.joo.api.board.mapper.BoardRepository;
+import com.joo.api.board.mapper.repository.BoardRepository;
 import com.joo.api.board.vo.BoardEsVo;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -16,15 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service(value = "boardEsServiceImpl")
+//@Service(value = "boardEsServiceImpl")
 public class BoardEsServiceImpl implements BoardServce{
 
-    @Resource(name = "boardServiceImpl")
+    //@Resource(name = "boardServiceImpl")
     private BoardServce boardServce;
 
     private BoardRepository boardRepository;
 
-    @Autowired
+    //@Autowired
     public void setBoardRepository(BoardRepository boardRepository) {
         this.boardRepository = boardRepository;
     }
@@ -58,28 +59,30 @@ public class BoardEsServiceImpl implements BoardServce{
     }
 
     @Override
-    public int insertBoard(BoardVo boardVo) {
+    public BoardVo insertBoard(BoardVo boardVo, MultipartFile[] uploadFile) {
 
-        int insertResult = boardServce.insertBoard(boardVo);
-        boardVo.setHits(0);
+        BoardVo insertBoardVo = boardServce.insertBoard(boardVo, uploadFile);
 
-        boardRepository.save(new BoardEsVo(boardVo));
+        insertBoardVo.setHits(0);
 
-        return insertResult;
+        boardRepository.save(new BoardEsVo(insertBoardVo));
+
+        return boardVo;
     }
 
     @Override
-    public int updateBoard(BoardVo boardVo) {
+    public BoardVo updateBoard(BoardVo boardVo, MultipartFile[] uploadFile, List<Integer> detachFileIds) {
 
-        int updateResult = boardServce.updateBoard(boardVo);
+        boardServce.updateBoard(boardVo, uploadFile, detachFileIds);
 
         BoardSearchVo searchVo = new BoardSearchVo();
         searchVo.setPageIdx(boardVo.getIdx());
 
-        boardVo = boardServce.selectBoardOne(searchVo);
-        boardRepository.save(new BoardEsVo(boardVo));
+        //es에 조회수 정보도 입력하기 위해 조회
+        BoardVo updatedBoardVo = boardServce.selectBoardOne(searchVo);
+        boardRepository.save(new BoardEsVo(updatedBoardVo));
 
-        return updateResult;
+        return updatedBoardVo;
     }
 
     @Override

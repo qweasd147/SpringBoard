@@ -35,26 +35,26 @@ public interface BoardMapper {
      * @param boardVo
      * @return
      */
-    int insertBoard(BoardVo boardVo);
+    void insertBoard(BoardVo boardVo);
 
     /**
      * 게시물 한건을 수정한다.
      * @param boardVo
      * @return
      */
-    int updateBoard(BoardVo boardVo);
+    void updateBoard(BoardVo boardVo);
 
     /**
      * 게시물 한건을 삭제한다.
      * @param boardId
      * @return
      */
-    int deleteBoardById(int boardId);
+    void deleteBoardById(int boardId);
 
     /**
      * 게시판 조회수를 증가 시킨다.
      * @param boardId
      * @return
      */
-    int updateBoardHits(int boardId);
+    void updateBoardHits(int boardId);
 }

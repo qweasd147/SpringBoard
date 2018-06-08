@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-@Document(indexName = "cmnBoard", type = "board")
+@Document(indexName = "joo", type = "board")
 public class BoardEsVo implements Serializable{
 
     private static final long serialVersionUID = 3588196752802751105L;

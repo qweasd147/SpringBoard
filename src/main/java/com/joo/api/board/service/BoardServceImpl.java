@@ -3,8 +3,10 @@ package com.joo.api.board.service;
 import com.joo.api.board.mapper.BoardMapper;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
+import com.joo.api.board.vo.FileVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,9 @@ public class BoardServceImpl implements BoardServce{
 
     @Autowired
     BoardMapper boardMapper;
+
+    @Autowired
+    FileService fileService;
 
     @Override
     public Map<String, ?> selectBoardList(BoardSearchVo searchVo) {
@@ -44,17 +49,37 @@ public class BoardServceImpl implements BoardServce{
     }
 
     @Override
-    public int insertBoard(BoardVo boardVo) {
-        return boardMapper.insertBoard(boardVo);
+    public BoardVo insertBoard(BoardVo boardVo, MultipartFile[] uploadFile) {
+
+        boardMapper.insertBoard(boardVo);
+        List<FileVo> fileVoList = fileService.uploadFiles(uploadFile);
+        fileService.insertFileList(fileVoList);
+
+        boardVo.setFileList(fileVoList);
+        fileService.insertFileMapping(boardVo.getIdx(), fileVoList);
+
+        return boardVo;
     }
 
     @Override
-    public int updateBoard(BoardVo boardVo) {
-        return boardMapper.updateBoard(boardVo);
+    public BoardVo updateBoard(BoardVo boardVo, MultipartFile[] uploadFile, List<Integer> detachFileIdList) {
+        boardMapper.updateBoard(boardVo);
+
+        List<FileVo> fileVoList = fileService.uploadFiles(uploadFile);
+        fileService.insertFileList(fileVoList);
+
+        boardVo.setFileList(fileVoList);
+        fileService.insertFileMapping(boardVo.getIdx(), fileVoList);
+
+        fileService.deleteFileMappingByFileID(detachFileIdList);
+
+        return boardVo;
     }
 
     @Override
     public int deleteBoardById(int boardId) {
-        return boardMapper.deleteBoardById(boardId);
+        boardMapper.deleteBoardById(boardId);
+
+        return SUCCESS_STATE;
     }
 }

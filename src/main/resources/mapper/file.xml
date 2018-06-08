@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joo.api.board.mapper.FileMapper">
+
+    <sql id="TB_BOARD">TB_BOARD</sql>
+    <sql id="TB_BOARD_FILE">TB_BOARD_FILE</sql>
+    <sql id="TB_BOARD_FILE_MAP">TB_BOARD_FILE_MAP</sql>
+
+    <select id="selectFile" parameterType="hashMap" resultType="FileVo">
+        SELECT
+          FILE.IDX
+          , FILE.CONTENT_TYPE
+          , FILE.FILE_PATH
+          , FILE.ORIGIN_FILE_NAME
+          , FILE.SAVE_FILE_NAME
+          , FILE.FILE_SIZE
+          , FILE.WRITER
+          , FILE.REG_DATE
+          , FILE.STATE
+          , REG_DATE
+        FROM <include refid="TB_BOARD_FILE" /> BOARD
+            JOIN <include refid="TB_BOARD_FILE_MAP" /> MAP ON BOARD.IDX = MAP.BOARD_IDX  AND BOARD.IDX = #{boardIdx}
+            JOIN <include refid="TB_BOARD_FILE" /> FILE ON MAP.FILE_IDX = FILE.IDX AND FILE.IDX = #{fileIdx}
+        WHERE BOARD.STATE = 1 AND FILE.STATE = 1
+    </select>
+
+    <update id="deleteFile" parameterType="hashMap">
+        UPDATE	<include refid="TB_BOARD_FILE" />
+        SET
+          STATE = 0
+        WHERE IDX =
+        (
+          SELECT
+            FILE.IDX
+          FROM <include refid="TB_BOARD_FILE" /> BOARD
+            JOIN <include refid="TB_BOARD_FILE_MAP" /> MAP ON BOARD.IDX = MAP.BOARD_IDX  AND BOARD.IDX = #{boardIdx}
+            JOIN <include refid="TB_BOARD_FILE" /> FILE ON MAP.FILE_IDX = FILE.IDX AND FILE.IDX = #{fileIdx}
+          WHERE BOARD.STATE = 1 AND FILE.STATE = 1
+        )
+    </update>
+
+    <delete id="deleteFileMappingByBoardID" parameterType="int">
+        DELETE
+        FROM <include refid="TB_BOARD_FILE_MAP" />
+        WHERE BOARD_IDX = #{boardIdx}
+    </delete>
+
+    <delete id="deleteFileMappingByFileID" parameterType="int">
+        DELETE
+        FROM <include refid="TB_BOARD_FILE_MAP" />
+        WHERE FILE_IDX = #{boardIdx}
+    </delete>
+
+    <insert id="insertFile" parameterType="FileVo">
+        <selectKey keyProperty="idx" order="BEFORE" resultType="int">
+            SELECT SQ_BOARD_FILE.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO <include refid="TB_BOARD_FILE" /> (
+            IDX
+            , CONTENT_TYPE
+            , FILE_PATH
+            , ORIGIN_FILE_NAME
+            , SAVE_FILE_NAME
+            , FILE_SIZE
+            , WRITER
+            , REG_DATE
+            , STATE
+        )
+        VALUES (
+            #{idx}
+            , #{contentType}
+            , #{filePath}
+            , #{origiFileName}
+            , #{saveFileName}
+            , #{fileSize}
+            , #{writer}
+            , SYSDATE
+            , 1
+        )
+    </insert>
+
+    <insert id="insertMapping" parameterType="hashMap">
+        INSERT INTO <include refid="TB_BOARD_FILE_MAP" /> (
+            BOARD_IDX
+            , FILE_IDX
+        )
+        VALUES (
+            #{boardIdx}
+            , #{fileIdx}
+        )
+    </insert>
+</mapper>

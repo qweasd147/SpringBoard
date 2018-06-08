@@ -12,7 +12,7 @@ public class FileVo implements Serializable{
     private String filePath;
     private String originFileName;
     private String saveFileName;
-    private int fileSize;
+    private long fileSize;
     private String writer;
     private Date regDate;
     private int state;
@@ -57,11 +57,11 @@ public class FileVo implements Serializable{
         this.saveFileName = saveFileName;
     }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 
