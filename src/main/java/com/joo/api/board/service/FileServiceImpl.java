@@ -31,9 +31,6 @@ public class FileServiceImpl implements FileService{
     @Autowired
     private FileMapper fileMapper;
 
-    @Value("#{appProperty['file.upload.dir']}")
-    public String baseUploadPathStr;
-
     private final Path baseUploadPath;
 
     public FileServiceImpl(@Value("#{appProperty['file.upload.dir']}")String baseUploadPathStr) {
@@ -63,7 +60,7 @@ public class FileServiceImpl implements FileService{
             FileVo fileVo = new FileVo();
 
             fileVo.setContentType(file.getContentType());
-            fileVo.setFilePath(baseUploadPathStr);
+            fileVo.setFilePath(baseUploadPath.toAbsolutePath().toString());
             fileVo.setOriginFileName(originFileName);
             fileVo.setSaveFileName(saveFileName);
             fileVo.setFileSize(file.getSize());
@@ -80,16 +77,25 @@ public class FileServiceImpl implements FileService{
 
         Map<String, Integer> params = new HashMap<>();
 
-        params.put(FileMapper.XmlMappingID.boardIdx.toString(), boardIdx);
-        params.put(FileMapper.XmlMappingID.fileIdx.toString(), fileIdx);
+        params.put(FileMapper.XmlMappingID.boardIdx.getCode(), boardIdx);
+        params.put(FileMapper.XmlMappingID.fileIdx.getCode(), fileIdx);
 
         return fileMapper.selectFile(params);
     }
 
     @Override
+    public List<FileVo> selectFileList(int boardIdx) {
+        return fileMapper.selectFileList(boardIdx);
+    }
+
+    @Override
+    public List<FileVo> selectBasicFileList(int boardIdx) {
+        return fileMapper.selectBasicFileList(boardIdx);
+    }
+
+    @Override
     public List<FileVo> insertFileList(List<FileVo> fileVoList) {
 
-        //TODO : 배치로 돌리던가 mybatis에서 foreach 쓰던가 변경 해야됨
         for(int i=0;i<fileVoList.size();i++){
             fileMapper.insertFile(fileVoList.get(i));
         }
@@ -100,11 +106,10 @@ public class FileServiceImpl implements FileService{
     public void insertFileMapping(int boardIdx, List<FileVo> fileVoList) {
 
         Map<String, Integer> params = new HashMap<>();
-        params.put(FileMapper.XmlMappingID.boardIdx.toString(), boardIdx);
+        params.put(FileMapper.XmlMappingID.boardIdx.getCode(), boardIdx);
 
         for(int i=0;i<fileVoList.size();i++){
-            //TODO : 배치로 돌리던가 mybatis에서 foreach 쓰던가 변경 해야됨
-            params.put(FileMapper.XmlMappingID.fileIdx.toString(), fileVoList.get(i).getIdx());
+            params.put(FileMapper.XmlMappingID.fileIdx.getCode(), fileVoList.get(i).getIdx());
             fileMapper.insertMapping(params);
         }
     }
@@ -112,9 +117,13 @@ public class FileServiceImpl implements FileService{
     @Override
     public void deleteFileMappingByFileID(List<Integer> fileIdxList) {
         for(int i=0;i<fileIdxList.size();i++){
-            //TODO : 배치로 돌리던가 mybatis에서 foreach 쓰던가 변경 해야됨
             fileMapper.deleteFileMappingByFileID(fileIdxList.get(i));
         }
+    }
+
+    @Override
+    public void deleteFileMappingByBoardID(int boardIdx) {
+        fileMapper.deleteFileMappingByBoardID(boardIdx);
     }
 
     @Override

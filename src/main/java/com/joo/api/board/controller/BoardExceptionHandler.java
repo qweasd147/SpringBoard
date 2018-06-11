@@ -34,7 +34,7 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
-        return new ResponseEntity(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<Result<?>>(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = { RuntimeException.class })
@@ -45,7 +45,7 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
-        return new ResponseEntity(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<Result<?>>(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = { BusinessException.class })
@@ -56,6 +56,6 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult(ex.getCode(), ex.getMessage(), ex.getData());
 
-        return new ResponseEntity(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<Result<?>>(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

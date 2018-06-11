@@ -24,7 +24,7 @@
             WHERE STATE = 1
             ORDER BY IDX DESC
             ) TB
-            WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage} + #{rowsPerPage}
+            WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage}
         )
         WHERE NUM <![CDATA[>=]]> (#{pageIdx} - 1) * #{rowsPerPage} + 1
     </select>

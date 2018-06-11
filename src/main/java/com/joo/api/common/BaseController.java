@@ -1,11 +1,14 @@
 package com.joo.api.common;
 
+import com.joo.api.exception.BusinessException;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,20 +45,25 @@ public class BaseController {
 
     protected ResponseEntity<Resource> setFileDownload(String fileName, Resource fileResource){
 
-        //TODO : 브라우저마다 한글 안깨지는지 테스트 해와야됨
-        /*
+        String encodedFileName = null;
+        try {
+            encodedFileName = URLEncoder.encode(fileName,"UTF-8").replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            throw new BusinessException("88","파일 다운로드 에러", null);
+        }
+
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store must-revalidate");
-        headers.add("Pragma", "no-cache");
+        headers.setCacheControl("no-cache, no-store must-revalidate");
+        headers.setPragma("no-cache");
         headers.add("Expiers", "0");
-        headers.add("Content-Disposition", "attachment; fileName=" + fileName);
-        */
+        headers.setContentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE));
+        headers.setContentDispositionFormData(HttpHeaders.CONTENT_DISPOSITION, encodedFileName);
 
         return ResponseEntity
                 .ok()
-                //.headers(headers)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+fileName+"\"")
-                .contentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .headers(headers)
+                //.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+fileName+"\"")
+                //.contentType(MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM_VALUE))
                 .body(fileResource);
     }
 }

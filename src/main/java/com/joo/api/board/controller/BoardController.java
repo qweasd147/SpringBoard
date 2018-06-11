@@ -6,7 +6,6 @@ import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
 import com.joo.api.board.vo.FileVo;
 import com.joo.api.common.BaseController;
-import com.joo.api.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -42,32 +41,27 @@ public class BoardController extends BaseController {
                                          @PathVariable int boardId){
 
         searchVo.setBoardIdx(boardId);
-
         BoardVo boardOne = boardServce.selectBoardOne(searchVo);
-
-        if(boardOne == null){
-            throw new BusinessException("99","데이터가 존재하지 않습니다.", null);
-        }
 
         return successResult(boardOne);
     }
 
     @RequestMapping(value = "/board", headers = "content-type=multipart/*", method = RequestMethod.POST)
-    public ResponseEntity insertBoard(@ModelAttribute BoardVo boardVo, @RequestParam(value="uploadFile", required=false) MultipartFile[] uploadFiles){
+    public ResponseEntity insertBoard(@ModelAttribute BoardVo boardVo, @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
 
         boardServce.insertBoard(boardVo, uploadFiles);
 
         return createResult();
     }
 
-    @RequestMapping(value = "/board/{boardId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/board/{boardId}", headers = "content-type=multipart/*", method = RequestMethod.POST)
     public ResponseEntity updateBoard(@ModelAttribute BoardVo boardVo
-            , @PathVariable int boardId, @RequestParam(value = "detachFiles") List<Integer> detachFiles
-            , @RequestParam("file") MultipartFile[] uploadFiles){
+            , @PathVariable int boardId
+            , @RequestParam(value="deleteFile[]", required=false) List<Integer> deleteFiles
+            , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
 
         boardVo.setIdx(boardId);
-
-        boardServce.updateBoard(boardVo, uploadFiles, detachFiles);
+        boardServce.updateBoard(boardVo, uploadFiles, deleteFiles);
 
         return successResult();
     }

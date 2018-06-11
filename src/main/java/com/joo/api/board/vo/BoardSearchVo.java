@@ -1,13 +1,35 @@
 package com.joo.api.board.vo;
 
+import com.joo.api.common.EnumCodeType;
+
 import java.io.Serializable;
 
 public class BoardSearchVo implements Serializable{
 
     private static final long serialVersionUID = -8216665660181770998L;
 
-    public enum searchKeyWord{
-        subject, contents, tag
+    /**
+     * 검색 조건 목록 enum
+     */
+    public enum searchKeyWord implements EnumCodeType{
+
+        subject("제목"), contents("내용"), tag("태그");
+
+        private String description;
+
+        searchKeyWord(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String getCode() {
+            return name();
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
     }
     
     private int pageIdx = 1;

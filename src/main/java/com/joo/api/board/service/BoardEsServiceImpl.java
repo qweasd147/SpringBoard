@@ -105,11 +105,11 @@ public class BoardEsServiceImpl implements BoardServce{
         String subject = "";
         String contents = "";
 
-        if(BoardSearchVo.searchKeyWord.subject.toString().equals(searchVo.getSearchCondition())){
+        if(BoardSearchVo.searchKeyWord.subject.getCode().equals(searchVo.getSearchCondition())){
             if(StringUtils.isNotEmpty(searchVo.getSearchKeyWord())){
                 subject = searchVo.getSearchKeyWord();
             }
-        }else if(BoardSearchVo.searchKeyWord.contents.toString().equals(searchVo.getSearchCondition())){
+        }else if(BoardSearchVo.searchKeyWord.contents.getCode().equals(searchVo.getSearchCondition())){
             if(StringUtils.isNotEmpty(searchVo.getSearchKeyWord())){
                 contents = searchVo.getSearchKeyWord();
             }
