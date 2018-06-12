@@ -22,6 +22,9 @@
                 , REG_DATE
             FROM <include refid="TB_BOARD" />
             WHERE STATE = 1
+            <if test="searchCondition != null and searchCondition != ''" >
+                AND #{searchCondition} = #{searchKeyWord}
+            </if>
             ORDER BY IDX DESC
             ) TB
             WHERE ROWNUM <![CDATA[<=]]> #{pageIdx} * #{rowsPerPage}

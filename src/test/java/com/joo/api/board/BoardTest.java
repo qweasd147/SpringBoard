@@ -32,9 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(locations = {"file:src/main/resources/context/**/context-*.xml"
                         , "file:src/main/webapp/WEB-INF/spring/root-context.xml"
                         , "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"})
-public class EsBoardTest {
+public class BoardTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(EsBoardTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(BoardTest.class);
 
     private static final String API_BOARD = "/api/board";
 
@@ -50,7 +50,16 @@ public class EsBoardTest {
     }
 
     @Test
-    public void BoardInsertTest() throws Exception {
+    public void testMain() throws Exception {
+        //boardInsertTest();          //일반 글쓰기 요청 테스트
+        boardListTest();            //일반 목록 요청 테스트
+
+        //invalidBoardInsertTest();   //벨리데이션 체크용 잘못된 글쓰기 요청 테스트
+        //invalidBoardListTest();     //벨리데이션 체크용 잘못된 목록 요청 테스트
+
+    }
+
+    public void boardInsertTest() throws Exception {
 
         /*
         BoardVo boardVo = new BoardVo();
@@ -89,8 +98,7 @@ public class EsBoardTest {
         */
     }
 
-    @Test
-    public void BoardListTest() throws Exception {
+    public void boardListTest() throws Exception {
 
         MvcResult result =
                 this.mockMvc.perform(get(API_BOARD))
@@ -104,5 +112,35 @@ public class EsBoardTest {
         String content = result.getResponse().getContentAsString();
         System.out.println(content);
         */
+    }
+
+    /**
+     * 잘못된 요청값으로 입력 테스트
+     * @throws Exception
+     */
+    public void invalidBoardInsertTest() throws Exception {
+
+        MvcResult result =
+                this.mockMvc.perform(fileUpload(API_BOARD))
+                        .andDo(print())
+                        .andExpect(status().isCreated())
+                        .andReturn();
+    }
+
+    /**
+     * 잘못된 요청값으로 목록 조회 테스트
+     * @throws Exception
+     */
+    public void invalidBoardListTest() throws Exception {
+
+        MvcResult result =
+                this.mockMvc.perform(
+                        get(API_BOARD)
+                        .param("searchCondition","fsafsafsafsafsafsafsawn")
+                    )
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
+                    .andReturn();
     }
 }

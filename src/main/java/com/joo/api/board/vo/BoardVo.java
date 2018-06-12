@@ -1,5 +1,9 @@
 package com.joo.api.board.vo;
 
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +13,10 @@ public class BoardVo implements Serializable {
     private static final long serialVersionUID = 6348958289640869735L;
 
     private int idx;
+
+    @NotNull
     private String subject;
+    @NotEmpty
     private String contents;
     private int hits;
     private int state;

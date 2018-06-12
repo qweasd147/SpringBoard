@@ -49,7 +49,7 @@ public class BoardServceImpl implements BoardServce{
 
         BoardVo boardOne = boardMapper.selectBoardOne(searchVo);
 
-        if(boardOne == null)    throw new BusinessException("99","데이터가 존재하지 않습니다.", null);
+        if(boardOne == null)    throw new BusinessException("HTTP_404","데이터가 존재하지 않습니다.", null);
 
         List<FileVo> fileList = fileService.selectBasicFileList(boardOne.getIdx());
         boardOne.setFileList(fileList);

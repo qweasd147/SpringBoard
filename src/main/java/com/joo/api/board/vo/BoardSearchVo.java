@@ -1,8 +1,10 @@
 package com.joo.api.board.vo;
 
+import com.joo.api.board.vo.validator.AvailableCondition;
 import com.joo.api.common.EnumCodeType;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class BoardSearchVo implements Serializable{
 
@@ -11,13 +13,13 @@ public class BoardSearchVo implements Serializable{
     /**
      * 검색 조건 목록 enum
      */
-    public enum searchKeyWord implements EnumCodeType{
+    public enum SearchKeyWord implements EnumCodeType{
 
-        subject("제목"), contents("내용"), tag("태그");
+        SUBJECT("제목"), CONTENTS("내용");//,TAG("태그");
 
         private String description;
 
-        searchKeyWord(String description) {
+        SearchKeyWord(String description) {
             this.description = description;
         }
 
@@ -30,10 +32,22 @@ public class BoardSearchVo implements Serializable{
         public String getDescription() {
             return description;
         }
+
+        /**
+         * 등록된 검색조건(기준)에 있는지 조회한다.
+         * @param condition
+         * @return
+         */
+        public static boolean hasCondition(String condition){
+            return Arrays.stream(SearchKeyWord.values())
+                    .anyMatch(searchKeyWord -> searchKeyWord.getCode().equals(condition));
+        }
     }
     
     private int pageIdx = 1;
     private int boardIdx;
+
+    @AvailableCondition
     private String searchCondition = "";
     private String searchKeyWord = "";
     private int rowsPerPage = 10;       //페이지 당 출력할 row 갯수

@@ -146,7 +146,7 @@ public class FileServiceImpl implements FileService{
             logger.error(voPathInfo);
             logger.error(e.getMessage());
 
-            new BusinessException("98","파일 처리 오류 "+voPathInfo, null);
+            new BusinessException("HTTP_500","파일 처리 오류");
         }
 
         return null;
