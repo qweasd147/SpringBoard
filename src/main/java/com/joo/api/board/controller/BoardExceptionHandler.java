@@ -1,5 +1,6 @@
 package com.joo.api.board.controller;
 
+import com.joo.api.common.BaseController;
 import com.joo.api.common.Result;
 import com.joo.api.exception.BusinessException;
 import com.joo.api.exception.ValidateException;
@@ -25,10 +26,9 @@ import java.util.stream.IntStream;
 /**
  * Exception 공통 handler
  */
-//TODO : Result class 사용 결정 시, 그에 맞게 보내줘야됨
 @ControllerAdvice(annotations = RestController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
+public class BoardExceptionHandler extends ResponseEntityExceptionHandler implements BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(BoardExceptionHandler.class);
 
@@ -40,7 +40,7 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
-        return new ResponseEntity<Result<?>>(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        return getRespResult(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = { RuntimeException.class })
@@ -51,7 +51,7 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
-        return new ResponseEntity<Result<?>>(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        return getRespResult(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = { BusinessException.class })
@@ -64,7 +64,7 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult(ex.getCode(), ex.getMessage(), ex.getData());
 
-        return new ResponseEntity<Result<?>>(failResult, httpStatus);
+        return getRespResult(failResult, httpStatus);
     }
 
     @ExceptionHandler(value = { ValidateException.class })
@@ -74,7 +74,6 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
         logger.error(ex.getMessage());
 
         BindingResult br = ex.getBindResult();
-
         List<FieldError> errorList = br.getFieldErrors();
 
         //debug 이상 레벨이고, list가 존재할 시, 반복문 진행
@@ -90,7 +89,7 @@ public class BoardExceptionHandler extends ResponseEntityExceptionHandler{
 
         Result<?> failResult = Result.getFailResult("HTTP_422", "잘못된 요청", ex.getVo());
 
-        return new ResponseEntity<Result<?>>(failResult, HttpStatus.UNPROCESSABLE_ENTITY);
+        return getRespResult(failResult, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     private HttpStatus findHttpStatusByCode(String code){

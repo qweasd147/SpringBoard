@@ -23,7 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/api")
 @CrossOrigin(origins = "*")
-public class BoardController extends BaseController {
+public class BoardController implements BaseController {
 
     @Autowired
     @Qualifier("boardServiceImpl")
@@ -41,7 +41,7 @@ public class BoardController extends BaseController {
 
         Map<String, ?> listData = boardServce.selectBoardList(searchVo);
 
-        return successResult(listData);
+        return successRespResult(listData);
     }
 
     @RequestMapping(value = "/board/{boardId}", method = RequestMethod.GET)
@@ -51,7 +51,7 @@ public class BoardController extends BaseController {
         searchVo.setBoardIdx(boardId);
         BoardVo boardOne = boardServce.selectBoardOne(searchVo);
 
-        return successResult(boardOne);
+        return successRespResult(boardOne);
     }
 
     @RequestMapping(value = "/board", headers = "content-type=multipart/*", method = RequestMethod.POST)
@@ -66,7 +66,7 @@ public class BoardController extends BaseController {
 
         boardServce.insertBoard(boardVo, uploadFiles);
 
-        return createResult();
+        return createRespResult();
     }
 
     @RequestMapping(value = "/board/{boardId}", headers = "content-type=multipart/*", method = RequestMethod.POST)
@@ -83,7 +83,7 @@ public class BoardController extends BaseController {
         boardVo.setIdx(boardId);
         boardServce.updateBoard(boardVo, uploadFiles, deleteFiles);
 
-        return successResult();
+        return successRespResult();
     }
 
     @RequestMapping(value = "/board/{boardId}", method = RequestMethod.DELETE)
@@ -91,7 +91,7 @@ public class BoardController extends BaseController {
 
         boardServce.deleteBoardById(boardId);
 
-        return successResult();
+        return successRespResult();
     }
 
     @RequestMapping(value = "/board/download/{boardId}/{fileId}", method = RequestMethod.GET)

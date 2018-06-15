@@ -104,6 +104,7 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public void insertFileMapping(int boardIdx, List<FileVo> fileVoList) {
+        if(fileVoList == null || fileVoList.size() == 0)    return;
 
         Map<String, Integer> params = new HashMap<>();
         params.put(FileMapper.XmlMappingID.boardIdx.getCode(), boardIdx);
@@ -116,6 +117,9 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public void deleteFileMappingByFileID(List<Integer> fileIdxList) {
+
+        if(fileIdxList == null || fileIdxList.size() == 0)  return;
+
         for(int i=0;i<fileIdxList.size();i++){
             fileMapper.deleteFileMappingByFileID(fileIdxList.get(i));
         }

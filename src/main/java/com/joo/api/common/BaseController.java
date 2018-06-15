@@ -9,43 +9,43 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
-public class BaseController {
-    //TODO : Result class 사용 시, 아예 사용 안하거나 크게 바꿔야됨
-
-    protected ResponseEntity successResult(){
-        Map<String, Boolean> successMap = new HashMap<>();
-
-        successMap.put("success", Boolean.TRUE);
-
-        return new ResponseEntity<Map>(successMap, HttpStatus.OK);
+/**
+ * 다중 상속을 위해 interface로 만듦...
+ * 잘하는 짓인지 모르겠음
+ */
+public interface BaseController {
+    default ResponseEntity successRespResult(){
+        return successRespResult(null);
     }
 
-    protected <T> ResponseEntity successResult(T data){
-        return getResult(data, HttpStatus.OK);
+    default <T> ResponseEntity successRespResult(T data){
+        return new ResponseEntity<Result>(Result.getSuccessResult(data), HttpStatus.OK);
     }
 
-    protected ResponseEntity createResult(){
-        Map<String, Boolean> successMap = new HashMap<>();
-
-        successMap.put("success", Boolean.TRUE);
-
-        return getResult(successMap, HttpStatus.CREATED);
+    default ResponseEntity createRespResult(){
+        return createRespResult(null);
     }
 
-    protected <T> ResponseEntity createResult(T data){
-        return getResult(data, HttpStatus.CREATED);
+    default <T> ResponseEntity createRespResult(T data){
+        return new ResponseEntity<Result>(Result.getSuccessResult(data), HttpStatus.CREATED);
     }
 
-    private <T> ResponseEntity getResult(T result, HttpStatus statusCode){
-        return new ResponseEntity<>(result, statusCode);
+    default ResponseEntity warningRespResult(){
+        return warningRespResult(null);
     }
 
-    protected ResponseEntity<Resource> setFileDownload(String fileName, Resource fileResource){
+    default <T> ResponseEntity warningRespResult(T data){
+        return new ResponseEntity<Result>(Result.getWarningResult(data), HttpStatus.OK);
+    }
 
-        String encodedFileName = null;
+    default ResponseEntity getRespResult(Result result, HttpStatus httpStatus){
+        return new ResponseEntity<Result>(result, httpStatus);
+    }
+
+    default ResponseEntity<Resource> setFileDownload(String fileName, Resource fileResource){
+
+        String encodedFileName;
         try {
             encodedFileName = URLEncoder.encode(fileName,"UTF-8").replace("+", "%20");
         } catch (UnsupportedEncodingException e) {
