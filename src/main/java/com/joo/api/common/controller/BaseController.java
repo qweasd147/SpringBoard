@@ -1,6 +1,7 @@
-package com.joo.api.common;
+package com.joo.api.common.controller;
 
-import com.joo.api.exception.BusinessException;
+import com.joo.api.common.Result;
+import com.joo.exception.BusinessException;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

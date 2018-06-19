@@ -4,7 +4,7 @@ import com.joo.api.board.mapper.BoardMapper;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
 import com.joo.api.board.vo.FileVo;
-import com.joo.api.exception.BusinessException;
+import com.joo.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

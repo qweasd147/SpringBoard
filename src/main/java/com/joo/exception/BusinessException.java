@@ -1,4 +1,4 @@
-package com.joo.api.exception;
+package com.joo.exception;
 
 public class BusinessException extends RuntimeException{
 

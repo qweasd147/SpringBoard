@@ -3,7 +3,6 @@ package com.joo.api.board.vo;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +13,7 @@ public class BoardVo implements Serializable {
 
     private int idx;
 
-    @NotNull
+    @NotEmpty
     private String subject;
     @NotEmpty
     private String contents;
@@ -24,20 +23,6 @@ public class BoardVo implements Serializable {
     private Date regDate;
     private List<FileVo> fileList;
     private List<?> tagList;
-
-    public BoardVo() {}
-
-    public BoardVo(BoardEsVo esVo) {
-        this.idx = esVo.getIdx();
-        this.subject = esVo.getSubject();
-        this.contents = esVo.getContents();
-        this.hits = esVo.getHits();
-        this.state = esVo.getState();
-        this.writer = esVo.getWriter();
-        this.regDate = esVo.getRegDate();
-        this.fileList = esVo.getFileList();
-        this.tagList = esVo.getTagList();
-    }
 
     public int getIdx() {
         return idx;

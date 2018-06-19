@@ -1,10 +1,8 @@
-package com.joo.api.board.controller;
+package com.joo.api.common.controller;
 
-import com.joo.api.common.BaseController;
 import com.joo.api.common.Result;
-import com.joo.api.exception.BusinessException;
-import com.joo.api.exception.ValidateException;
-import org.mybatis.spring.MyBatisSystemException;
+import com.joo.exception.BusinessException;
+import com.joo.exception.ValidateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -21,16 +19,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * Exception 공통 handler
  */
 @ControllerAdvice(annotations = RestController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class BoardExceptionHandler extends ResponseEntityExceptionHandler implements BaseController{
+public class ControllerExceptionHandler extends ResponseEntityExceptionHandler implements BaseController{
 
-    private static final Logger logger = LoggerFactory.getLogger(BoardExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
     @ExceptionHandler(value = { SQLException.class })
     public ResponseEntity handleSQLException(SQLException ex){

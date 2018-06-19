@@ -1,4 +1,4 @@
-package com.joo.api.exception;
+package com.joo.exception;
 
 import org.springframework.validation.BindingResult;
 
