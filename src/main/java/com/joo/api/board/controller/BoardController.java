@@ -5,7 +5,7 @@ import com.joo.api.board.service.FileService;
 import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
 import com.joo.api.board.vo.FileVo;
-import com.joo.api.common.BaseController;
+import com.joo.api.common.controller.BaseController;
 import com.joo.exception.BusinessException;
 import com.joo.exception.ValidateException;
 import org.springframework.beans.factory.annotation.Autowired;
