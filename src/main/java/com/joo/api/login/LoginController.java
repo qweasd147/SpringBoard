@@ -72,15 +72,13 @@ public class LoginController{
      * @param code
      * @param state
      * @param req
-     * @param model
      * @return
      * @throws Exception
      */
     @RequestMapping("/api/authen/login/{serviceName}/callback")
     public String serviceLoginCB(@RequestParam String code
             , @PathVariable("serviceName") String serviceName
-            , @RequestParam String state, HttpServletRequest req
-            , Model model) throws Exception {
+            , @RequestParam String state, HttpServletRequest req) throws Exception {
 
         String beanName = serviceName+"Login";
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joo.api.user.mapper.UserMapper">
+
+    <sql id="TB_USER">TB_USER</sql>
+
+    <select id="selectUserOne" parameterType="hashMap" resultType="UserVo">
+        SELECT
+          SERVICE_NAME
+          , ID
+          , `NAME`
+          , NICK_NAME
+          , EMAIL
+          , STATE
+        FROM <include refid="TB_USER" />
+        WHERE SERVICE_NAME = #{serviceName}
+          AND ID = #{id}
+    </select>
+
+    <insert id="insertUser" parameterType="UserVo">
+        INSERT INTO <include refid="TB_USER" /> (
+            SERVICE_NAME
+            , ID
+            , `NAME`
+            , NICK_NAME
+            , EMAIL
+            , STATE
+        )
+        VALUES (
+            #{serviceName}
+            , #{id}
+            , #{name}
+            , #{nickName}
+            , #{email}
+            , #{state}
+        )
+    </insert>
+
+    <update id="updateUser" parameterType="UserVo">
+        UPDATE	<include refid="TB_USER" />
+        SET
+        SUBJECT     = #{subject}
+        , CONTENTS   = #{contents}
+        WHERE IDX = #{idx}
+        AND STATE != 0
+    </update>
+
+</mapper>
