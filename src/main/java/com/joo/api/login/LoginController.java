@@ -96,7 +96,7 @@ public class LoginController{
     @ResponseBody
     public Map<String, String> logout(HttpServletRequest req, Model model) throws IOException {
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         UserVo userVo = (UserVo) WebUtil.getSessionAttribute(LoginAPI.LOGIN_SESSION_KEY);
 
@@ -129,7 +129,7 @@ public class LoginController{
 
         System.out.println("session");
         while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
+            String name = names.nextElement();
 
             System.out.println("name : "+name+", val : "+session.getAttribute(name));
         }

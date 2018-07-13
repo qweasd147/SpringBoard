@@ -13,13 +13,18 @@ public class UserServiceImpl implements UserService{
     private UserMapper userMapper;
 
     @Override
-    public UserVo getUser(String type, String userId) {
+    public UserVo getUserByIdx(int idx) {
+        return userMapper.getUserByIdx(idx);
+    }
+
+    @Override
+    public UserVo getUserByCandidate(String type, String userId) {
 
         Map<String, Object> params = new HashMap<>();
 
-        params.put(UserMapper.ColumnName.serviceName.toString(), type);
-        params.put(UserMapper.ColumnName.id.toString(), userId);
+        params.put(UserMapper.ColumnName.SERVICE_NAME.getCamelCase(), type);
+        params.put(UserMapper.ColumnName.ID.getCamelCase(), userId);
 
-        return userMapper.selectUserOne(params);
+        return userMapper.getUserByCandidate(params);
     }
 }

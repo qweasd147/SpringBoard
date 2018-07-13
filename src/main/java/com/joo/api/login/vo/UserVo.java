@@ -4,9 +4,10 @@ import java.io.Serializable;
 
 public class UserVo implements Serializable{
 
+    private static final long serialVersionUID = 7432896190010419477L;
 
     public enum State{
-        //TODO : enable 여부만 체크
+        //TODO : 우선 enable 여부만 체크, 나중에 바뀔 수도 있음
         ENABLED(0), LOCKED(1), EXPIRED(2);
 
         private int state;
@@ -19,8 +20,7 @@ public class UserVo implements Serializable{
         }
     }
 
-    private static final long serialVersionUID = 7432896190010419477L;
-
+    private int idx;
     private String serviceName;		//default, kakao, naver 등
     private String id;
     private String name;
@@ -32,7 +32,8 @@ public class UserVo implements Serializable{
 
     public UserVo() {}
 
-    public UserVo(String serviceName, String id, String name, String nickName, String email, String accessToken, State state) {
+    public UserVo(int idx, String serviceName, String id, String name, String nickName, String email, String accessToken, State state) {
+        this.idx = idx;
         this.serviceName = serviceName;
         this.id = id;
         this.name = name;
@@ -43,6 +44,7 @@ public class UserVo implements Serializable{
     }
 
     public UserVo(UserVo userVo) {
+        this.idx = userVo.getIdx();
         this.serviceName = userVo.serviceName;
         this.id = userVo.id;
         this.name = userVo.name;
@@ -50,6 +52,14 @@ public class UserVo implements Serializable{
         this.email = userVo.email;
         this.accessToken = userVo.accessToken;
         this.state = userVo.state;
+    }
+
+    public int getIdx() {
+        return idx;
+    }
+
+    public void setIdx(int idx) {
+        this.idx = idx;
     }
 
     public String getServiceName() {

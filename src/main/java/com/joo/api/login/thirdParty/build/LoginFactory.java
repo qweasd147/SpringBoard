@@ -200,9 +200,7 @@ public abstract class LoginFactory implements LoginAPI{
 		try {
 			userVo = getUserVo(userProfile);
 		} catch (Exception e) {
-			//parsing exception
-			//e.printStackTrace();
-			
+			logger.error("파싱 에러남 : "+e.getMessage());
 			userVo = null;
 		}
 		
