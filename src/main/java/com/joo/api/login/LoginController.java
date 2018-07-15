@@ -1,20 +1,17 @@
 package com.joo.api.login;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.joo.api.login.thirdParty.build.HandleLoginFactory;
-import com.joo.api.login.thirdParty.build.LoginAPI;
-import com.joo.api.login.thirdParty.build.LoginFactory;
+import com.joo.api.login.build.HandleLoginFactory;
+import com.joo.api.login.build.LoginAPI;
+import com.joo.api.login.build.LoginFactory;
 import com.joo.api.login.vo.UserVo;
 import com.joo.api.utils.WebUtil;
 import org.slf4j.Logger;
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 

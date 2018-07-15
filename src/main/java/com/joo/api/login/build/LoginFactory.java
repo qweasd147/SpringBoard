@@ -1,4 +1,4 @@
-package com.joo.api.login.thirdParty.build;
+package com.joo.api.login.build;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;

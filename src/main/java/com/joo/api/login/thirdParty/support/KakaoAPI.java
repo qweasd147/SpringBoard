@@ -2,8 +2,8 @@ package com.joo.api.login.thirdParty.support;
 
 
 import com.github.scribejava.core.model.Verb;
-import com.joo.api.login.thirdParty.build.LoginAPI;
-import com.joo.api.login.thirdParty.build.LoginFactory;
+import com.joo.api.login.build.LoginAPI;
+import com.joo.api.login.build.LoginFactory;
 import com.joo.api.login.vo.UserVo;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

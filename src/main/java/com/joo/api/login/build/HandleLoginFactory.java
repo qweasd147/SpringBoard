@@ -1,4 +1,4 @@
-package com.joo.api.login.thirdParty.build;
+package com.joo.api.login.build;
 
 import com.joo.api.utils.WebUtil;
 import org.slf4j.Logger;

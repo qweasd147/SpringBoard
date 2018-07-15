@@ -1,6 +1,10 @@
 package com.joo.api.security.custom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joo.api.common.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -8,7 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * 권한이 부족하였을때 로그인 페이지로 보내는게 아니라
@@ -16,22 +19,20 @@ import java.util.HashMap;
  */
 public class CustomEntryPointHandler implements AuthenticationEntryPoint {
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomEntryPointHandler.class);
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
 
-        HashMap<String,Object> obj = new HashMap<>();
-        Long timestamp = System.currentTimeMillis();
-        obj.put("path", request.getRequestURI());
-        obj.put("timestamp", timestamp);
-        obj.put("status", "401");
-        obj.put("error", "Unauthorized");
-        obj.put("message", "Access Denied");
+        logger.debug("login fail : "+request.getRequestURI());
 
-        response.setContentType("application/json");
+        Result failResult = Result.getFailResult("fail99", "로그인 실패", null);
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), obj);
+        mapper.writeValue(response.getOutputStream(), failResult);
     }
 }
