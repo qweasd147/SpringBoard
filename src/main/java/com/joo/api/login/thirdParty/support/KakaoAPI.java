@@ -88,7 +88,7 @@ public class KakaoAPI extends LoginFactory {
 	}
 
 	@Override
-	public UserVo getUserVo(JSONObject userProfile) {
+	public UserVo profileToUserVo(JSONObject userProfile) {
 		UserVo userVo = new UserVo();
 		JSONObject properties = null;
 		

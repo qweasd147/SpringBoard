@@ -2,6 +2,7 @@ package com.joo.api.utils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.web.context.WebApplicationContext;
@@ -86,7 +87,19 @@ public class WebUtil {
         return getSession(req);
     }
 
+    public static String getSessionID(){
+        return RequestContextHolder.getRequestAttributes().getSessionId();
+    }
+
     public static HttpSession getSession(HttpServletRequest request) {
         return request.getSession();
+    }
+
+    public static HttpServletRequest getRequest(){
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    }
+
+    public static HttpServletResponse getResponse(){
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
     }
 }

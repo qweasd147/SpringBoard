@@ -90,7 +90,7 @@ public class GoogleAPI extends LoginFactory {
 	}
 
 	@Override
-	public UserVo getUserVo(JSONObject userProfile){
+	public UserVo profileToUserVo(JSONObject userProfile){
 		UserVo userVo = new UserVo();
 		
 		if(userProfile == null || !userProfile.containsKey("name") || !userProfile.containsKey("emails")) {

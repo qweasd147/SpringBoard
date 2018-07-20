@@ -20,26 +20,26 @@ public class UserVo implements Serializable{
         }
     }
 
-    private int idx;
+    private String idx;
     private String serviceName;		//default, kakao, naver 등
     private String id;
     private String name;
     private String nickName;
     private String email;
-    private String accessToken;
+    private String thirdPartyToken;
     private State state;
 
 
     public UserVo() {}
 
-    public UserVo(int idx, String serviceName, String id, String name, String nickName, String email, String accessToken, State state) {
+    public UserVo(String idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, State state) {
         this.idx = idx;
         this.serviceName = serviceName;
         this.id = id;
         this.name = name;
         this.nickName = nickName;
         this.email = email;
-        this.accessToken = accessToken;
+        this.thirdPartyToken = thirdPartyToken;
         this.state = state;
     }
 
@@ -50,15 +50,15 @@ public class UserVo implements Serializable{
         this.name = userVo.name;
         this.nickName = userVo.nickName;
         this.email = userVo.email;
-        this.accessToken = userVo.accessToken;
+        this.thirdPartyToken = userVo.thirdPartyToken;
         this.state = userVo.state;
     }
 
-    public int getIdx() {
+    public String getIdx() {
         return idx;
     }
 
-    public void setIdx(int idx) {
+    public void setIdx(String idx) {
         this.idx = idx;
     }
 
@@ -102,13 +102,13 @@ public class UserVo implements Serializable{
 
         return this;
     }
-    public String getAccessToken() {
-        return accessToken;
-    }
-    public UserVo setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
 
-        return this;
+    public String getThirdPartyToken() {
+        return thirdPartyToken;
+    }
+
+    public void setThirdPartyToken(String thirdPartyToken) {
+        this.thirdPartyToken = thirdPartyToken;
     }
 
     public State getState() {

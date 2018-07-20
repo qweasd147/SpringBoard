@@ -91,7 +91,7 @@ public class NaverAPI extends LoginFactory {
 	}
 
 	@Override
-	public UserVo getUserVo(JSONObject profile) {
+	public UserVo profileToUserVo(JSONObject profile) {
 		
 		String result = (String) profile.get("message");
 		UserVo userVo = new UserVo();

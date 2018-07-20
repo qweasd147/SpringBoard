@@ -68,7 +68,7 @@ public abstract class LoginFactory implements LoginAPI{
 	
 	public abstract String getAuthorizationBaseURL();
 	
-	public abstract UserVo getUserVo(JSONObject userProfile) throws Exception;
+	public abstract UserVo profileToUserVo(JSONObject userProfile) throws Exception;
 	
 	public abstract String logoutProcess() throws IOException;
 	
@@ -78,7 +78,7 @@ public abstract class LoginFactory implements LoginAPI{
 	 * @param session
 	 * @return
 	 */
-	private String getSessionState(HttpSession session){
+	public static String getSessionState(HttpSession session){
 		return (String) session.getAttribute(LoginAPI.LOGIN_SESSION_STATE_KEY);
 	}
 
@@ -92,11 +92,9 @@ public abstract class LoginFactory implements LoginAPI{
 	}
 
 	@Override
-	public OAuth2AccessToken getOAuthAccessToken(HttpSession session, String code, String state) throws IOException {
+	public OAuth2AccessToken getOAuthAccessToken(String sessionState, String code, String state) throws IOException {
 		
 		//Callback으로 전달받은 세선검증용 난수값과 세션에 저장되어있는 값이 일치하는지 확인
-		String sessionState = getSessionState(session);
-		
 		if(!IS_CHECK_STATE || sessionState !=null && sessionState.equals(state)){
 			OAuth20Service oauthService = getServiceBuilder(true).build(innerAPI);
 			// Scribe에서 제공하는 AccessToken 획득 기능으로 네아로 Access Token을 획득 
@@ -160,16 +158,15 @@ public abstract class LoginFactory implements LoginAPI{
 	public String getAccessTokenFromSession() {
 		
 		UserVo userVo = (UserVo) WebUtil.getSessionAttribute(LoginAPI.LOGIN_SESSION_KEY);
-		
+
 		if(userVo == null)	return null;
-		
-		String accessToken = userVo.getAccessToken();
+		String accessToken = userVo.getThirdPartyToken();
 		
 		return accessToken;
 	}
 	
 	@Override
-	public UserVo getUserProfile(OAuth2AccessToken oauthToken) throws IOException, ParseException {
+	public UserVo getUserVoWithProfile(OAuth2AccessToken oauthToken) throws IOException, ParseException {
 		OAuth20Service oauthService = getServiceBuilder(true).build(innerAPI);
 		
 		String requestKey = getPropertiesKey(LoginAPI.USER_PROFILE);
@@ -188,17 +185,9 @@ public abstract class LoginFactory implements LoginAPI{
 		String strResult = response.getBody();
 		JSONObject userProfile = (JSONObject)JSON_PARSER.parse(strResult);
 		
-		/*
-		if(userMethod == null) {
-			logger.error("UserMethod가 정의되어 있지 않음");
-			
-			return null;
-		}
-		*/
-		
-		UserVo userVo = null;
+		UserVo userVo;
 		try {
-			userVo = getUserVo(userProfile);
+			userVo = profileToUserVo(userProfile);
 		} catch (Exception e) {
 			logger.error("파싱 에러남 : "+e.getMessage());
 			userVo = null;
@@ -208,35 +197,33 @@ public abstract class LoginFactory implements LoginAPI{
 	}
 	
 	@Override
-	public boolean login(HttpServletRequest req, String code, String state) throws IOException, ParseException {
+	public UserVo getValidatedUserVo(String sessionState, String code, String state) throws IOException, ParseException {
 		
-		HttpSession session = req.getSession();
-		OAuth2AccessToken oauthToken = getOAuthAccessToken(session, code, state);
+		OAuth2AccessToken oauthToken = getOAuthAccessToken(sessionState, code, state);
     	
 		if(oauthToken == null) {
 			logger.error("로그인 잘못됨! state값과 session에 저장된 state 값이 다름");
-			return false;
+			return null;
 		}
 		
     	String token = oauthToken.getAccessToken();
-    	UserVo userVo = getUserProfile(oauthToken);
+    	UserVo userVo = getUserVoWithProfile(oauthToken);
     	
 		if(userVo == null) {
 			logger.error("로그인 잘못됨!");
 			
-			return false;
+			return null;
 		}
 		
-		userVo.setAccessToken(token);
+		userVo.setThirdPartyToken(token);
 		
 		/*
-		 * TODO : userVo로 DB에 등록된 사용자를 조회. DB 구축되면 구현
-    	Object userData = loginService.getUser(userVo);
+		 * TODO : 사용자 정보가 DB에 있는지 조회. 없으면 insert 있으면 pass
+		 * DB 구축되면 구현 예정
+    	Object userData = loginService.validateUser(userVo);
     	*/
-    	WebUtil.setSessionAttribute(req, LoginAPI.LOGIN_SESSION_KEY, userVo);
-    	logger.info("login success. User Vo :"+userVo);
-    	
-		return true;
+
+		return userVo;
 	}
 	
 	@Override

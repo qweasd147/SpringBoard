@@ -35,16 +35,16 @@ public interface LoginAPI{
 	 * @return
 	 */
 	String getAuthorizationUrl(HttpSession session, String state);
-	
+
 	/**
 	 * 외부 제공지에서 accesstoken을 요청한다.
-	 * @param session
+	 * @param sessionState
 	 * @param code
 	 * @param state
 	 * @return
 	 * @throws IOException
 	 */
-	OAuth2AccessToken getOAuthAccessToken(HttpSession session, String code, String state) throws IOException;
+	OAuth2AccessToken getOAuthAccessToken(String sessionState, String code, String state) throws IOException;
 	
 	/**
 	 * 세션에서 accessToken을 가져온다.
@@ -53,12 +53,12 @@ public interface LoginAPI{
 	String getAccessTokenFromSession();
 	
 	/**
-	 * 서비스 제공하는 쪽에서의 유저 프로필 정보를 조회하여 UserVo로 넘겨준다.
+	 * 서비스 제공하는 쪽에서의 유저 프로필 정보를 조회하여 프로필 정보를 담아 UserVo로 넘겨준다.
 	 * @return
 	 * @throws IOException 
 	 * @throws ParseException 
 	 */
-	UserVo getUserProfile(OAuth2AccessToken oauthToken) throws IOException, ParseException;
+	UserVo getUserVoWithProfile(OAuth2AccessToken oauthToken) throws IOException, ParseException;
 	
 	/**
 	 * 서비스에서 제공하는 API를 요청한다.
@@ -70,15 +70,15 @@ public interface LoginAPI{
 	String requestAPI(Verb method, String commandKey, Map<String, String> params) throws IOException;
 
 	/**
-	 * 로그인 처리를 수행한다.
-	 * @param req
+	 * 서드파티에서 사용자를 조회하여 프로필, access token을 담은 UserVo를 반환한다.
+	 * @param sessionState
 	 * @param code
 	 * @param state
 	 * @return
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	boolean login(HttpServletRequest req, String code, String state) throws IOException, ParseException;
+	UserVo getValidatedUserVo(String sessionState, String code, String state) throws IOException, ParseException;
 	
 	/**
 	 * 로그아웃 처리한다.

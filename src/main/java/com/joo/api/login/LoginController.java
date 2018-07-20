@@ -13,10 +13,19 @@ import com.joo.api.login.build.HandleLoginFactory;
 import com.joo.api.login.build.LoginAPI;
 import com.joo.api.login.build.LoginFactory;
 import com.joo.api.login.vo.UserVo;
+import com.joo.api.security.TokenUtils;
+import com.joo.api.security.custom.CustomUserDetails;
+import com.joo.api.security.custom.TokenBasedAuthentication;
+import com.joo.api.utils.CookieUtils;
 import com.joo.api.utils.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,10 +45,12 @@ public class LoginController{
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
+    private static final Integer TOKEN_EXPIRATION = TokenUtils.expiration;
+
     /**
      * 로그인 성공 후 이동할 URL
      */
-    public String SUCCESS_LOGIN_URL="redirect:/";
+    public static final String SUCCESS_LOGIN_URL="redirect:/";
 
     //차후 API에서 받은 사용자 정보를 바탕으로 프로젝트 내 DB 조회 등 목적으로 만들어 놓기만 한 service
     //@Autowired
@@ -48,6 +59,15 @@ public class LoginController{
 
     @Autowired
     private List<? extends LoginFactory> loginFactoryList;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private TokenUtils tokenUtils;
 
     /**
      * 로그인 페이지로 이동 요청 바인딩
@@ -80,10 +100,34 @@ public class LoginController{
 
         LoginAPI serviceFactory = (LoginAPI) WebUtil.getBean(req, beanName);
 
-        if(serviceFactory != null)
-            serviceFactory.login(req, code, state);
+        if(serviceFactory == null){
+            //TODO : null값 일 시, redirect 처리 어찌 해야할지
+            logger.error("bean을 찾을 수 없음! :"+beanName);
+            return SUCCESS_LOGIN_URL;
+        }
 
-        //TODO : null값 일 시, 처리 해야함
+        String sessionState = LoginFactory.getSessionState(req.getSession());
+        UserVo userVo = serviceFactory.getValidatedUserVo(sessionState, code, state);
+
+        /*
+        기존 세션 방식 로그인
+        WebUtil.setSession(LoginAPI.LOGIN_SESSION_KEY, userVo);
+        logger.info("login success. User Vo :"+userVo);
+        */
+
+        CustomUserDetails userDetails = (CustomUserDetails) this.userDetailsService.loadUserByUsername(userVo.getIdx());
+        String token = this.tokenUtils.createToken(userDetails);
+
+        CookieUtils.setCookie("token", token, TOKEN_EXPIRATION);
+
+        TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
+        /*
+        Authentication authentication = this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userVo.getIdx(),null)
+        );
+        */
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return SUCCESS_LOGIN_URL;
     }
