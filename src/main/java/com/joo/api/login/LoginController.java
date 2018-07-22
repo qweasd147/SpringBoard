@@ -21,6 +21,7 @@ import com.joo.api.utils.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,6 +45,9 @@ public class LoginController{
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     private static final Integer TOKEN_EXPIRATION = TokenUtils.expiration;
+
+    @Value("${jwt.header}")
+    private String tokenHeader;
 
     /**
      * 로그인 성공 후 이동할 URL
@@ -116,7 +120,7 @@ public class LoginController{
         CustomUserDetails userDetails = (CustomUserDetails) this.userDetailsService.loadUserByUsername(userVo.getIdx());
         String token = this.tokenUtils.createToken(userDetails);
 
-        CookieUtils.setCookie("token", token, TOKEN_EXPIRATION);
+        CookieUtils.setCookie(tokenHeader, token, TOKEN_EXPIRATION);
 
         TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
         /*
