@@ -1,8 +1,10 @@
 package com.joo.api.security.custom;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,12 +30,25 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
         http.csrf().disable()
                 .headers().cacheControl().disable().and()
                 .exceptionHandling().authenticationEntryPoint(this.customEntryPointHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()       //사용자의 쿠키에 세션을 저장하지 않겠다
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/**").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/api/**").authenticated()
                 .anyRequest().permitAll();
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public CustomUserFilter authenticationTokenFilterBean() throws Exception {
+        CustomUserFilter authenticationTokenFilter = new CustomUserFilter();
+        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
+        return authenticationTokenFilter;
     }
 }
