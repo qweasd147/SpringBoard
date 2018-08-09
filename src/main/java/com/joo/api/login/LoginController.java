@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.joo.api.common.Result;
 import com.joo.api.login.build.HandleLoginFactory;
 import com.joo.api.login.build.LoginAPI;
 import com.joo.api.login.build.LoginFactory;
@@ -22,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -82,6 +85,19 @@ public class LoginController{
         new HandleLoginFactory(loginFactoryList).setLoginURLParams(model);
 
         return "loginList";
+    }
+
+    /**
+     * 로그인 페이지로 이동 요청 바인딩
+     * @return
+     */
+    @RequestMapping("/loginURL")
+    public ResponseEntity loginURL() {
+
+        // third party 로그인 URL 값을 담아서 보내준다.
+        Map<String, String> urlMap = new HandleLoginFactory(loginFactoryList).getLoginURLParams();
+
+        return new ResponseEntity<Result>(Result.getSuccessResult(urlMap), HttpStatus.OK);
     }
 
     /**
