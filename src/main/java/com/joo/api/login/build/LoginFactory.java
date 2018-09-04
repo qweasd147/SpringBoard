@@ -5,16 +5,17 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.model.*;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import com.joo.api.login.vo.UserVo;
+import com.joo.api.user.service.UserService;
 import com.joo.api.utils.WebUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Iterator;
@@ -24,6 +25,9 @@ import java.util.Properties;
 public abstract class LoginFactory implements LoginAPI{
 	
 	private static final Logger logger = LoggerFactory.getLogger(LoginFactory.class);
+
+	@Autowired
+	private UserService userService;
 	
 	//TODO : 어디서 host값을 받아올지 고민중
 	private String host = "http://localhost";
@@ -206,30 +210,35 @@ public abstract class LoginFactory implements LoginAPI{
 			return null;
 		}
 		
-    	String token = oauthToken.getAccessToken();
-    	UserVo userVo = getUserVoWithProfile(oauthToken);
+    	UserVo userVoFromThird = getUserVoWithProfile(oauthToken);
     	
-		if(userVo == null) {
+		if(userVoFromThird == null) {
 			logger.error("로그인 잘못됨!");
 			
 			return null;
 		}
-		
-		userVo.setThirdPartyToken(token);
-		
-		/*
-		 * TODO : 사용자 정보가 DB에 있는지 조회. 없으면 insert 있으면 pass
-		 * DB 구축되면 구현 예정
-    	Object userData = loginService.validateUser(userVo);
-    	*/
 
-		return userVo;
+		UserVo userVoFromDB = userService.getUserByCandidate(userVoFromThird.getServiceName(), userVoFromThird.getId());
+
+		if(userVoFromDB == null){
+			//기존에 등록된 정보가 없으면 새롭게 등록한다.
+			userService.register(userVoFromThird);
+			userVoFromThird.setState(UserVo.State.ENABLED);
+
+			userVoFromDB = userVoFromThird;
+		}
+
+		//토큰 정보를 담아준다.
+		String token = oauthToken.getAccessToken();
+		userVoFromDB.setThirdPartyToken(token);
+
+		return userVoFromDB;
 	}
 	
 	@Override
 	public boolean logOut() {
 		
-		String result = null;
+		String result;
 		
 		try {
 			result = logoutProcess();

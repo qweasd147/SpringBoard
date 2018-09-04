@@ -33,7 +33,7 @@ public class CustomUserDetails extends UserVo implements UserDetails{
 
     @Override
     public String getUsername() {
-        return getIdx();
+        return String.valueOf(getIdx());
     }
 
     @Override

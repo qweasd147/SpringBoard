@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,8 +20,17 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
     @Autowired
     private CustomEntryPointHandler customEntryPointHandler;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customUserDetailsService).passwordEncoder(
+                shaPasswordEncoder());
+    }
+
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web){
         web.ignoring()
                 .antMatchers("resources/**")
                 .antMatchers("/api/authen/login/**/callback");  //로그인 처리 로직. 보안관련은 내부에서 검사함
@@ -50,5 +61,10 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
         CustomUserFilter authenticationTokenFilter = new CustomUserFilter();
         authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
         return authenticationTokenFilter;
+    }
+
+    @Bean
+    public ShaPasswordEncoder shaPasswordEncoder() {
+        return new ShaPasswordEncoder();
     }
 }

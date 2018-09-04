@@ -30,10 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * login, logout 처리 controller.
@@ -42,6 +39,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author joo
  *
  */
+
+@RequestMapping(value = "/api/authen")
+@CrossOrigin(origins = "*")
 @Controller
 public class LoginController{
 
@@ -49,8 +49,11 @@ public class LoginController{
 
     private static final Integer TOKEN_EXPIRATION = TokenUtils.expiration;
 
-    @Value("${jwt.header}")
+    @Value("#{appProperty['jwt.header']}")
     private String tokenHeader;
+
+    @Value("#{appProperty['redirect.domain']}")
+    private String cbDomain;
 
     /**
      * 로그인 성공 후 이동할 URL
@@ -88,10 +91,11 @@ public class LoginController{
     }
 
     /**
-     * 로그인 페이지로 이동 요청 바인딩
+     * 로그인 이동 URL 목록을 반환한다.
      * @return
      */
     @RequestMapping("/loginURL")
+    @ResponseBody
     public ResponseEntity loginURL() {
 
         // third party 로그인 URL 값을 담아서 보내준다.
@@ -109,7 +113,7 @@ public class LoginController{
      * @return
      * @throws Exception
      */
-    @RequestMapping("/api/authen/login/{serviceName}/callback")
+    @RequestMapping("login/{serviceName}/callback")
     public String serviceLoginCB(@RequestParam String code
             , @PathVariable("serviceName") String serviceName
             , @RequestParam String state, HttpServletRequest req) throws Exception {
@@ -121,7 +125,7 @@ public class LoginController{
         if(serviceFactory == null){
             //TODO : null값 일 시, redirect 처리 어찌 해야할지
             logger.error("bean을 찾을 수 없음! :"+beanName);
-            return SUCCESS_LOGIN_URL;
+            return "redirect:"+cbDomain;
         }
 
         String sessionState = LoginFactory.getSessionState(req.getSession());
@@ -133,7 +137,8 @@ public class LoginController{
         logger.info("login success. User Vo :"+userVo);
         */
 
-        CustomUserDetails userDetails = (CustomUserDetails) this.userDetailsService.loadUserByUsername(userVo.getIdx());
+        CustomUserDetails userDetails = (CustomUserDetails) this.userDetailsService.loadUserByUsername(String.valueOf(userVo.getIdx()));
+        userDetails.setThirdPartyToken(userVo.getThirdPartyToken());
         String token = this.tokenUtils.createToken(userDetails);
 
         CookieUtils.setCookie(tokenHeader, token, TOKEN_EXPIRATION);
@@ -147,7 +152,7 @@ public class LoginController{
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return SUCCESS_LOGIN_URL;
+        return "redirect:"+cbDomain;
     }
 
     @RequestMapping("/logout")

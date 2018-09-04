@@ -4,45 +4,65 @@
 
     <sql id="TB_USER">TB_USER</sql>
 
-    <select id="selectUserOne" parameterType="hashMap" resultType="UserVo">
+    <select id="getUserByIdx" parameterType="hashMap" resultType="UserVo">
         SELECT
-          SERVICE_NAME
-          , ID
-          , `NAME`
-          , NICK_NAME
-          , EMAIL
-          , STATE
+        "IDX"
+        ,SERVICE_NAME
+        , ID
+        , "NAME"
+        , NICK_NAME
+        , EMAIL
+        , STATE
         FROM <include refid="TB_USER" />
-        WHERE SERVICE_NAME = #{serviceName}
-          AND ID = #{id}
+        WHERE IDX = #{idx}
     </select>
 
-    <insert id="insertUser" parameterType="UserVo">
-        INSERT INTO <include refid="TB_USER" /> (
-            SERVICE_NAME
+    <select id="getUserByCandidate" parameterType="hashMap" resultType="UserVo">
+        SELECT
+            "IDX"
+            , SERVICE_NAME
             , ID
-            , `NAME`
+            , "NAME"
             , NICK_NAME
             , EMAIL
             , STATE
+        FROM <include refid="TB_USER" />
+        WHERE SERVICE_NAME = #{serviceName}
+            AND ID = #{id}
+    </select>
+
+    <insert id="register" parameterType="UserVo">
+        <selectKey keyProperty="idx" order="BEFORE" resultType="int">
+            SELECT SQ_USER.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO <include refid="TB_USER" /> (
+        IDX
+        , SERVICE_NAME
+        , ID
+        , "NAME"
+        , NICK_NAME
+        , EMAIL
+        , STATE
         )
         VALUES (
-            #{serviceName}
-            , #{id}
-            , #{name}
-            , #{nickName}
-            , #{email}
-            , #{state}
+        #{idx}
+        , #{serviceName}
+        , #{id}
+        , #{name}
+        , #{nickName}
+        , #{email}
+        , 0
         )
     </insert>
 
-    <update id="updateUser" parameterType="UserVo">
+    <update id="update" parameterType="UserVo">
         UPDATE	<include refid="TB_USER" />
         SET
-        SUBJECT     = #{subject}
-        , CONTENTS   = #{contents}
+        "NAME"     = #{name}
+        , NICK_NAME   = #{nickName}
+        , EMAIL   = #{email}
         WHERE IDX = #{idx}
-        AND STATE != 0
+          AND STATE != 0
     </update>
 
 </mapper>

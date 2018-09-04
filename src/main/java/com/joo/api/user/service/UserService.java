@@ -18,4 +18,17 @@ public interface UserService {
      * @return
      */
     UserVo getUserByCandidate(String type, String userId);
+
+    /**
+     * 새로운 회원을 등록한다.
+     * @param userVo
+     */
+    int register(UserVo userVo);
+
+    /**
+     * 회원 정보를 수정한다.
+     * @param userVo
+     * @return
+     */
+    int update(UserVo userVo);
 }

@@ -1,16 +1,20 @@
 package com.joo.api.login.vo;
 
+import com.joo.api.common.EnumCodeType;
+import com.joo.api.common.EnumTypeHandler;
+
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class UserVo implements Serializable{
 
     private static final long serialVersionUID = 7432896190010419477L;
 
-    public enum State{
-        //TODO : 우선 enable 여부만 체크, 나중에 바뀔 수도 있음
+    public enum State implements EnumCodeType{
         ENABLED(0), LOCKED(1), EXPIRED(2);
 
         private int state;
+
         State(int state) {
             this.state = state;
         }
@@ -18,9 +22,34 @@ public class UserVo implements Serializable{
         public int getState() {
             return state;
         }
+
+        public static State findState(int stateVal){
+            return Arrays.stream(State.values())
+                    .filter(userState -> userState.getState() == stateVal)
+                    .findFirst()
+                    .orElse(LOCKED);
+        }
+
+        @Override
+        public String getCode() {
+            return String.valueOf(this.state);
+        }
+
+        @Override
+        public String getDescription() {
+            return this.name();
+        }
+
+        public static class StateTypeHandler extends EnumTypeHandler<State> {
+            public StateTypeHandler() {
+                super(State.class);
+            }
+        }
+
+        //TODO : 우선 enable 여부만 체크, 나중에 바뀔 수도 있음
     }
 
-    private String idx;
+    private int idx;
     private String serviceName;		//default, kakao, naver 등
     private String id;
     private String name;
@@ -32,7 +61,7 @@ public class UserVo implements Serializable{
 
     public UserVo() {}
 
-    public UserVo(String idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, State state) {
+    public UserVo(int idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, State state) {
         this.idx = idx;
         this.serviceName = serviceName;
         this.id = id;
@@ -54,11 +83,11 @@ public class UserVo implements Serializable{
         this.state = userVo.state;
     }
 
-    public String getIdx() {
+    public int getIdx() {
         return idx;
     }
 
-    public void setIdx(String idx) {
+    public void setIdx(int idx) {
         this.idx = idx;
     }
 

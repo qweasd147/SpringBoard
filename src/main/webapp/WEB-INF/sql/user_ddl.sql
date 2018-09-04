@@ -1,5 +1,5 @@
 --------------------------------------------------------
---  파일이 생성됨 - 월요일-7월-02-2018
+--  파일이 생성됨 - 화요일-9월-04-2018
 --------------------------------------------------------
 --------------------------------------------------------
 --  DDL for Table TB_USER
@@ -14,13 +14,16 @@
 	"EMAIL" VARCHAR2(150),
 	"STATE" NUMBER
    )
-REM INSERTING into TB_USER
-SET DEFINE OFF;
 --------------------------------------------------------
 --  DDL for Index TB_USER_PK
 --------------------------------------------------------
 
   CREATE UNIQUE INDEX "TB_USER_PK" ON "TB_USER" ("IDX")
+--------------------------------------------------------
+--  DDL for Index UNQ_SERVICE_ID
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "UNQ_SERVICE_ID" ON "TB_USER" ("SERVICE_NAME", "ID")
 --------------------------------------------------------
 --  Constraints for Table TB_USER
 --------------------------------------------------------
@@ -38,6 +41,8 @@ SET DEFINE OFF;
   ALTER TABLE "TB_USER" MODIFY ("STATE" NOT NULL ENABLE)
 
   ALTER TABLE "TB_USER" ADD CONSTRAINT "TB_USER_PK" PRIMARY KEY ("IDX") ENABLE
+
+  ALTER TABLE "TB_USER" ADD CONSTRAINT "UNQ_SERVICE_ID" UNIQUE ("SERVICE_NAME", "ID") ENABLE
 
 --------------------------------------------------------
 --  파일이 생성됨 - 월요일-7월-02-2018

@@ -23,13 +23,16 @@
         <typeAlias alias="BoardSearchVo" type="com.joo.api.board.vo.BoardSearchVo"/>
         <typeAlias alias="BoardVo" type="com.joo.api.board.vo.BoardVo"/>
         <typeAlias alias="FileVo" type="com.joo.api.board.vo.FileVo"/>
+        <typeAlias alias="UserVo" type="com.joo.api.login.vo.UserVo"/>
+        <typeAlias alias="UserState" type="com.joo.api.login.vo.UserVo$State"/>
     </typeAliases>
 
     <typeHandlers>
         <!--  java.sql.Timestamp 를 java.util.Date 형으로 반환 -->
-        <typeHandler javaType="java.sql.Timestamp" handler="org.apache.ibatis.type.DateTypeHandler"/>
-        <typeHandler javaType="java.sql.Time"      handler="org.apache.ibatis.type.DateTypeHandler"/>
-        <typeHandler javaType="java.sql.Date"      handler="org.apache.ibatis.type.DateTypeHandler"/>
+        <typeHandler javaType="java.sql.Timestamp"                  handler="org.apache.ibatis.type.DateTypeHandler"/>
+        <typeHandler javaType="java.sql.Time"                       handler="org.apache.ibatis.type.DateTypeHandler"/>
+        <typeHandler javaType="java.sql.Date"                       handler="org.apache.ibatis.type.DateTypeHandler"/>
+        <typeHandler handler="com.joo.api.login.vo.UserVo$State$StateTypeHandler" javaType="com.joo.api.login.vo.UserVo$State" />
     </typeHandlers>
 
     <!--
