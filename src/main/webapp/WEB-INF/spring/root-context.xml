@@ -15,7 +15,6 @@
 	<context:component-scan base-package="com.joo">
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
-		<context:exclude-filter type="regex" expression="com.joo.api.board.mapper.repository.*Repository"/>
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
 </beans>

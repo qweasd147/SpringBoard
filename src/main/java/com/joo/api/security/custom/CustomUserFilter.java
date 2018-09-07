@@ -19,7 +19,6 @@ public class CustomUserFilter extends UsernamePasswordAuthenticationFilter{
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         super.doFilter(req, res, chain);
-
         chain.doFilter(req, res);
     }
 }

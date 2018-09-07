@@ -51,8 +51,8 @@ public class BoardTest {
 
     @Test
     public void testMain() throws Exception {
-        //boardInsertTest();          //일반 글쓰기 요청 테스트
-        boardListTest();            //일반 목록 요청 테스트
+        boardInsertTest();          //일반 글쓰기 요청 테스트
+        //boardListTest();            //일반 목록 요청 테스트
 
         //invalidBoardInsertTest();   //벨리데이션 체크용 잘못된 글쓰기 요청 테스트
         //invalidBoardListTest();     //벨리데이션 체크용 잘못된 목록 요청 테스트
