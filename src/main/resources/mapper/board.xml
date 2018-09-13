@@ -71,7 +71,7 @@
             , #{contents}
             , 0
             , 1
-            , 'USER_01'
+            , #{nickName}
             , SYSDATE
         )
     </insert>
