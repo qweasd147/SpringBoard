@@ -63,13 +63,6 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
     }
 
     @Bean
-    public CustomUserFilter authenticationTokenFilterBean() throws Exception {
-        CustomUserFilter authenticationTokenFilter = new CustomUserFilter();
-        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
-        return authenticationTokenFilter;
-    }
-
-    @Bean
     public ShaPasswordEncoder shaPasswordEncoder() {
         return new ShaPasswordEncoder();
     }

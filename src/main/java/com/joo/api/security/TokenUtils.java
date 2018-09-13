@@ -186,6 +186,23 @@ public class TokenUtils {
         return refreshedToken;
     }
 
+    /**
+     * 토큰의 유효기간을 넘겨버린다.
+     * @param token
+     * @return
+     */
+    public String deleteToken(String token) {
+        String deletedToken;
+        try {
+            final Claims claims = this.getClaimsFromToken(token);
+            claims.put("created", new Date(System.currentTimeMillis() + this.expiration * 2000));
+            deletedToken = this.createToken(claims);
+        } catch (Exception e) {
+            deletedToken = null;
+        }
+        return deletedToken;
+    }
+
     public Boolean validateToken(String token, UserDetails userDetails) {
         CustomUserDetails user = (CustomUserDetails) userDetails;
         final String username = this.getUsernameFromToken(token);

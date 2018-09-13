@@ -1,15 +1,12 @@
 package com.joo.api.login;
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import com.joo.api.common.Result;
+import com.joo.api.common.controller.BaseController;
 import com.joo.api.login.build.HandleLoginFactory;
 import com.joo.api.login.build.LoginAPI;
 import com.joo.api.login.build.LoginFactory;
@@ -25,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
@@ -43,7 +40,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/authen")
 @CrossOrigin(origins = "*")
 @Controller
-public class LoginController{
+public class LoginController implements BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
@@ -52,24 +49,14 @@ public class LoginController{
     @Value("#{appProperty['jwt.header']}")
     private String tokenHeader;
 
-    @Value("#{appProperty['redirect.domain']}")
-    private String cbDomain;
-
     /**
      * 로그인 성공 후 이동할 URL
      */
-    public static final String SUCCESS_LOGIN_URL="redirect:/";
-
-    //차후 API에서 받은 사용자 정보를 바탕으로 프로젝트 내 DB 조회 등 목적으로 만들어 놓기만 한 service
-    //@Autowired
-    private LoginService loginService;
-
+    @Value("#{appProperty['redirect.domain']}")
+    private String cbDomain;
 
     @Autowired
     private List<? extends LoginFactory> loginFactoryList;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -144,12 +131,6 @@ public class LoginController{
         CookieUtils.setCookie(tokenHeader, token, TOKEN_EXPIRATION);
 
         TokenBasedAuthentication authentication = new TokenBasedAuthentication(userDetails);
-        /*
-        Authentication authentication = this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userVo.getIdx(),null)
-        );
-        */
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return "redirect:"+cbDomain;
@@ -157,44 +138,14 @@ public class LoginController{
 
     @RequestMapping("/logout")
     @ResponseBody
-    public Map<String, String> logout(HttpServletRequest req, Model model) throws IOException {
+    public ResponseEntity logout(@AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        Map<String, String> map = new HashMap<>();
+        LoginAPI loginAPI = (LoginAPI) WebUtil.getBean(customUserDetails.getServiceName()+"Login");
+        loginAPI.logOut();
 
-        UserVo userVo = (UserVo) WebUtil.getSessionAttribute(LoginAPI.LOGIN_SESSION_KEY);
+        SecurityContextHolder.getContext().setAuthentication(null);
+        //CookieUtils.removeCookie(tokenHeader);
 
-        if(userVo == null) {
-
-            logger.debug("잘못된 접근. 로그인 상태가 아님");
-
-            map.put("result", "로그인 된 상태가 아님");
-
-            return map;
-        }
-
-        LoginAPI loginAPI = (LoginAPI) WebUtil.getBean(userVo.getServiceName()+"Login");
-
-        Map<String, String> resultMap = new HandleLoginFactory(loginAPI).getLogOutResult(map);
-
-        map.putAll(resultMap);
-
-        return map;
-    }
-
-
-    @RequestMapping("/checkSession")
-    @ResponseBody
-    public void checkSession(HttpServletRequest req, Model model) throws IOException {
-
-        HttpSession session = req.getSession();
-
-        Enumeration<String> names = session.getAttributeNames();
-
-        System.out.println("session");
-        while (names.hasMoreElements()) {
-            String name = names.nextElement();
-
-            System.out.println("name : "+name+", val : "+session.getAttribute(name));
-        }
+        return successRespResult();
     }
 }

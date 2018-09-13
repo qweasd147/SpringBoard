@@ -13,6 +13,9 @@ public class CustomUserDetails extends UserVo implements UserDetails{
 
     private Set<? extends GrantedAuthority> authorities;
 
+    public CustomUserDetails() {
+        super();
+    }
     public CustomUserDetails(UserVo userVo) {
         super(userVo);
     }

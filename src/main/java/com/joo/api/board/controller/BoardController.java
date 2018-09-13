@@ -6,12 +6,14 @@ import com.joo.api.board.vo.BoardSearchVo;
 import com.joo.api.board.vo.BoardVo;
 import com.joo.api.board.vo.FileVo;
 import com.joo.api.common.controller.BaseController;
+import com.joo.api.security.custom.CustomUserDetails;
 import com.joo.exception.BusinessException;
 import com.joo.exception.ValidateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,11 +60,14 @@ public class BoardController implements BaseController {
     public ResponseEntity insertBoard(
             @Valid @ModelAttribute BoardVo boardVo
             , BindingResult br
-            , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
+            , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles
+            , @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
         if(br.hasErrors()){
             throw new ValidateException(br, boardVo);
         }
+
+        boardVo.setWriter(customUserDetails.getNickName());
 
         boardServce.insertBoard(boardVo, uploadFiles);
 

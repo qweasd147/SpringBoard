@@ -40,7 +40,7 @@ public class FileServiceImpl implements FileService{
     public List<FileVo> uploadFiles(MultipartFile[] files) {
 
         List<FileVo> uploadedList = new ArrayList<>();
-        
+
         for (int i=0;i< files.length;i++){
             MultipartFile file = files[i];
             if(!isAvaliableFile(file))  continue;       //check file validate

@@ -16,6 +16,10 @@
 			<bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
 			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
 		</mvc:message-converters>
+		<mvc:argument-resolvers>
+			<!-- for annotation AuthenticationPrincipal-->
+			<bean class="org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver"/>
+		</mvc:argument-resolvers>
 	</mvc:annotation-driven>
 
 	<!--

@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService{
 
@@ -31,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService{
         CustomUserDetails userDetails = new CustomUserDetails(userVo);
 
         //TODO : 해당 사용자의 권한 정보 입력
-        //userDetails.setAuthorities();
+        userDetails.setAuthorities(Collections.EMPTY_SET);
 
         return userDetails;
     }

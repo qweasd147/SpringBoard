@@ -4,15 +4,9 @@ import com.joo.api.utils.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * LoginFactory를 핸들링 하는게 목적.
@@ -86,42 +80,18 @@ public class HandleLoginFactory {
 	public Map<String, String> getLogOutResult(Map<String, String> params) {
 		
 		if(loginAPI == null) {
-			params.put("result", "시스템 오류");
-			logger.debug("loginAPI이 존재하지 않음");
+			logger.warn("loginAPI이 존재하지 않음");
 		}
-		
+
+		Objects.requireNonNull(this.loginAPI);
 		boolean logOutResult = loginAPI.logOut();
-		checkInstance();
 
 		if(logOutResult) {
-			params.put("result", "로그아웃 처리됨");
+			logger.debug("result", "로그아웃 처리됨");
     	}else {
-    		params.put("result", "시스템 오류");
+    		logger.error("시스템 오류");
     	}
 		
 		return params;
-	}
-	
-	public void checkInstance() {
-		
-		if(this.loginAPI == null) {
-			//TODO : exception 처리까진 보류
-			throw new RuntimeException("check LoginAPI.");
-		}
-	}
-	
-	public void checkInstanceList() {
-		
-		if(this.loginAPIList == null) {
-			//TODO : exception 처리까진 보류
-			throw new RuntimeException("check LoginAPI List.");
-		}
-		
-		for(LoginAPI loginAPI : this.loginAPIList) {
-			if(loginAPI == null) {
-				//TODO : exception 처리까진 보류
-				throw new RuntimeException("check LoginAPI.");
-			}
-		}
 	}
 }

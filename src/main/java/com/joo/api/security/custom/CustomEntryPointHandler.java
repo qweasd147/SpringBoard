@@ -29,7 +29,7 @@ public class CustomEntryPointHandler implements AuthenticationEntryPoint {
 
         logger.debug("login fail : "+request.getRequestURI());
 
-        Result failResult = Result.getFailResult("fail99", "로그인 실패", null);
+        Result failResult = Result.getFailResult("fail99", "권한이 부족함", null);
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
