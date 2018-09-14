@@ -3,6 +3,7 @@ package com.joo.api.security.custom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -13,6 +14,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -46,14 +51,17 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
                 .exceptionHandling().authenticationEntryPoint(this.customEntryPointHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()   //사용자의 쿠키에 세션을 저장하지 않겠다
                 .authorizeRequests()
-                .antMatchers("/api/authen/login/**/callback").permitAll()                  //로그인 처리 로직. 보안관련은 내부에서 검사함
+                //.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .antMatchers("/api/authen/logout/").authenticated()                  //로그아웃은 인증된 사용자여야함
+                .antMatchers("/api/authen/login/**/callback").permitAll()           //로그인 처리 로직. 보안관련은 내부에서 검사함
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/**").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/api/**").authenticated()
-                .anyRequest().permitAll();
+                .anyRequest().denyAll();
 
         http.addFilterBefore(customTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.cors().configurationSource(request -> getCorsConfigurationSource());
     }
 
     @Bean
@@ -65,5 +73,35 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
     @Bean
     public ShaPasswordEncoder shaPasswordEncoder() {
         return new ShaPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfiguration getCorsConfigurationSource() {
+        final List<String> allowedHeaders = Arrays.asList(
+                HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS
+                , HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS
+                , HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN
+                , HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS
+                , HttpHeaders.ORIGIN
+                , HttpHeaders.CACHE_CONTROL
+                , HttpHeaders.CONTENT_TYPE
+                , HttpHeaders.AUTHORIZATION);
+
+        final List<String> allowedMethods = Arrays.asList(
+                HttpMethod.GET.name()
+                , HttpMethod.POST.name()
+                , HttpMethod.PUT.name()
+                , HttpMethod.DELETE.name()
+                , HttpMethod.PATCH.name()
+                , HttpMethod.OPTIONS.name()
+        );
+
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(allowedHeaders);
+        configuration.setAllowedMethods(allowedMethods);
+
+        return configuration;
     }
 }

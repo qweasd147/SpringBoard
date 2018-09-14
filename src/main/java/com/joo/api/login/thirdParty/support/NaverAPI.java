@@ -125,14 +125,15 @@ public class NaverAPI extends LoginFactory {
 	}
 
 	@Override
-	public String logoutProcess() throws IOException {
+	public String logoutProcess(String thirdpartyToken) throws IOException {
 		
 		String requestKey = getPropertiesKey(LoginAPI.LOGOUT_KEY);
 		Map<String, String> params = new HashMap<>();
 		
 		params.put(OAuthConstants.CLIENT_ID, getClientId());
 		params.put(OAuthConstants.CLIENT_SECRET, getClientSecret());
+		params.put(ACCESS_TOKEN, thirdpartyToken);
 		
-		return requestAPI(Verb.GET,requestKey , params);
+		return requestAPI(Verb.GET, requestKey, params);
 	}
 }

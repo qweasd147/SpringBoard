@@ -1,8 +1,10 @@
 package com.joo.api.login.build;
 
+import com.joo.api.security.custom.CustomUserDetails;
 import com.joo.api.utils.WebUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpSession;
@@ -84,7 +86,9 @@ public class HandleLoginFactory {
 		}
 
 		Objects.requireNonNull(this.loginAPI);
-		boolean logOutResult = loginAPI.logOut();
+
+		CustomUserDetails userDetails = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		boolean logOutResult = loginAPI.logout(userDetails.getThirdPartyToken());
 
 		if(logOutResult) {
 			logger.debug("result", "로그아웃 처리됨");

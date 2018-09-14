@@ -121,11 +121,11 @@ public class GoogleAPI extends LoginFactory {
 	}
 
 	@Override
-	public String logoutProcess() throws IOException {
+	public String logoutProcess(String thirdpartyToken) throws IOException {
 		
 		String requestKey = getPropertiesKey(LoginAPI.LOGOUT_KEY);
 		Map<String, String> params = new HashMap<>();
-		params.put("token", getAccessTokenFromSession());
+		params.put("token", thirdpartyToken);
 		
 		return requestAPI(Verb.GET,requestKey , params);
 	}

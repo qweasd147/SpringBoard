@@ -71,7 +71,7 @@
             , #{contents}
             , 0
             , 1
-            , #{nickName}
+            , #{writer}
             , SYSDATE
         )
     </insert>

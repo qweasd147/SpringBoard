@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KakaoAPI extends LoginFactory {
 	
@@ -118,10 +120,14 @@ public class KakaoAPI extends LoginFactory {
 	}
 
 	@Override
-	public String logoutProcess() throws IOException {
+	public String logoutProcess(String thirdpartyToken) throws IOException {
 		
 		String requestKey = getPropertiesKey(LoginAPI.LOGOUT_KEY);
-		String result = requestAPI(Verb.GET,requestKey , null);
+
+		Map<String, String> params = new HashMap<>();
+		params.put(ACCESS_TOKEN, thirdpartyToken);
+
+		String result = requestAPI(Verb.GET, requestKey , params);
 		
 		return result;
 	}

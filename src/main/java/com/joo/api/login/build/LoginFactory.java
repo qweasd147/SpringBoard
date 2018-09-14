@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BiConsumer;
 
 public abstract class LoginFactory implements LoginAPI{
 	
@@ -29,16 +32,13 @@ public abstract class LoginFactory implements LoginAPI{
 	@Autowired
 	private UserService userService;
 	
-	//TODO : 어디서 host값을 받아올지 고민중
-	private String host = "http://localhost";
-	
 	/**
 	 * serviceName만 interface에 getter를 만들어 놓음.
 	 * 그 외 정보는 다른곳에서 구지 핸들링 할 필요가 없을꺼 같음 
 	 */
 	
 	private static final JSONParser JSON_PARSER = new JSONParser();
-	
+
 	//request 주소를 담은 프로퍼티
 	@Resource(name="requestURL")
 	private Properties properties;
@@ -74,7 +74,7 @@ public abstract class LoginFactory implements LoginAPI{
 	
 	public abstract UserVo profileToUserVo(JSONObject userProfile) throws Exception;
 	
-	public abstract String logoutProcess() throws IOException;
+	public abstract String logoutProcess(String thirdpartyToken) throws IOException;
 	
 	
 	/**
@@ -111,7 +111,9 @@ public abstract class LoginFactory implements LoginAPI{
 	@Override
 	public String requestAPI(Verb method, String commandKey, Map<String, String> params) throws IOException {
 		
-		String accessToken = getAccessTokenFromSession();
+		String accessToken = null;
+		if(params != null)	accessToken = params.get(ACCESS_TOKEN);
+
 		OAuth20Service service = getServiceBuilder(false).build(innerAPI);
 		boolean hasServiceURL = properties.containsKey(commandKey);
 		
@@ -120,41 +122,46 @@ public abstract class LoginFactory implements LoginAPI{
 			logger.warn("해당 키가 프로퍼티에 존재하지 않음. key : "+commandKey);
 			
 			return null;
-		};
+		}
 		
 		String serviceURL = properties.getProperty(commandKey);
 		OAuthRequest oauthReq = new OAuthRequest(method, serviceURL, service);
 		
 		//token을 부여한다.
-		oauthReq.addQuerystringParameter(OAuthConstants.ACCESS_TOKEN, accessToken);
+		if(!StringUtils.isEmpty(accessToken))
+			oauthReq.addQuerystringParameter(OAuthConstants.ACCESS_TOKEN, accessToken);
 		
 		if(params != null){
-			Iterator<String> paramsKeys = params.keySet().iterator();
-			
+			BiConsumer<String, String> addParameter;
+
 			switch(method){
 				case GET :
-					while(paramsKeys.hasNext()){
-						String key = paramsKeys.next();
-						oauthReq.addQuerystringParameter(key, params.get(key));
-					}
+					addParameter = (key, value)->oauthReq.addQuerystringParameter(key, value);
 					break;
 				case POST :
-					while(paramsKeys.hasNext()){
-						String key = paramsKeys.next();
-						oauthReq.addBodyParameter(key, params.get(key));
-					}
+					addParameter = (key, value)->oauthReq.addBodyParameter(key, value);
 					break;
 			default:
 				logger.warn("get, post를 제외한 다른 메소드는 준비중");
-				break; 
+				throw new UnsupportedOperationException("get, post를 제외한 다른 메소드는 준비중");
 			}
+
+			params.keySet().stream()
+					.filter(key -> !ACCESS_TOKEN.equals(params.get(key)))
+					.forEach((key)-> addParameter.accept(key, params.get(key)));
 		}
 		
 		Response modelResp = oauthReq.send();
 		String result = modelResp.getBody();
-		
-		logger.debug("result 결과 : "+result);
-		
+
+		if(logger.isDebugEnabled()){
+			int code = modelResp.getCode();
+
+			String message = modelResp.getMessage();
+			logger.debug("성공? : " + HttpStatus.valueOf(code).is2xxSuccessful());
+			logger.debug("message : " + message);
+		}
+
 		return result;
 	}
 	
@@ -236,17 +243,18 @@ public abstract class LoginFactory implements LoginAPI{
 	}
 	
 	@Override
-	public boolean logOut() {
+	public boolean logout(String thirdpartyToken) {
 		
 		String result;
 		
 		try {
-			result = logoutProcess();
+			result = logoutProcess(thirdpartyToken);
 			logger.info("로그아웃 성공. msg : "+result);
 		} catch (IOException e) {
 			logger.warn("logout 요청에 실패!");
 		}finally {
-			WebUtil.removeSessionAttribute(LoginAPI.LOGIN_SESSION_KEY);
+			//세션 방식으로 하지 않음
+			//WebUtil.removeSessionAttribute(LoginAPI.LOGIN_SESSION_KEY);
 		}
 		
 		return true;

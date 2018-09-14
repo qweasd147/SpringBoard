@@ -17,6 +17,7 @@ public interface LoginAPI{
 	 */
 	String LOGIN_SESSION_STATE_KEY="LoginState";
 	String LOGIN_SESSION_KEY="LOGIN_SESSION_INFO";
+	String ACCESS_TOKEN = "accessToken";
 	
 	/**
 	 * 프로퍼티에서 프로필 정보 요청 api 주소를 불러올 키값
@@ -84,7 +85,7 @@ public interface LoginAPI{
 	 * 로그아웃 처리한다.
 	 * @return
 	 */
-	boolean logOut();
+	boolean logout(String thirdpartyToken);
 	
 	/**
 	 * 사용자 정보가 유효한지 판별한다(세션, token 유효성 검사).

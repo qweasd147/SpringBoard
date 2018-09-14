@@ -141,7 +141,7 @@ public class LoginController implements BaseController{
     public ResponseEntity logout(@AuthenticationPrincipal CustomUserDetails customUserDetails){
 
         LoginAPI loginAPI = (LoginAPI) WebUtil.getBean(customUserDetails.getServiceName()+"Login");
-        loginAPI.logOut();
+        loginAPI.logout(customUserDetails.getThirdPartyToken());
 
         SecurityContextHolder.getContext().setAuthentication(null);
         //CookieUtils.removeCookie(tokenHeader);

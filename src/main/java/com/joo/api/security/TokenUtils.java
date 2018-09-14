@@ -25,6 +25,11 @@ public class TokenUtils {
     private final static String secret = "wngudWkdWkd";
     public final static Integer expiration = 86400;        //기간. 단위 초 => 하루
 
+    /**
+     * 외부(naver, kakao 등)에서 사용 될 token
+     */
+    private final static String THIRDPARTY_TOKEN = "thirdpartyToken";
+
     public String getUsernameFromToken(String token) {
         String username;
         try {
@@ -48,14 +53,14 @@ public class TokenUtils {
     }
 
     public String getThirdPartyTokenFromToken(String token) {
-        String password;
+        String thirdpartyToken;
         try {
             final Claims claims = this.getClaimsFromToken(token);
-            password = (String) claims.get("thirdpartyToken");
+            thirdpartyToken = (String) claims.get(THIRDPARTY_TOKEN);
         } catch (Exception e) {
-            password = null;
+            thirdpartyToken = null;
         }
-        return password;
+        return thirdpartyToken;
     }
 
     /**
@@ -157,7 +162,7 @@ public class TokenUtils {
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", userDetails.getUsername());
         claims.put("created", this.createCurrentDate());
-        claims.put("thirdpartyToken", userDetails.getThirdPartyToken());
+        claims.put(THIRDPARTY_TOKEN, userDetails.getThirdPartyToken());
         //claims.put("password", userDetails.getPassword());
         return this.createToken(claims);
     }
