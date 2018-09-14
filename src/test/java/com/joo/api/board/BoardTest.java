@@ -2,13 +2,20 @@ package com.joo.api.board;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joo.api.board.vo.BoardVo;
+import com.joo.api.login.vo.UserVo;
+import com.joo.api.security.TokenUtils;
+import com.joo.api.security.custom.CustomUserDetails;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -17,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.Filter;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -44,9 +52,24 @@ public class BoardTest {
     private WebApplicationContext wac;
     private MockMvc mockMvc;
 
+    @Value("#{appProperty['jwt.header']}")
+    private String tokenHeader;
+
+    @Autowired
+    private TokenUtils tokenUtils;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private Filter springSecurityFilterChain;
+
     @Before
     public void setup(){
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .dispatchOptions(true)
+                .addFilter(springSecurityFilterChain)
+                .build();
     }
 
     @Test
@@ -59,6 +82,28 @@ public class BoardTest {
 
     }
 
+    /**
+     * 권한이 없는 상태에서 입력 요청
+     * @throws Exception
+     */
+    public void unauthorizedBoardInsertTest() throws Exception {
+        MvcResult result =
+                this.mockMvc.perform(
+                        fileUpload(API_BOARD)
+                                //.file(mockFile)
+                                .param("subject","mock를 통한 게시판 제목 입력")
+                                .param("contents","mock를 통한 게시판 내용 입력")
+                                //.content(strParameter)
+                )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andReturn();
+    }
+
+    /**
+     * 정상적인 입력 요청
+     * @throws Exception
+     */
     public void boardInsertTest() throws Exception {
 
         /*
@@ -85,11 +130,12 @@ public class BoardTest {
                                 //.file(mockFile)
                                 .param("subject","mock를 통한 게시판 제목 입력")
                                 .param("contents","mock를 통한 게시판 내용 입력")
-                                //.content(strParameter)
+                                .headers(getAuthHeader())
+                        //.content(strParameter)
                 )
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andReturn();
+                        .andDo(print())
+                        .andExpect(status().isCreated())
+                        .andReturn();
 
         /*
         logger.info("-------------------------------------------------");
@@ -142,5 +188,30 @@ public class BoardTest {
                     .andExpect(status().isOk())
                     //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
                     .andReturn();
+    }
+
+    public CustomUserDetails getMockCustomUserDetails(){
+
+        UserVo userVo = new UserVo();
+
+        userVo.setId("mockID");
+        userVo.setName("mockName");
+        userVo.setEmail("mock@test.co.kr");
+        userVo.setNickName("mockNickName");
+        userVo.setServiceName("mockServiceName");
+        userVo.setState(UserVo.State.ENABLED);
+
+        return new CustomUserDetails(userVo);
+    }
+
+    public HttpHeaders getAuthHeader(){
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        CustomUserDetails customUserDetails = getMockCustomUserDetails();
+        String token = this.tokenUtils.createToken(customUserDetails);
+
+        httpHeaders.add(tokenHeader,token);
+
+        return httpHeaders;
     }
 }
