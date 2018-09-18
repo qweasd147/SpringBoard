@@ -1,20 +1,22 @@
 package com.joo.api.board;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.joo.api.board.vo.BoardVo;
 import com.joo.api.login.vo.UserVo;
 import com.joo.api.security.TokenUtils;
 import com.joo.api.security.custom.CustomUserDetails;
+import com.joo.api.user.service.UserService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,14 +27,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
-import java.io.File;
-import java.io.FileInputStream;
+import javax.sql.DataSource;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -59,10 +59,15 @@ public class BoardTest {
     private TokenUtils tokenUtils;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserService userService;
 
     @Autowired
     private Filter springSecurityFilterChain;
+
+    @Autowired
+    private SqlSessionFactoryBean sqlSessionFactoryBean;
+
+    private UserVo dummyUser = null;
 
     @Before
     public void setup(){
@@ -70,16 +75,41 @@ public class BoardTest {
                 .dispatchOptions(true)
                 .addFilter(springSecurityFilterChain)
                 .build();
+
+        //change datasource for testing
+        //sqlSessionFactoryBean.setDataSource(getMockDataSource());
+
+        //insert dummy user
+        dummyUser = getDummyUser();
+        userService.register(dummyUser);
+    }
+
+    @After
+    public void deleteUser(){
+        //userService.deleteFromDB(dummyUser.getIdx());
+    }
+
+    public DataSource getMockDataSource(){
+        return new EmbeddedDatabaseBuilder()
+                .generateUniqueName(true)
+                .setType(EmbeddedDatabaseType.H2)
+                .setScriptEncoding("UTF-8")
+                .ignoreFailedDrops(true)
+                .addScript("src/test/resources/board_ddl.sql")
+                .addScript("src/test/resources/board_ddl.sql")
+                .addScript("src/test/resources/mock_data_dml.sql").build();
     }
 
     @Test
     public void testMain() throws Exception {
+
         boardInsertTest();          //일반 글쓰기 요청 테스트
         //boardListTest();            //일반 목록 요청 테스트
 
         //invalidBoardInsertTest();   //벨리데이션 체크용 잘못된 글쓰기 요청 테스트
         //invalidBoardListTest();     //벨리데이션 체크용 잘못된 목록 요청 테스트
 
+        userService.deleteFromDB(dummyUser.getIdx());
     }
 
     /**
@@ -130,7 +160,7 @@ public class BoardTest {
                                 //.file(mockFile)
                                 .param("subject","mock를 통한 게시판 제목 입력")
                                 .param("contents","mock를 통한 게시판 내용 입력")
-                                .headers(getAuthHeader())
+                                .headers(getHeaderWithAuthToken())
                         //.content(strParameter)
                 )
                         .andDo(print())
@@ -190,8 +220,18 @@ public class BoardTest {
                     .andReturn();
     }
 
-    public CustomUserDetails getMockCustomUserDetails(){
+    public HttpHeaders getHeaderWithAuthToken(){
+        HttpHeaders httpHeaders = new HttpHeaders();
 
+        CustomUserDetails customUserDetails = new CustomUserDetails(dummyUser);
+        String token = "Bearer " + this.tokenUtils.createToken(customUserDetails);
+
+        httpHeaders.add(tokenHeader,token);
+
+        return httpHeaders;
+    }
+
+    private UserVo getDummyUser(){
         UserVo userVo = new UserVo();
 
         userVo.setId("mockID");
@@ -201,17 +241,6 @@ public class BoardTest {
         userVo.setServiceName("mockServiceName");
         userVo.setState(UserVo.State.ENABLED);
 
-        return new CustomUserDetails(userVo);
-    }
-
-    public HttpHeaders getAuthHeader(){
-        HttpHeaders httpHeaders = new HttpHeaders();
-
-        CustomUserDetails customUserDetails = getMockCustomUserDetails();
-        String token = this.tokenUtils.createToken(customUserDetails);
-
-        httpHeaders.add(tokenHeader,token);
-
-        return httpHeaders;
+        return userVo;
     }
 }

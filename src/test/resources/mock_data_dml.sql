@@ -1,0 +1,1 @@
+Insert into TB_USER values (-99, 'DUMMY_SERVICE', '99999', 'DUMMY_NAME', 'DUMMY_NICK_NAME', 'DUMMY_EMAIL@test.co.kr', 0);
