@@ -39,4 +39,9 @@ public class UserServiceImpl implements UserService{
     public int update(UserVo userVo) {
         return userMapper.update(userVo);
     }
+
+    @Override
+    public int deleteFromDB(int idx) {
+        return userMapper.deleteFromDB(idx);
+    }
 }

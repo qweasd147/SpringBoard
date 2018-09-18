@@ -101,4 +101,10 @@
           AND STATE != 0
     </update>
 
+    <delete id="deleteFromDB" parameterType="int">
+        DELETE
+        FROM <include refid="TB_BOARD" />
+        WHERE IDX = #{idx}
+    </delete>
+
 </mapper>

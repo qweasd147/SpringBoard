@@ -31,4 +31,11 @@ public interface UserService {
      * @return
      */
     int update(UserVo userVo);
+
+    /**
+     * 회원 정보를 삭제한다.
+     * @param idx
+     * @return
+     */
+    int deleteFromDB(int idx);
 }
