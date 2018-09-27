@@ -134,7 +134,7 @@ public class FileServiceImpl implements FileService{
 
         Path file = Paths.get(fileVo.getFilePath(), fileVo.getSaveFileName());
 
-        Resource resource = null;
+        Resource resource;
         try {
             resource = new UrlResource(file.toUri());
 
@@ -144,15 +144,13 @@ public class FileServiceImpl implements FileService{
                 throw new MalformedURLException("파일을 읽을 수 없음");
             }
         } catch (MalformedURLException e) {
-            String voPathInfo = fileVo.getFilePath()+"/"+fileVo.getOriginFileName()+"("+fileVo.getOriginFileName()+")";
+            String fileFullPath = fileVo.getFilePath()+"/"+fileVo.getSaveFileName()+"("+fileVo.getOriginFileName()+")";
             logger.error("file ERROR!");
-            logger.error(voPathInfo);
+            logger.error(fileFullPath);
             logger.error(e.getMessage());
 
-            new BusinessException("HTTP_500","파일 처리 오류");
+            throw new BusinessException("HTTP_500","파일 처리 오류");
         }
-
-        return null;
     }
 
     private boolean isAvaliableFile(MultipartFile file){

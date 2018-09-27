@@ -9,6 +9,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Enum과 Mybatis 맵핑 중간 역할을 한다.
+ * @param <E>
+ */
 public class EnumTypeHandler <E extends Enum<E> & EnumCodeType> implements TypeHandler<E>{
 
     private Class <E> enumCodeType;

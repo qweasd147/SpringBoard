@@ -15,6 +15,6 @@ public class SearchVoValidator implements ConstraintValidator<AvailableCondition
     public boolean isValid(String searchCondition, ConstraintValidatorContext context) {
 
         if(StringUtils.isEmpty(searchCondition))    return true;
-        return SearchKeyWord.hasCondition(searchCondition);
+        return SearchKeyWord.contains(searchCondition);
     }
 }

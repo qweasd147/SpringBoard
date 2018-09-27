@@ -41,10 +41,10 @@ public interface BaseController {
     }
 
     default ResponseEntity getRespResult(Result result, HttpStatus httpStatus){
-        return new ResponseEntity<Result>(result, httpStatus);
+        return new ResponseEntity<>(result, httpStatus);
     }
 
-    default ResponseEntity<Resource> setFileDownload(String fileName, Resource fileResource){
+    default ResponseEntity<Resource> getResponseEntityWithResource(String fileName, Resource fileResource){
 
         String encodedFileName;
         try {

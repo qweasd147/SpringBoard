@@ -77,7 +77,7 @@ public class BoardTest {
                 .build();
 
         //change datasource for testing
-        //sqlSessionFactoryBean.setDataSource(getMockDataSource());
+        sqlSessionFactoryBean.setDataSource(getMockDataSource());
 
         //insert dummy user
         dummyUser = getDummyUser();
@@ -95,7 +95,6 @@ public class BoardTest {
                 .setType(EmbeddedDatabaseType.H2)
                 .setScriptEncoding("UTF-8")
                 .ignoreFailedDrops(true)
-                .addScript("src/test/resources/board_ddl.sql")
                 .addScript("src/test/resources/board_ddl.sql")
                 .addScript("src/test/resources/mock_data_dml.sql").build();
     }

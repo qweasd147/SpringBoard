@@ -38,7 +38,7 @@ public class BoardSearchVo implements Serializable{
          * @param condition
          * @return
          */
-        public static boolean hasCondition(String condition){
+        public static boolean contains(String condition){
             return Arrays.stream(SearchKeyWord.values())
                     .anyMatch(searchKeyWord -> searchKeyWord.getCode().equals(condition));
         }

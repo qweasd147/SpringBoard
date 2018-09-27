@@ -108,6 +108,6 @@ public class BoardController implements BaseController {
 
         Resource fileResource = fileService.getFileResouce(fileVo);
 
-        return setFileDownload(fileVo.getOriginFileName(), fileResource);
+        return getResponseEntityWithResource(fileVo.getOriginFileName(), fileResource);
     }
 }
