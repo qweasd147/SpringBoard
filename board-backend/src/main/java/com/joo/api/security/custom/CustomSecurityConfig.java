@@ -101,6 +101,7 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(allowedHeaders);
         configuration.setAllowedMethods(allowedMethods);
+        //configuration.setMaxAge();
 
         return configuration;
     }

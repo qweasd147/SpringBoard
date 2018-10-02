@@ -1,4 +1,4 @@
-﻿package com.joo.api.board;
+package com.joo.api.board;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joo.api.login.vo.UserVo;
@@ -38,8 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(locations = {"file:src/main/resources/context/**/context-*.xml"
-                        , "file:src/main/webapp/WEB-INF/spring/root-context.xml"
-                        , "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"})
+        , "file:src/main/webapp/WEB-INF/spring/root-context.xml"
+        , "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"})
 public class BoardTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BoardTest.class);
@@ -122,11 +122,11 @@ public class BoardTest {
                                 //.file(mockFile)
                                 .param("subject","mock를 통한 게시판 제목 입력")
                                 .param("contents","mock를 통한 게시판 내용 입력")
-                                //.content(strParameter)
+                        //.content(strParameter)
                 )
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andReturn();
+                        .andDo(print())
+                        .andExpect(status().isCreated())
+                        .andReturn();
     }
 
     /**
@@ -177,10 +177,10 @@ public class BoardTest {
 
         MvcResult result =
                 this.mockMvc.perform(get(API_BOARD))
-                .andDo(print())
-                .andExpect(status().isOk())
-                //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
-                .andReturn();
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
+                        .andReturn();
 
         /*
         logger.info("-------------------------------------------------");
@@ -211,12 +211,12 @@ public class BoardTest {
         MvcResult result =
                 this.mockMvc.perform(
                         get(API_BOARD)
-                        .param("searchCondition","fsafsafsafsafsafsafsawn")
-                    )
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
-                    .andReturn();
+                                .param("searchCondition","fsafsafsafsafsafsafsawn")
+                )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
+                        .andReturn();
     }
 
     public HttpHeaders getHeaderWithAuthToken(){
