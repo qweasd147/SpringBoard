@@ -11,56 +11,50 @@ const METHOD = {
     , delete : 'delete'
 }
 
-export function requestGET(apiURL, data, option={}){
-    const params = [data, option];
-
-    return requestAjax(apiURL, METHOD.get, params);
-}
-
-export function requestPOST(apiURL, data, option={}){
-    const params = [data, option];
+export function requestGET(...params){
+    const ajaxParams = handleParams(params);
     
-    return requestAjax(apiURL, METHOD.post, params);
+    return axios.get(...ajaxParams);
 }
 
-export function requestPUT(apiURL, data, option={}){
-    const params = [data, option];
+export function requestPOST(...params){
+    const ajaxParams = handleParams(params);
     
-    return requestAjax(apiURL, METHOD.put, params);
+    return axios.post(...ajaxParams);
 }
 
-export function requestDELETE(apiURL, data, option={}){
-    const params = [data, option];
+export function requestPUT(...params){
+    const ajaxParams = handleParams(params);
     
-    return requestAjax(apiURL, METHOD.delete, params);
+    return axios.put(...ajaxParams);
 }
 
-//요청 한 function을 구해서 ajax 호출 시 맞는 매개변수값을 넘겨준다.
-//axios 에선 첫번째 매개변수를 url로 고정함.
-function requestAjax(apiURL, method, params){
-    addAuthHeader(params[1]);
-    apiURL = HOST_NAME+apiURL;
-
-    let callFn;
-
-    switch(method){
-        case METHOD.get :
-            callFn = axios.get;
-            params = [params[1]];
-            break;
-        case METHOD.delete : 
-            callFn = axios.delete;
-            params = [params[1]];
-            break;
-        case METHOD.post : callFn = axios.post;break;
-        case METHOD.put : callFn = axios.put;break;
-        default : callFn = axios.get;break;
-    }
-
-    return callFn.apply(this, [apiURL].concat(params));
+export function requestDELETE(...params){
+    const ajaxParams = handleParams(params);
+    
+    return axios.delete(...ajaxParams);
 }
 
-function addAuthHeader(option = {}){
+/**
+ * 호스트 정보와 토큰 정보를 넣어 배열로 반환한다.
+ * @param {*} apiURL 
+ * @param {*} data 
+ * @param {*} option 
+ */
+function handleParams(apiURL, data, option={}){
+    addAuthFromCookie(option);
+
+    if(data)
+        return [HOST_NAME+apiURL, data, option]
+    else
+        return [HOST_NAME+apiURL, option]
+}
+
+/**
+ * 쿠키에서 토큰을 가져와 입력한다.
+ * @param {*} option 
+ */
+function addAuthFromCookie(option = {}){
 
     const authToken = cookieUtils.getCookie("Authorization");
 
@@ -71,5 +65,3 @@ function addAuthHeader(option = {}){
 }
 
 export { METHOD }
-
-
