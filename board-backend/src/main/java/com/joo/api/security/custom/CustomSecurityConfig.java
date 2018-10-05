@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,6 +32,9 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Autowired
     private CustomTokenFilter customTokenFilter;
+
+    @Autowired
+    private CustomAuthenticationProvider customAuthenticationProvider;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -63,6 +67,13 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
         http.addFilterBefore(customTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.cors().configurationSource(request -> getCorsConfigurationSource());
     }
+
+    /*
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(customAuthenticationProvider);
+    }
+    */
 
     @Bean
     @Override
@@ -101,7 +112,7 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(allowedHeaders);
         configuration.setAllowedMethods(allowedMethods);
-        //configuration.setMaxAge();
+        configuration.setMaxAge(3600L);
 
         return configuration;
     }

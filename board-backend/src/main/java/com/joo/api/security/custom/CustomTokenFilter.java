@@ -1,6 +1,8 @@
 package com.joo.api.security.custom;
 
 import com.joo.api.security.TokenUtils;
+import com.joo.exception.TokenExpiredException;
+import io.jsonwebtoken.lang.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,27 +55,39 @@ public class CustomTokenFilter extends OncePerRequestFilter{
 
         if(token != null && SecurityContextHolder.getContext().getAuthentication() == null){
             //토큰 정보가 있지만 spring context에 올려져 있지 않을 시 올려놓는다.
-            String userName = tokenUtils.getUsernameFromToken(token);
-            String thirdPartyToken = tokenUtils.getThirdPartyTokenFromToken(token);
-
-            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(userName);
-            userDetails.setThirdPartyToken(thirdPartyToken);
-
-            if(tokenUtils.validateToken(token, userDetails)){
-                logger.debug("pass validate");
-                //토큰 유효성을 체크한다.
-                UsernamePasswordAuthenticationToken authToken
-                        = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                //사용자 정보를 spring context에 올려 놓는다.
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }else{
-                logger.debug("validate 통과 실패! "+userDetails.toString());
-            }
+            setAuthInfo(request, token);
         }else {
             logger.debug("사용자 정보 없음");
         }
         filterChain.doFilter(request, response);
+    }
+
+    public void setAuthInfo(HttpServletRequest request, String token){
+
+        String userName = tokenUtils.getUsernameFromToken(token);
+
+        Assert.notNull(userName);
+
+        String thirdPartyToken = tokenUtils.getThirdPartyTokenFromToken(token);
+
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(userName);
+        userDetails.setThirdPartyToken(thirdPartyToken);
+
+        TokenUtils.TOKEN_STATUS tokenStatus = tokenUtils.getTokenStatus(token, userDetails);
+
+        if(tokenStatus == TokenUtils.TOKEN_STATUS.ENABLED){
+            logger.debug("pass validate");
+            //토큰 유효성을 체크한다.
+            UsernamePasswordAuthenticationToken authToken
+                    = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            //사용자 정보를 spring context에 올려 놓는다.
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }else if(tokenStatus == TokenUtils.TOKEN_STATUS.EXPIRED){
+            //throw new TokenExpiredException("expired");
+        }else{
+            logger.debug("validate 통과 실패! "+userDetails.toString());
+        }
     }
 }

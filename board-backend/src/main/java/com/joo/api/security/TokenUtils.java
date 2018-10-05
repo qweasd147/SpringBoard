@@ -8,10 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 차후 상수 값이나 그 외 값들이 spring과 연관 관계가 있을 수 있어서
@@ -25,15 +27,22 @@ public class TokenUtils {
     private final static String secret = "wngudWkdWkd";
     public final static Integer expiration = 86400;        //기간. 단위 초 => 하루
 
+    public enum TOKEN_STATUS {
+        ENABLED, EXPIRED, INVALID
+    }
+
     /**
      * 외부(naver, kakao 등)에서 사용 될 token
      */
     private final static String THIRDPARTY_TOKEN = "thirdpartyToken";
 
     public String getUsernameFromToken(String token) {
+        return this.getUsernameFromToken(this.getClaimsFromToken(token));
+    }
+
+    public String getUsernameFromToken(final Claims claims) {
         String username;
         try {
-            final Claims claims = this.getClaimsFromToken(token);
             username = claims.getSubject();
         } catch (Exception e) {
             username = null;
@@ -42,9 +51,12 @@ public class TokenUtils {
     }
 
     public String getPasswordFromToken(String token) {
+        return this.getPasswordFromToken(this.getClaimsFromToken(token));
+    }
+
+    public String getPasswordFromToken(final Claims claims) {
         String password;
         try {
-            final Claims claims = this.getClaimsFromToken(token);
             password = (String) claims.get("password");
         } catch (Exception e) {
             password = null;
@@ -53,9 +65,12 @@ public class TokenUtils {
     }
 
     public String getThirdPartyTokenFromToken(String token) {
+        return this.getThirdPartyTokenFromToken(this.getClaimsFromToken(token));
+    }
+
+    public String getThirdPartyTokenFromToken(final Claims claims) {
         String thirdpartyToken;
         try {
-            final Claims claims = this.getClaimsFromToken(token);
             thirdpartyToken = (String) claims.get(THIRDPARTY_TOKEN);
         } catch (Exception e) {
             thirdpartyToken = null;
@@ -69,9 +84,17 @@ public class TokenUtils {
      * @return
      */
     public Date getCreatedDateFromToken(String token) {
+        return this.getCreatedDateFromToken(this.getClaimsFromToken(token));
+    }
+
+    /**
+     * 토큰에서 생성 날짜를 파싱하여 반환한다.
+     * @param claims
+     * @return
+     */
+    public Date getCreatedDateFromToken(final Claims claims) {
         Date created;
         try {
-            final Claims claims = this.getClaimsFromToken(token);
             created = new Date((Long) claims.get("created"));
         } catch (Exception e) {
             created = null;
@@ -85,20 +108,25 @@ public class TokenUtils {
      * @return
      */
     public Date getExpirationDateFromToken(String token) {
-        Date expiration;
-        try {
-            final Claims claims = this.getClaimsFromToken(token);
-            expiration = claims.getExpiration();
-        } catch (Exception e) {
-            expiration = null;
-        }
-        return expiration;
+        return this.getCreatedDateFromToken(this.getClaimsFromToken(token));
+    }
+
+    /**
+     * 토큰에서 만료날짜를 가져온다.
+     * @param claims
+     * @return
+     */
+    public Date getExpirationDateFromToken(final Claims claims) {
+        return claims.getExpiration();
     }
 
     public String getAudienceFromToken(String token) {
+        return this.getAudienceFromToken(this.getClaimsFromToken(token));
+    }
+
+    public String getAudienceFromToken(final Claims claims) {
         String audience;
         try {
-            final Claims claims = this.getClaimsFromToken(token);
             audience = (String) claims.get("audience");
         } catch (Exception e) {
             audience = null;
@@ -144,8 +172,13 @@ public class TokenUtils {
      * @return
      */
     private Boolean isTokenExpired(String token) {
-        final Date expiration = this.getExpirationDateFromToken(token);
-        return expiration.before(this.createCurrentDate());
+        final Claims claims = this.getClaimsFromToken(token);
+
+        final Date expireDate = claims.getExpiration();
+        final Date createDate = new Date((Long) claims.get("created"));
+
+        // 만기일 < 생성일 or 현재시간 < 만기일  ==> 토큰 만료
+        return expireDate.before(createDate) || this.createCurrentDate().before(expireDate);
     }
 
     private Boolean isCreatedBeforeLastPasswordReset(
@@ -173,18 +206,23 @@ public class TokenUtils {
                 .signWith(SignatureAlgorithm.HS512, this.secret).compact();
     }
 
-    public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
+    public Boolean isTokenBeRefreshed(String token, Date lastPasswordReset) {
         final Date created = this.getCreatedDateFromToken(token);
         return (!(this.isCreatedBeforeLastPasswordReset(created,
                 lastPasswordReset)) && !(this.isTokenExpired(token)));
     }
 
-    public String refreshToken(String token) {
+    public String createRefreshToken(String token) {
         String refreshedToken;
         try {
             final Claims claims = this.getClaimsFromToken(token);
+
             claims.put("created", this.createCurrentDate());
-            refreshedToken = this.createToken(claims);
+            claims.setId(UUID.randomUUID().toString());
+            claims.setExpiration(new Date(System.currentTimeMillis() + this.expiration * 30 * 1000));   //30일
+
+            refreshedToken = Jwts.builder().setClaims(claims)
+                    .signWith(SignatureAlgorithm.HS512, this.secret).compact();
         } catch (Exception e) {
             refreshedToken = null;
         }
@@ -208,13 +246,38 @@ public class TokenUtils {
         return deletedToken;
     }
 
+    /**
+     * 토큰이 사용 가능한지 검사한다.
+     * @param token
+     * @param userDetails
+     * @return
+     */
     public Boolean validateToken(String token, UserDetails userDetails) {
-        CustomUserDetails user = (CustomUserDetails) userDetails;
-        final String username = this.getUsernameFromToken(token);
-        //final String password = this.getPasswordFromToken(token);
-        return (username.equals(user.getUsername())
-                && !(this.isTokenExpired(token))
-                //&& password.equals(user.getPassword())    비밀번호 직접 관리 안함
-        );
+
+        TOKEN_STATUS tokenStatus = getTokenStatus(token, userDetails);
+        return tokenStatus == TOKEN_STATUS.ENABLED;
+    }
+
+    /**
+     * 토큰 상태값을 가져온다.
+     * @param token
+     * @param userDetails
+     * @return
+     */
+    public TOKEN_STATUS getTokenStatus(String token, UserDetails userDetails){
+        if(token == null || userDetails == null)    return TOKEN_STATUS.INVALID;
+
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+
+        final Claims claims = this.getClaimsFromToken(token);
+        final String userNameFromToken = this.getUsernameFromToken(claims);
+        //final String password = this.getPasswordFromToken(claims);
+
+        if(StringUtils.isEmpty(userNameFromToken))  return TOKEN_STATUS.INVALID;
+
+        if(this.isTokenExpired(token))  return TOKEN_STATUS.EXPIRED;
+        if(userNameFromToken.equals(customUserDetails.getUsername()))   return TOKEN_STATUS.ENABLED;        //비밀번호도 할꺼면 여기서 userDetails랑 토큰에서 뽑아서 검사해야함
+
+        return TOKEN_STATUS.INVALID;
     }
 }

@@ -5,6 +5,9 @@ import com.joo.api.login.vo.UserVo;
 import com.joo.api.security.TokenUtils;
 import com.joo.api.security.custom.CustomUserDetails;
 import com.joo.api.user.service.UserService;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +31,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 import javax.sql.DataSource;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,16 +84,15 @@ public class BoardTest {
                 .build();
 
         //change datasource for testing
-        sqlSessionFactoryBean.setDataSource(getMockDataSource());
+        //sqlSessionFactoryBean.setDataSource(getMockDataSource());
 
         //insert dummy user
         dummyUser = getDummyUser();
-        userService.register(dummyUser);
     }
 
     @After
     public void deleteUser(){
-        //userService.deleteFromDB(dummyUser.getIdx());
+
     }
 
     public DataSource getMockDataSource(){
@@ -102,13 +108,15 @@ public class BoardTest {
     @Test
     public void testMain() throws Exception {
 
-        boardInsertTest();          //일반 글쓰기 요청 테스트
+        //boardInsertTest();          //일반 글쓰기 요청 테스트
         //boardListTest();            //일반 목록 요청 테스트
 
         //invalidBoardInsertTest();   //벨리데이션 체크용 잘못된 글쓰기 요청 테스트
         //invalidBoardListTest();     //벨리데이션 체크용 잘못된 목록 요청 테스트
 
-        userService.deleteFromDB(dummyUser.getIdx());
+        InvalidInsertWithExpiredToken();    //기간 만료된 토큰으로 글쓰기 요청
+
+        //userService.deleteFromDB(dummyUser.getIdx());
     }
 
     /**
@@ -219,6 +227,26 @@ public class BoardTest {
                         .andReturn();
     }
 
+    public void InvalidInsertWithExpiredToken(){
+        try {
+            MvcResult result =
+                    this.mockMvc.perform(
+                            fileUpload(API_BOARD)
+                                    //.file(mockFile)
+                                    .param("subject","mock를 통한 게시판 제목 입력")
+                                    .param("contents","mock를 통한 게시판 내용 입력")
+                                    .headers(getHeaderWithExpiredToken())
+                    )
+                            .andDo(print())
+                            .andExpect(status().isUnauthorized())
+                            .andReturn();
+
+            System.out.println(result.getResponse());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public HttpHeaders getHeaderWithAuthToken(){
         HttpHeaders httpHeaders = new HttpHeaders();
 
@@ -230,9 +258,23 @@ public class BoardTest {
         return httpHeaders;
     }
 
+    public HttpHeaders getHeaderWithExpiredToken(){
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        CustomUserDetails customUserDetails = new CustomUserDetails(dummyUser);
+
+        String token = this.tokenUtils.createToken(customUserDetails);
+        token = "Bearer " + this.tokenUtils.deleteToken(token);
+
+        httpHeaders.add(tokenHeader,token);
+
+        return httpHeaders;
+    }
+
     private UserVo getDummyUser(){
         UserVo userVo = new UserVo();
 
+        userVo.setIdx(-99);
         userVo.setId("mockID");
         userVo.setName("mockName");
         userVo.setEmail("mock@test.co.kr");
