@@ -1,5 +1,6 @@
 package com.joo.api.security;
 
+import com.joo.api.login.vo.UserVo;
 import com.joo.api.security.custom.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,10 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 차후 상수 값이나 그 외 값들이 spring과 연관 관계가 있을 수 있어서
@@ -28,7 +26,41 @@ public class TokenUtils {
     public final static Integer expiration = 86400;        //기간. 단위 초 => 하루
 
     public enum TOKEN_STATUS {
-        ENABLED, EXPIRED, INVALID
+        ENABLED(0), INVALID(1), EXPIRED(2);
+
+        private int state;
+
+        TOKEN_STATUS(int state) {
+            this.state = state;
+        }
+
+        public int getState() {
+            return state;
+        }
+
+        /**
+         * 토큰 상태값으로 UserVo 상태값을 찾는다.
+         *
+         * 일단 같은값 상수값으로 찾고, 없으면 lock상태값 변환
+         * @return
+         */
+        public UserVo.State getUserStateFromTokenStatus(){
+            return Arrays.stream(UserVo.State.values())
+                    .filter((voState)-> this.state == voState.getState())
+                    .findAny()
+                    .orElse(UserVo.State.LOCKED);
+        }
+
+        /**
+         * UserVo 상태값으로 토큰 상태값을 구한다.
+         * @return
+         */
+        public static TOKEN_STATUS getTokenStatusFromUserState(UserVo.State userState){
+            return Arrays.stream(TokenUtils.TOKEN_STATUS.values())
+                    .filter((tokenStatus)-> userState.getState() == tokenStatus.getState())
+                    .findAny()
+                    .orElse(TOKEN_STATUS.INVALID);
+        }
     }
 
     /**
@@ -273,9 +305,11 @@ public class TokenUtils {
         final String userNameFromToken = this.getUsernameFromToken(claims);
         //final String password = this.getPasswordFromToken(claims);
 
-        if(StringUtils.isEmpty(userNameFromToken))  return TOKEN_STATUS.INVALID;
-
-        if(this.isTokenExpired(token))  return TOKEN_STATUS.EXPIRED;
+        //잘못된 토큰 정보(파싱 불가)
+        if(StringUtils.isEmpty(userNameFromToken))                     return TOKEN_STATUS.INVALID;
+        //토큰 만료
+        if(this.isTokenExpired(token))                                  return TOKEN_STATUS.EXPIRED;
+        //그 외 사용할 수 있는지
         if(userNameFromToken.equals(customUserDetails.getUsername()))   return TOKEN_STATUS.ENABLED;        //비밀번호도 할꺼면 여기서 userDetails랑 토큰에서 뽑아서 검사해야함
 
         return TOKEN_STATUS.INVALID;

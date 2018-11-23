@@ -1,7 +1,7 @@
 package com.joo.api.security.custom;
 
 import com.joo.api.security.TokenUtils;
-import com.joo.exception.TokenExpiredException;
+import static com.joo.api.security.TokenUtils.TOKEN_STATUS;
 import io.jsonwebtoken.lang.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -21,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 public class CustomTokenFilter extends OncePerRequestFilter{
@@ -55,27 +55,30 @@ public class CustomTokenFilter extends OncePerRequestFilter{
 
         if(token != null && SecurityContextHolder.getContext().getAuthentication() == null){
             //토큰 정보가 있지만 spring context에 올려져 있지 않을 시 올려놓는다.
-            setAuthInfo(request, token);
+            setAuthInfo(request, response, token);
         }else {
             logger.debug("사용자 정보 없음");
         }
         filterChain.doFilter(request, response);
     }
 
-    public void setAuthInfo(HttpServletRequest request, String token){
+    public void setAuthInfo(HttpServletRequest request, HttpServletResponse response, String token) throws IOException {
 
         String userName = tokenUtils.getUsernameFromToken(token);
-
-        Assert.notNull(userName);
-
         String thirdPartyToken = tokenUtils.getThirdPartyTokenFromToken(token);
 
+        Objects.requireNonNull(userName, "not found user name from token. "+token);
+        if(Objects.isNull(thirdPartyToken)) logger.debug("not found third party token from token. "+token);
+
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(userName);
+        TOKEN_STATUS tokenStatus = tokenUtils.getTokenStatus(token, userDetails);
+
+        Objects.requireNonNull(tokenStatus, "not found token status from token. "+token);
+
         userDetails.setThirdPartyToken(thirdPartyToken);
+        userDetails.setState(tokenStatus.getUserStateFromTokenStatus());
 
-        TokenUtils.TOKEN_STATUS tokenStatus = tokenUtils.getTokenStatus(token, userDetails);
-
-        if(tokenStatus == TokenUtils.TOKEN_STATUS.ENABLED){
+        if(tokenStatus == TOKEN_STATUS.ENABLED){
             logger.debug("pass validate");
             //토큰 유효성을 체크한다.
             UsernamePasswordAuthenticationToken authToken
@@ -84,9 +87,9 @@ public class CustomTokenFilter extends OncePerRequestFilter{
             //사용자 정보를 spring context에 올려 놓는다.
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
-        }else if(tokenStatus == TokenUtils.TOKEN_STATUS.EXPIRED){
-            //throw new TokenExpiredException("expired");
-        }else{
+        } else if(tokenStatus == TOKEN_STATUS.EXPIRED){
+            response.sendError(401);
+        } else{
             logger.debug("validate 통과 실패! "+userDetails.toString());
         }
     }

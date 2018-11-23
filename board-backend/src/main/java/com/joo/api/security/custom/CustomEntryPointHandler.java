@@ -6,6 +6,7 @@ import com.joo.exception.TokenExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,11 @@ public class CustomEntryPointHandler implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException{
 
+        handleExceptionInSecurity(request, response, authException);
+    }
+
+    public void handleExceptionInSecurity(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException{
         logger.debug("login fail : "+request.getRequestURI());
 
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
@@ -35,6 +41,8 @@ public class CustomEntryPointHandler implements AuthenticationEntryPoint {
         Result failResult;
 
         if(authException instanceof TokenExpiredException){
+            failResult = Result.getFailResult(TokenExpiredException.EXCEPTION_CODE, "access token 기간 만료", null);
+        }else if(authException instanceof AccountExpiredException){
             failResult = Result.getFailResult(TokenExpiredException.EXCEPTION_CODE, "access token 기간 만료", null);
         }else{
             failResult = Result.getFailResult("fail99", "인증 or 권한 부족", null);

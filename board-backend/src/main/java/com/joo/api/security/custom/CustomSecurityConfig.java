@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +34,6 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Autowired
     private CustomTokenFilter customTokenFilter;
-
-    @Autowired
-    private CustomAuthenticationProvider customAuthenticationProvider;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -55,7 +54,7 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
                 .exceptionHandling().authenticationEntryPoint(this.customEntryPointHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()   //사용자의 쿠키에 세션을 저장하지 않겠다
                 .authorizeRequests()
-                //.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()                     //Preflight 요청은 따로 제한 x
                 .antMatchers("/api/authen/logout/").authenticated()                  //로그아웃은 인증된 사용자여야함
                 .antMatchers("/api/authen/login/**/callback").permitAll()           //로그인 처리 로직. 보안관련은 내부에서 검사함
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
@@ -67,13 +66,6 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
         http.addFilterBefore(customTokenFilter, UsernamePasswordAuthenticationFilter.class);
         http.cors().configurationSource(request -> getCorsConfigurationSource());
     }
-
-    /*
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(customAuthenticationProvider);
-    }
-    */
 
     @Bean
     @Override

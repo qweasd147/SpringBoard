@@ -114,9 +114,21 @@ public class BoardTest {
         //invalidBoardInsertTest();   //벨리데이션 체크용 잘못된 글쓰기 요청 테스트
         //invalidBoardListTest();     //벨리데이션 체크용 잘못된 목록 요청 테스트
 
-        InvalidInsertWithExpiredToken();    //기간 만료된 토큰으로 글쓰기 요청
+        invalidInsertWithExpiredToken();    //기간 만료된 토큰으로 글쓰기 요청
 
         //userService.deleteFromDB(dummyUser.getIdx());
+    }
+
+    @Test
+    public void testBoardWhenNormal() throws Exception {
+        boardInsertTest();          //일반 글쓰기 요청 테스트
+        boardListTest();            //일반 목록 요청 테스트
+    }
+
+    @Test
+    public void testBoardWhenInvalid() throws Exception {
+        invalidBoardInsertTest();   //벨리데이션 체크용 잘못된 글쓰기 요청 테스트
+        invalidBoardListTest();     //벨리데이션 체크용 잘못된 목록 요청 테스트
     }
 
     /**
@@ -206,7 +218,7 @@ public class BoardTest {
         MvcResult result =
                 this.mockMvc.perform(fileUpload(API_BOARD))
                         .andDo(print())
-                        .andExpect(status().isCreated())
+                        .andExpect(status().isUnauthorized())
                         .andReturn();
     }
 
@@ -227,7 +239,7 @@ public class BoardTest {
                         .andReturn();
     }
 
-    public void InvalidInsertWithExpiredToken(){
+    public void invalidInsertWithExpiredToken(){
         try {
             MvcResult result =
                     this.mockMvc.perform(

@@ -41,7 +41,7 @@ public class CustomUserDetails extends UserVo implements UserDetails{
 
     @Override
     public boolean isAccountNonExpired() {
-        return getState() == State.ENABLED;
+        return getState() != State.EXPIRED;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class CustomUserDetails extends UserVo implements UserDetails{
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return getState() == State.ENABLED;
+        return getState() != State.EXPIRED;
     }
 
     @Override
