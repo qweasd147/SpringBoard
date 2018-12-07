@@ -1,6 +1,6 @@
 package com.joo.service;
 
-import com.joo.model.entity.File;
+import com.joo.model.entity.FileEntity;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +14,7 @@ public interface FileService {
      * @param files
      * @return
      */
-    List<File> uploadFilesInPhysical(MultipartFile[] files);
+    List<FileEntity> uploadFilesInPhysical(MultipartFile[] files);
 
     /**
      * 단건 파일 하나를 조회한다.
@@ -22,35 +22,35 @@ public interface FileService {
      * @param fileIdx
      * @return
      */
-    File selectFile(int boardIdx, int fileIdx);     //TODO : 차후 board랑 file 연관관계 끊는게 좋을꺼 같음
+    FileEntity selectFile(int boardIdx, int fileIdx);     //TODO : 차후 board랑 file 연관관계 끊는게 좋을꺼 같음
 
     /**
      * 게시글에 등록된 파일 목록을 조회한다.
      * @param boardIdx
      * @return
      */
-    List<File> selectFileList(int boardIdx);
+    List<FileEntity> selectFileList(int boardIdx);
 
     /**
      * 게시글에 등록된 파일들의 기본적인 정보만 조회한다.
      * @param boardIdx
      * @return
      */
-    List<File> selectBasicFileList(int boardIdx);
+    List<FileEntity> selectBasicFileList(int boardIdx);
 
     /**
      * 파일들 정보를 DB에 저장한다.
-     * @param FileList
+     * @param fileEntityList
      * @return
      */
-    List<File> insertFileList(List<File> FileList);
+    List<FileEntity> insertFileList(List<FileEntity> fileEntityList);
 
     /**
      * 파일 맵핑 정보를 저장한다.
      * @param boardIdx
-     * @param FileList
+     * @param fileEntityList
      */
-    void insertFileMapping(int boardIdx, List<File> FileList);
+    void insertFileMapping(int boardIdx, List<FileEntity> fileEntityList);
 
     /**
      * 요청한 파일 목록의 정보를 삭제한다.
@@ -66,8 +66,8 @@ public interface FileService {
 
     /**
      * 해당 파일의 리소스 정보를 얻는다.
-     * @param File
+     * @param fileEntity
      * @return
      */
-    Resource getFileResouce(File File);
+    Resource getFileResouce(FileEntity fileEntity);
 }

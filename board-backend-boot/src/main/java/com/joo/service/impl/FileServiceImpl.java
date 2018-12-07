@@ -1,7 +1,8 @@
 package com.joo.service.impl;
 
-import com.joo.model.entity.File;
+import com.joo.model.entity.FileEntity;
 import com.joo.repository.FileRepository;
+import com.joo.service.BaseService;
 import com.joo.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-public class FileServiceImpl implements FileService{
+public class FileServiceImpl extends BaseService implements FileService{
 
     private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
@@ -37,8 +36,10 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public List<File> uploadFilesInPhysical(MultipartFile[] files) {
-        List<File> uploadedList = new ArrayList<>();
+    public List<FileEntity> uploadFilesInPhysical(MultipartFile[] files) {
+        List<FileEntity> uploadedList = new ArrayList<>();
+
+        if(Objects.isNull(files))   return Collections.EMPTY_LIST;
 
         for (int i=0;i< files.length;i++){
             MultipartFile file = files[i];
@@ -55,43 +56,44 @@ public class FileServiceImpl implements FileService{
                 e.printStackTrace();
             }
 
-            File fileVo = new File();
+            FileEntity fileEntity = new FileEntity();
 
-            fileVo.setContentType(file.getContentType());
-            fileVo.setFilePath(baseUploadPath.toAbsolutePath().toString());
-            fileVo.setOriginFileName(originFileName);
-            fileVo.setSaveFileName(saveFileName);
-            fileVo.setFileSize(file.getSize());
+            fileEntity.setContentType(file.getContentType());
+            fileEntity.setFilePath(baseUploadPath.toAbsolutePath().toString());
+            fileEntity.setOriginFileName(originFileName);
+            fileEntity.setSaveFileName(saveFileName);
+            fileEntity.setFileSize(file.getSize());
 
-            uploadedList.add(fileVo);
+            uploadedList.add(fileEntity);
         }
 
         return uploadedList;
     }
 
     @Override
-    public File selectFile(int boardIdx, int fileIdx) {
+    public FileEntity selectFile(int boardIdx, int fileIdx) {
+        //TODO : check board idx
         return fileRepository.findById((long) fileIdx).orElseThrow(()->new RuntimeException("못찾음"));
     }
 
     @Override
-    public List<File> selectFileList(int boardIdx) {
+    public List<FileEntity> selectFileList(int boardIdx) {
 
         return null;
     }
 
     @Override
-    public List<File> selectBasicFileList(int boardIdx) {
+    public List<FileEntity> selectBasicFileList(int boardIdx) {
         return null;
     }
 
     @Override
-    public List<File> insertFileList(List<File> FileList) {
+    public List<FileEntity> insertFileList(List<FileEntity> fileEntityList) {
         return null;
     }
 
     @Override
-    public void insertFileMapping(int boardIdx, List<File> FileList) {
+    public void insertFileMapping(int boardIdx, List<FileEntity> fileEntityList) {
 
     }
 
@@ -106,7 +108,7 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public Resource getFileResouce(File fileEntity) {
+    public Resource getFileResouce(FileEntity fileEntity) {
         Path file = Paths.get(fileEntity.getFilePath(), fileEntity.getSaveFileName());
 
         Resource resource;
