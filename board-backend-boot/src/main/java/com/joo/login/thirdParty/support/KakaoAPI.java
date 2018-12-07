@@ -1,0 +1,134 @@
+package com.joo.login.thirdParty.support;
+
+
+import com.github.scribejava.core.model.Verb;
+import com.joo.login.build.LoginAPI;
+import com.joo.login.build.LoginFactory;
+import com.joo.model.dto.UserDto;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class KakaoAPI extends LoginFactory {
+	
+	private static final Logger logger = LoggerFactory.getLogger(KakaoAPI.class);
+	
+	//TODO : host값을 어디서 초기화 해야 하는지 고민중
+	private String host = "http://localhost";
+	
+	private String serviceName;
+	private String clientId;
+	private String clientSecret;
+	private String redirectURL;
+	private String accessTokenEndPoint;
+	private String authorizationBaseURL;
+	
+	@Override
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	@Override
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	@Override
+	public void setClientSecret(String clientSecret) {
+		this.clientSecret = clientSecret;
+	}
+
+	@Override
+	public void setRedirectURL(String redirectURL) {
+		this.redirectURL = host + redirectURL;
+	}
+
+	@Override
+	public void setAccesstokenEndpoint(String accessTokenEndPoint) {
+		this.accessTokenEndPoint = accessTokenEndPoint;
+		
+	}
+
+	@Override
+	public void setAuthorizationBaseURL(String authorizationBaseURL) {
+		this.authorizationBaseURL = authorizationBaseURL;
+	}
+
+	@Override
+	public String getServiceName() {
+		return serviceName;
+	}
+
+
+	@Override
+	public String getClientId() {
+		return clientId;
+	}
+
+	@Override
+	public String getClientSecret() {
+		return clientSecret;
+	}
+
+	@Override
+	public String getRedirectURL() {
+		return redirectURL;
+	}
+
+	@Override
+	public String getAccesstokenEndpoint() {
+		return accessTokenEndPoint;
+	}
+
+	@Override
+	public String getAuthorizationBaseURL() {
+		return authorizationBaseURL;
+	}
+
+	@Override
+	public UserDto profileToUserVo(JSONObject userProfile) {
+		UserDto userDto = new UserDto();
+		JSONObject properties = null;
+		
+		if(userProfile == null || !userProfile.containsKey("properties")) {
+			logger.error("통신 실패!");
+			return null;
+		}
+		
+		try {
+			properties = (JSONObject) userProfile.get("properties");
+
+			String id =userProfile.get("id").toString();	//long 형태로 반환된걸 String으로 변환
+			String name = (String) properties.get("nickname");
+			String nickName = (String) properties.get("nickname");
+			String email = (String) userProfile.get("kaccount_email");
+
+			userDto.setId(id)
+				.setName(name)
+				.setNickName(nickName)
+				.setEmail(email)
+				.setServiceName("kakao");
+		}catch (Exception e) {
+			//parsing exception
+			throw e;
+		}
+		return userDto;
+	}
+
+	@Override
+	public String logoutProcess(String thirdpartyToken) throws IOException {
+		
+		String requestKey = getPropertiesKey(LoginAPI.LOGOUT_KEY);
+
+		Map<String, String> params = new HashMap<>();
+		params.put(ACCESS_TOKEN, thirdpartyToken);
+
+		String result = requestAPI(Verb.GET, requestKey , params);
+		
+		return result;
+	}
+}
