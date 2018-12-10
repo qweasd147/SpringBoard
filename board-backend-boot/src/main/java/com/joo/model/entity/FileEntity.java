@@ -1,6 +1,8 @@
 package com.joo.model.entity;
 
 
+import com.joo.model.dto.FileDto;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -80,5 +82,9 @@ public class FileEntity extends BaseEntity<String>{
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public FileDto toDto(){
+        return convertType(this, FileDto.class);
     }
 }

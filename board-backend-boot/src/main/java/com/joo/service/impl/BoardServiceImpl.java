@@ -1,5 +1,7 @@
 package com.joo.service.impl;
 
+import com.joo.model.dto.BoardDto;
+import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.BoardSearchEntity;
 import com.joo.repository.BoardRepository;
@@ -23,9 +25,9 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     BoardRepository boardRepository;
 
     @Override
-    public Map selectBoardList(BoardSearchEntity boardSearchEntity, Pageable pageable) {
+    public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
 
-        Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchEntity), pageable);
+        Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);
 
         Map<String, Object> listData = new HashMap<>();
 
@@ -37,23 +39,24 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     }
 
     @Override
-    public int selectBoardListTotCount(BoardSearchEntity boardSearchEntity) {
-        return (int) boardRepository.count(getBoardSpec(boardSearchEntity));
+    public int selectBoardListTotCount(BoardSearchDto boardSearchDto) {
+        return (int) boardRepository.count(getBoardSpec(boardSearchDto));
     }
 
     @Override
-    public BoardEntity selectBoardOne(BoardSearchEntity boardSearchEntity) {
-        return boardRepository.findById((long) boardSearchEntity.getBoardIdx()).orElseThrow(()->new RuntimeException("못찾음"));
+    public BoardDto selectBoardOne(BoardSearchDto boardSearchDto) {
+        BoardEntity boardEntity = boardRepository.findById((long) boardSearchDto.getBoardIdx()).orElseThrow(() -> new RuntimeException("못찾음"));
+        return boardEntity.toDto();
     }
 
     @Override
-    public BoardEntity insertBoard(BoardEntity boardEntity, MultipartFile[] uploadFile) {
-        return boardRepository.save(boardEntity);
+    public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
+        return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
     @Override
-    public BoardEntity updateBoard(BoardEntity boardVo, MultipartFile[] uploadFile, List<Integer> detachFileList) {
-        return boardRepository.save(boardVo);
+    public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Integer> detachFileList) {
+        return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
     @Override
@@ -64,13 +67,13 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
     /**
      * 조회 검색 조건을 반환한다.
-     * @param boardSearchEntity
+     * @param boardSearchDto
      * @return
      */
-    private static Specification<BoardEntity> getBoardSpec(BoardSearchEntity boardSearchEntity){
+    private static Specification<BoardEntity> getBoardSpec(BoardSearchDto boardSearchDto){
         return (root, query, cb)->{
-            String condition = boardSearchEntity.getSearchCondition();  //검색할 column
-            String containsLikePattern = getJpaContainsLikePattern(boardSearchEntity.getSearchKeyWord());   //검색 키워드
+            String condition = boardSearchDto.getSearchCondition();  //검색할 column
+            String containsLikePattern = getJpaContainsLikePattern(boardSearchDto.getSearchKeyWord());   //검색 키워드
 
             return cb.or(cb.like(cb.lower(root.get(condition)), containsLikePattern));
         };

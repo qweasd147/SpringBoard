@@ -2,6 +2,7 @@ package com.joo.model.dto;
 
 
 import com.joo.model.BaseModel;
+import com.joo.model.entity.BoardEntity;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -95,5 +96,9 @@ public class BoardDto extends BaseModel implements Serializable {
 
     public void setTagList(List<?> tagList) {
         this.tagList = tagList;
+    }
+
+    public BoardEntity toEntity(){
+        return convertType(this, BoardEntity.class);
     }
 }

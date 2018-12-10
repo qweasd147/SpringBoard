@@ -1,7 +1,7 @@
 package com.joo.service;
 
-import com.joo.model.entity.BoardEntity;
-import com.joo.model.entity.BoardSearchEntity;
+import com.joo.model.dto.BoardDto;
+import com.joo.model.dto.BoardSearchDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,41 +12,41 @@ public interface BoardService {
 
     /**
      * 게시물 리스트를 조회한다.
-     * @param boardSearchEntity
+     * @param boardSearchDto
      * @return
      */
-    Map selectBoardList(BoardSearchEntity boardSearchEntity, Pageable pageable);
+    Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable);
 
     /**
      * 게시물 리스트 전체 개수를 조회한다.
-     * @param boardSearchEntity
+     * @param boardSearchDto
      * @return
      */
-    int selectBoardListTotCount(BoardSearchEntity boardSearchEntity);
+    int selectBoardListTotCount(BoardSearchDto boardSearchDto);
 
     /**
      * 게시물 하나를 조회한다.
-     * @param boardSearchEntity
+     * @param boardSearchDto
      * @return
      */
-    BoardEntity selectBoardOne(BoardSearchEntity boardSearchEntity);
+    BoardDto selectBoardOne(BoardSearchDto boardSearchDto);
 
     /**
      * 게시물 하나를 등록한다.
-     * @param boardEntity
-     * @param uploadFile
+     * @param boardDto
+     * @param uploadFiles
      * @return
      */
-    BoardEntity insertBoard(BoardEntity boardEntity, MultipartFile[] uploadFile);
+    BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFiles);
 
     /**
      * 게시물 하나를 수정한다.
-     * @param boardEntity
-     * @param uploadFile
+     * @param boardDto
+     * @param uploadFiles
      * @param detachFileList
      * @return
      */
-    BoardEntity updateBoard(BoardEntity boardEntity, MultipartFile[] uploadFile, List<Integer> detachFileList);
+    BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFiles, List<Integer> detachFileList);
 
     /**
      * 게시물 하나를 삭제한다.

@@ -1,6 +1,7 @@
 package com.joo.model.dto;
 
 import com.joo.model.BaseModel;
+import com.joo.model.entity.FileEntity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -89,5 +90,9 @@ public class FileDto extends BaseModel implements Serializable{
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public FileEntity toEntity(){
+        return convertType(this, FileEntity.class);
     }
 }

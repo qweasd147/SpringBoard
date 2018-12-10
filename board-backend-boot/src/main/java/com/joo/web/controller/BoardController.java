@@ -6,6 +6,7 @@ import com.joo.service.BoardService;
 import com.joo.service.FileService;
 import com.joo.web.controller.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +25,14 @@ public class BoardController implements BaseController{
     @Autowired
     private FileService fileService;
 
-    @RequestMapping(value = "/board", method = RequestMethod.GET)
-    public ResponseEntity selectBoardList(@ModelAttribute @Valid BoardSearchDto searchDto, BindingResult br){
+    @GetMapping("/board")
+    public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable, BindingResult br){
 
         if(br.hasErrors()){
             throw new ValidateException(br, searchDto);
         }
 
-        Map<String, ?> listData = boardService.selectBoardList(searchDto);
+        Map<String, ?> listData = boardService.selectBoardList(searchDto, pageable);
 
         return successRespResult(listData);
     }

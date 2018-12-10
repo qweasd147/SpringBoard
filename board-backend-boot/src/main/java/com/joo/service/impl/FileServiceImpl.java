@@ -1,5 +1,6 @@
 package com.joo.service.impl;
 
+import com.joo.model.dto.FileDto;
 import com.joo.model.entity.FileEntity;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
@@ -36,13 +37,13 @@ public class FileServiceImpl extends BaseService implements FileService{
     }
 
     @Override
-    public List<FileEntity> uploadFilesInPhysical(MultipartFile[] files) {
-        List<FileEntity> uploadedList = new ArrayList<>();
+    public List<FileDto> uploadFilesInPhysical(MultipartFile[] multipartFiles) {
+        List<FileDto> uploadedList = new ArrayList<>();
 
-        if(Objects.isNull(files))   return Collections.EMPTY_LIST;
+        if(Objects.isNull(multipartFiles))   return Collections.EMPTY_LIST;
 
-        for (int i=0;i< files.length;i++){
-            MultipartFile file = files[i];
+        for (int i=0;i< multipartFiles.length;i++){
+            MultipartFile file = multipartFiles[i];
             if(!isAvaliableFile(file))  continue;       //check file validate
 
             String saveFileName = UUID.randomUUID().toString();
@@ -56,44 +57,44 @@ public class FileServiceImpl extends BaseService implements FileService{
                 e.printStackTrace();
             }
 
-            FileEntity fileEntity = new FileEntity();
+            FileDto fileDto = new FileDto();
 
-            fileEntity.setContentType(file.getContentType());
-            fileEntity.setFilePath(baseUploadPath.toAbsolutePath().toString());
-            fileEntity.setOriginFileName(originFileName);
-            fileEntity.setSaveFileName(saveFileName);
-            fileEntity.setFileSize(file.getSize());
+            fileDto.setContentType(file.getContentType());
+            fileDto.setFilePath(baseUploadPath.toAbsolutePath().toString());
+            fileDto.setOriginFileName(originFileName);
+            fileDto.setSaveFileName(saveFileName);
+            fileDto.setFileSize(file.getSize());
 
-            uploadedList.add(fileEntity);
+            uploadedList.add(fileDto);
         }
 
         return uploadedList;
     }
 
     @Override
-    public FileEntity selectFile(int boardIdx, int fileIdx) {
+    public FileDto selectFile(int boardIdx, int fileIdx) {
         //TODO : check board idx
-        return fileRepository.findById((long) fileIdx).orElseThrow(()->new RuntimeException("못찾음"));
+        return fileRepository.findById((long) fileIdx).orElseThrow(()->new RuntimeException("못찾음")).toDto();
     }
 
     @Override
-    public List<FileEntity> selectFileList(int boardIdx) {
+    public List<FileDto> selectFileList(int boardIdx) {
 
         return null;
     }
 
     @Override
-    public List<FileEntity> selectBasicFileList(int boardIdx) {
+    public List<FileDto> selectBasicFileList(int boardIdx) {
         return null;
     }
 
     @Override
-    public List<FileEntity> insertFileList(List<FileEntity> fileEntityList) {
+    public List<FileDto> insertFileList(List<FileDto> fileDtoList) {
         return null;
     }
 
     @Override
-    public void insertFileMapping(int boardIdx, List<FileEntity> fileEntityList) {
+    public void insertFileMapping(int boardIdx, List<FileDto> fileDtoList) {
 
     }
 
@@ -108,8 +109,8 @@ public class FileServiceImpl extends BaseService implements FileService{
     }
 
     @Override
-    public Resource getFileResouce(FileEntity fileEntity) {
-        Path file = Paths.get(fileEntity.getFilePath(), fileEntity.getSaveFileName());
+    public Resource getFileResouce(FileDto fileDto) {
+        Path file = Paths.get(fileDto.getFilePath(), fileDto.getSaveFileName());
 
         Resource resource;
         try {
@@ -121,7 +122,7 @@ public class FileServiceImpl extends BaseService implements FileService{
                 throw new MalformedURLException("파일을 읽을 수 없음");
             }
         } catch (MalformedURLException e) {
-            String fileFullPath = fileEntity.getFilePath()+"/"+fileEntity.getSaveFileName()+"("+fileEntity.getOriginFileName()+")";
+            String fileFullPath = fileDto.getFilePath()+"/"+fileDto.getSaveFileName()+"("+fileDto.getOriginFileName()+")";
             logger.error("file ERROR!");
             logger.error(fileFullPath);
             logger.error(e.getMessage());

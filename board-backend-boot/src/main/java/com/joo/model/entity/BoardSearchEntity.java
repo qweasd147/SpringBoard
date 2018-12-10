@@ -1,6 +1,7 @@
 package com.joo.model.entity;
 
 import com.joo.model.BaseModel;
+import com.joo.model.dto.BoardSearchDto;
 
 import java.io.Serializable;
 
@@ -52,5 +53,9 @@ public class BoardSearchEntity extends BaseModel implements Serializable{
 
     public void setRowsPerPage(int rowsPerPage) {
         this.rowsPerPage = rowsPerPage;
+    }
+
+    public BoardSearchDto toDto(){
+        return convertType(this, BoardSearchDto.class);
     }
 }
