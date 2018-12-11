@@ -3,9 +3,7 @@ package com.joo.model.entity;
 
 import com.joo.model.dto.FileDto;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 public class FileEntity extends BaseEntity<String>{
 
@@ -19,6 +17,18 @@ public class FileEntity extends BaseEntity<String>{
     private long fileSize;
     private String writer;
     private int state;
+
+    @ManyToOne(targetEntity = BoardEntity.class)
+    private BoardEntity boardEntity;
+
+
+    public BoardEntity getBoardEntity() {
+        return boardEntity;
+    }
+
+    public void setBoardEntity(BoardEntity boardEntity) {
+        this.boardEntity = boardEntity;
+    }
 
     public Long getIdx() {
         return idx;
