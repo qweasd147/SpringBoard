@@ -8,6 +8,7 @@ import com.joo.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,8 @@ public class FileServiceImpl extends BaseService implements FileService{
 
     private final Path baseUploadPath;
 
-    public FileServiceImpl(Path baseUploadPath) {
-        this.baseUploadPath = baseUploadPath;
+    public FileServiceImpl(@Value("${file.upload.dir}")String fileUploadPath) {
+        this.baseUploadPath = Paths.get(fileUploadPath);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class FileServiceImpl extends BaseService implements FileService{
     }
 
     @Override
-    public FileDto selectFile(int boardIdx, int fileIdx) {
+    public FileDto selectFileOne(int boardIdx, int fileIdx) {
         //TODO : check board idx
         return fileRepository.findById((long) fileIdx).orElseThrow(()->new RuntimeException("못찾음")).toDto();
     }

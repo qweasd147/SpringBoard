@@ -44,8 +44,8 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     }
 
     @Override
-    public BoardDto selectBoardOne(BoardSearchDto boardSearchDto) {
-        BoardEntity boardEntity = boardRepository.findById((long) boardSearchDto.getBoardIdx()).orElseThrow(() -> new RuntimeException("못찾음"));
+    public BoardDto selectBoardOne(int boardId) {
+        BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new RuntimeException("못찾음"));
         return boardEntity.toDto();
     }
 

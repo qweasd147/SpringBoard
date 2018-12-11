@@ -22,7 +22,7 @@ public interface FileService {
      * @param fileIdx
      * @return
      */
-    FileDto selectFile(int boardIdx, int fileIdx);     //TODO : 차후 board랑 file 연관관계 끊는게 좋을꺼 같음
+    FileDto selectFileOne(int boardIdx, int fileIdx);     //TODO : 차후 board랑 file 연관관계 끊는게 좋을꺼 같음
 
     /**
      * 게시글에 등록된 파일 목록을 조회한다.

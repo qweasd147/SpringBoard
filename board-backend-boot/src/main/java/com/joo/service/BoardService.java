@@ -26,10 +26,10 @@ public interface BoardService {
 
     /**
      * 게시물 하나를 조회한다.
-     * @param boardSearchDto
+     * @param boardId
      * @return
      */
-    BoardDto selectBoardOne(BoardSearchDto boardSearchDto);
+    BoardDto selectBoardOne(int boardId);
 
     /**
      * 게시물 하나를 등록한다.

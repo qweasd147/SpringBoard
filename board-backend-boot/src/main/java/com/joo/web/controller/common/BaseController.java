@@ -44,7 +44,7 @@ public interface BaseController {
         return new ResponseEntity<>(result, httpStatus);
     }
 
-    default ResponseEntity<Resource> getResourceResp(String fileName, Resource fileResource){
+    default ResponseEntity<Resource> getRespResource(String fileName, Resource fileResource){
 
         String encodedFileName;
         try {
