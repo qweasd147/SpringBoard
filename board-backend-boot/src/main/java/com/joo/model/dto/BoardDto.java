@@ -3,6 +3,7 @@ package com.joo.model.dto;
 
 import com.joo.model.BaseModel;
 import com.joo.model.entity.BoardEntity;
+import com.joo.model.state.BoardState;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -20,7 +21,7 @@ public class BoardDto extends BaseModel implements Serializable {
     @NotNull
     private String contents;
     private int hits;
-    private int state;
+    private BoardState boardState;
     private String writer;
     private Date regDate;
     private List<FileDto> fileList;
@@ -58,12 +59,16 @@ public class BoardDto extends BaseModel implements Serializable {
         this.hits = hits;
     }
 
-    public int getState() {
-        return state;
+    public BoardState getState() {
+        return boardState;
+    }
+
+    public void setState(BoardState boardState) {
+        this.boardState = boardState;
     }
 
     public void setState(int state) {
-        this.state = state;
+        this.boardState = BoardState.getStateByCode(state);
     }
 
     public String getWriter() {

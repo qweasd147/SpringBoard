@@ -1,6 +1,6 @@
 package com.joo.login;
 
-import com.joo.api.login.vo.UserVo;
+import com.joo.model.dto.UserDto;
 
 import java.util.Map;
 
@@ -10,5 +10,5 @@ public interface LoginService {
      * @param userVo
      * @return
      */
-    Map<String, String> getUser(UserVo userVo);
+    Map<String, String> getUser(UserDto userVo);
 }

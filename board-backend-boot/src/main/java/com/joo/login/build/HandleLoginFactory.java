@@ -51,27 +51,27 @@ public class HandleLoginFactory {
 
 	public Map<String, String> getLoginURLParams(){
 
+		if(loginAPIList == null){
+			logger.warn("not exist LoginFactory instance");
+			return Collections.EMPTY_MAP;
+		}
+
 		Map<String, String> urlMap = new HashMap<>();
 
-		if(loginAPIList != null){
+		String state = UUID.randomUUID().toString();
+		WebUtil.setSession(LoginAPI.LOGIN_SESSION_STATE_KEY, state);
 
-			String state = UUID.randomUUID().toString();
-			WebUtil.setSession(LoginAPI.LOGIN_SESSION_STATE_KEY, state);
+		HttpSession session = WebUtil.getSession();
 
-			HttpSession session = WebUtil.getSession();
+		for(int i=0;i<loginAPIList.size();i++){
+			LoginAPI loginFactoryClazz = loginAPIList.get(i);
 
-			for(int i=0;i<loginAPIList.size();i++){
-				LoginAPI loginFactoryClazz = loginAPIList.get(i);
+			logger.info("load login factory. "+loginFactoryClazz.getServiceName());
 
-				logger.info("load login factory. "+loginFactoryClazz.getServiceName());
+			String authURL = loginFactoryClazz.getAuthorizationUrl(session, state);
+			String serviceUrlName = loginFactoryClazz.getServiceName()+"URL";
 
-				String authURL = loginFactoryClazz.getAuthorizationUrl(session, state);
-				String serviceUrlName = loginFactoryClazz.getServiceName()+"URL";
-
-				urlMap.put(serviceUrlName, authURL);
-			}
-		}else{
-			logger.warn("not exist LoginFactory instance");
+			urlMap.put(serviceUrlName, authURL);
 		}
 
 		return urlMap;

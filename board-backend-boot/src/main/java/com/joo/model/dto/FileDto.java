@@ -1,6 +1,7 @@
 package com.joo.model.dto;
 
 import com.joo.model.BaseModel;
+import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public class FileDto extends BaseModel implements Serializable{
     private String writer;
     private Date regDate;
     private int state;
+    private BoardDto boardDto;
 
     public int getIdx() {
         return idx;
@@ -90,6 +92,14 @@ public class FileDto extends BaseModel implements Serializable{
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public BoardDto getBoardDto() {
+        return boardDto;
+    }
+
+    public void setBoardDto(BoardDto boardDto) {
+        this.boardDto = boardDto;
     }
 
     public FileEntity toEntity(){

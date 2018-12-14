@@ -1,10 +1,13 @@
 package com.joo.service.impl;
 
+import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.FileDto;
 import com.joo.model.entity.FileEntity;
+import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
 import com.joo.service.FileService;
+import org.apache.lucene.search.grouping.CollectedSearchGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FileServiceImpl extends BaseService implements FileService{
@@ -30,6 +34,9 @@ public class FileServiceImpl extends BaseService implements FileService{
 
     @Autowired
     FileRepository fileRepository;
+
+    @Autowired
+    BoardRepository boardRepository;
 
     private final Path baseUploadPath;
 
@@ -55,7 +62,9 @@ public class FileServiceImpl extends BaseService implements FileService{
                 Files.copy(fileInputStream, baseUploadPath.resolve(saveFileName),
                         StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("파일 저장 에러");
+                logger.error("save file name : {0}, origin file name : {1}", saveFileName, originFileName);
+                logger.error(e.getMessage());
             }
 
             FileDto fileDto = new FileDto();
@@ -74,14 +83,24 @@ public class FileServiceImpl extends BaseService implements FileService{
 
     @Override
     public FileDto selectFileOne(int boardIdx, int fileIdx) {
-        //TODO : check board idx
-        return fileRepository.findById((long) fileIdx).orElseThrow(()->new RuntimeException("못찾음")).toDto();
+
+        FileDto fileDto = fileRepository.findById((long) fileIdx).orElseThrow(() -> new RuntimeException("못찾음")).toDto();
+        BoardDto boardDto = fileDto.getBoardDto();
+        if(boardDto.getIdx() != boardIdx){
+            new RuntimeException("못찾음");
+        }
+
+        return fileDto;
     }
 
     @Override
     public List<FileDto> selectFileList(int boardIdx) {
 
-        return null;
+        List<FileEntity> fileEntityList =
+                boardRepository
+                    .findById((long) boardIdx)
+                    .orElseThrow(() -> new RuntimeException("못찾음")).getFileList();
+        return fileEntityList.stream().map(FileEntity::toDto).collect(Collectors.toList());
     }
 
     @Override
