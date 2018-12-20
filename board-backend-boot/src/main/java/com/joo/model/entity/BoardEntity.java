@@ -11,7 +11,7 @@ public class BoardEntity extends BaseEntity<String>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idx;
+    private Long idx;
 
     @Column(nullable = false)
     @NotNull
@@ -27,14 +27,13 @@ public class BoardEntity extends BaseEntity<String>{
     //board 조회 시, file도 같이 조회, 삭제 시 연관 파일 삭제
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<FileEntity> fileList;
-
     private List<?> tagList;
 
-    public int getIdx() {
+    public Long getIdx() {
         return idx;
     }
 
-    public void setIdx(int idx) {
+    public void setIdx(Long idx) {
         this.idx = idx;
     }
 

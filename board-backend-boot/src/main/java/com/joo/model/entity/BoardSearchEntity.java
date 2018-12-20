@@ -7,16 +7,16 @@ import java.io.Serializable;
 
 public class BoardSearchEntity extends BaseModel implements Serializable{
 
-    private int boardIdx;
+    private Long boardIdx;
 
     private String searchCondition = "";
     private String searchKeyWord = "";
 
-    public int getBoardIdx() {
+    public Long getBoardIdx() {
         return boardIdx;
     }
 
-    public void setBoardIdx(int boardIdx) {
+    public void setBoardIdx(Long boardIdx) {
         this.boardIdx = boardIdx;
     }
 

@@ -14,7 +14,7 @@ public class BoardDto extends BaseModel implements Serializable {
 
     private static final long serialVersionUID = 6348958289640869735L;
 
-    private int idx;
+    private Long idx;
 
     @NotNull
     private String subject;
@@ -27,11 +27,11 @@ public class BoardDto extends BaseModel implements Serializable {
     private List<FileDto> fileList;
     private List<?> tagList;
 
-    public int getIdx() {
+    public Long getIdx() {
         return idx;
     }
 
-    public void setIdx(int idx) {
+    public void setIdx(Long idx) {
         this.idx = idx;
     }
 

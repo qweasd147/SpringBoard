@@ -8,9 +8,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class Application {
 
 	static final String PROPERTIES = "spring.config.location="
-		+ "classpath:application.properties"
-		+ "classpath:thirdparty.request.properties,"
-		+ "classpath:thirdparty.security.properties";
+		+ "classpath:application.properties";
+		//+ "classpath:thirdparty.request.properties,"
+		//+ "classpath:thirdparty.security.properties";
 
 
 	public static void main(String[] args) {

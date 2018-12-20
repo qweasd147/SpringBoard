@@ -11,7 +11,7 @@ public class FileDto extends BaseModel implements Serializable{
 
     private static final long serialVersionUID = 2956026631315470683L;
 
-    private int idx;
+    private Long idx;
     private String contentType;
     private String filePath;
     private String originFileName;
@@ -22,11 +22,11 @@ public class FileDto extends BaseModel implements Serializable{
     private int state;
     private BoardDto boardDto;
 
-    public int getIdx() {
+    public Long getIdx() {
         return idx;
     }
 
-    public void setIdx(int idx) {
+    public void setIdx(Long idx) {
         this.idx = idx;
     }
 
