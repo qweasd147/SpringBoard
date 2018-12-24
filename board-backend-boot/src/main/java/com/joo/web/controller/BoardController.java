@@ -5,7 +5,6 @@ import com.joo.exception.ValidateException;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
-import com.joo.model.entity.BoardEntity;
 import com.joo.service.BoardService;
 import com.joo.service.FileService;
 import com.joo.web.controller.common.BaseController;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,7 +72,7 @@ public class BoardController implements BaseController{
 
     @PostMapping(value = "/board/{boardId}", headers = "content-type=multipart/*")
     public ResponseEntity updateBoard(@RequestBody @Valid BoardDto boardDto, BindingResult br
-            , @PathVariable int boardId
+            , @PathVariable Long boardId
             , @RequestParam(value="deleteFile[]", required=false) List<Integer> deleteFiles
             , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
 
