@@ -5,6 +5,7 @@ import com.joo.model.dto.FileDto;
 
 import javax.persistence.*;
 
+@Entity
 public class FileEntity extends BaseEntity<String>{
 
     @Id
@@ -19,6 +20,7 @@ public class FileEntity extends BaseEntity<String>{
     private int state;
 
     @ManyToOne(targetEntity = BoardEntity.class)
+    @JoinColumn(name="board_idx")
     private BoardEntity boardEntity;
 
 

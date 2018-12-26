@@ -24,9 +24,11 @@ public class BoardEntity extends BaseEntity<String>{
     private int state;
     private String writer;
 
-    //board 조회 시, file도 같이 조회, 삭제 시 연관 파일 삭제
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    //board 조회 시 file도 같이 조회, 삭제 시 연관 파일 삭제, boardEntity 변수로 맵핑
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "boardEntity")
     private List<FileEntity> fileList;
+
+    @Transient
     private List<?> tagList;
 
     public Long getIdx() {
