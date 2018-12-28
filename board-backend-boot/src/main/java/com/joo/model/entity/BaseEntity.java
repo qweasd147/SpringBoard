@@ -3,6 +3,7 @@ package com.joo.model.entity;
 import com.joo.model.BaseModel;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,6 +21,7 @@ public class BaseEntity<T> extends BaseModel{
     @CreatedDate
     private LocalDateTime createdDate;
 
+    @LastModifiedBy
     private T lastModifiedBy;
 
     @LastModifiedDate

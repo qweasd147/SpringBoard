@@ -22,7 +22,6 @@ public class BoardEntity extends BaseEntity<String>{
     private String contents;
     private int hits;
     private int state;
-    private String writer;
 
     //board 조회 시 file도 같이 조회, 삭제 시 연관 파일 삭제, boardEntity 변수로 맵핑
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "boardEntity")
@@ -69,14 +68,6 @@ public class BoardEntity extends BaseEntity<String>{
 
     public void setState(int state) {
         this.state = state;
-    }
-
-    public String getWriter() {
-        return writer;
-    }
-
-    public void setWriter(String writer) {
-        this.writer = writer;
     }
 
     public List<FileEntity> getFileList() {

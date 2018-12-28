@@ -16,7 +16,6 @@ public class FileEntity extends BaseEntity<String>{
     private String originFileName;
     private String saveFileName;
     private long fileSize;
-    private String writer;
     private int state;
 
     @ManyToOne(targetEntity = BoardEntity.class)
@@ -78,14 +77,6 @@ public class FileEntity extends BaseEntity<String>{
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
-    }
-
-    public String getWriter() {
-        return writer;
-    }
-
-    public void setWriter(String writer) {
-        this.writer = writer;
     }
 
     public int getState() {

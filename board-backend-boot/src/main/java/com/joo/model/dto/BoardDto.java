@@ -22,8 +22,6 @@ public class BoardDto extends BaseModel implements Serializable {
     private String contents;
     private int hits;
     private BoardState boardState;
-    private String writer;
-    private Date regDate;
     private List<FileDto> fileList;
     private List<?> tagList;
 
@@ -69,22 +67,6 @@ public class BoardDto extends BaseModel implements Serializable {
 
     public void setState(int state) {
         this.boardState = BoardState.getStateByCode(state);
-    }
-
-    public String getWriter() {
-        return writer;
-    }
-
-    public void setWriter(String writer) {
-        this.writer = writer;
-    }
-
-    public Date getRegDate() {
-        return regDate;
-    }
-
-    public void setRegDate(Date regDate) {
-        this.regDate = regDate;
     }
 
     public List<FileDto> getFileList() {

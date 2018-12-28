@@ -17,8 +17,6 @@ public class FileDto extends BaseModel implements Serializable{
     private String originFileName;
     private String saveFileName;
     private long fileSize;
-    private String writer;
-    private Date regDate;
     private int state;
     private BoardDto boardDto;
 
@@ -68,22 +66,6 @@ public class FileDto extends BaseModel implements Serializable{
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
-    }
-
-    public String getWriter() {
-        return writer;
-    }
-
-    public void setWriter(String writer) {
-        this.writer = writer;
-    }
-
-    public Date getRegDate() {
-        return regDate;
-    }
-
-    public void setRegDate(Date regDate) {
-        this.regDate = regDate;
     }
 
     public int getState() {
