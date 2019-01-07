@@ -2,27 +2,31 @@ package com.joo.service.impl;
 
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
+import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
-import com.joo.model.entity.BoardSearchEntity;
 import com.joo.repository.BoardRepository;
 import com.joo.service.BaseService;
 import com.joo.service.BoardService;
+import com.joo.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.persistence.criteria.Predicate;
+import java.util.*;
 
 @Service
 public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Autowired
     BoardRepository boardRepository;
+
+    @Autowired
+    FileService fileService;
 
     @Override
     public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
@@ -46,16 +50,25 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     @Override
     public BoardDto selectBoardOne(int boardId) {
         BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new RuntimeException("못찾음"));
+
+        boardEntity.setHits(boardEntity.getHits()+1);
+        boardRepository.save(boardEntity);
         return boardEntity.toDto();
     }
 
     @Override
     public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
+        List<FileDto> fileDtoList = fileService.uploadFilesInPhysical(uploadFile);
+        boardDto.setFileList(fileDtoList);
         return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
     @Override
     public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Integer> detachFileList) {
+
+        List<FileDto> fileDtoList = fileService.uploadFilesInPhysical(uploadFile);
+        boardDto.setFileList(fileDtoList);
+
         return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
@@ -72,10 +85,19 @@ public class BoardServiceImpl extends BaseService implements BoardService{
      */
     private static Specification<BoardEntity> getBoardSpec(BoardSearchDto boardSearchDto){
         return (root, query, cb)->{
+
+            final Collection<Predicate> predicates = new ArrayList<>();
+
             String condition = boardSearchDto.getSearchCondition();  //검색할 column
             String containsLikePattern = getJpaContainsLikePattern(boardSearchDto.getSearchKeyWord());   //검색 키워드
 
-            return cb.or(cb.like(cb.lower(root.get(condition)), containsLikePattern));
+            if(!StringUtils.isEmpty(condition) && !StringUtils.isEmpty(containsLikePattern)){
+                predicates.add(cb.like(cb.lower(root.get(condition)), containsLikePattern));
+            }
+
+            //return cb.or(cb.like(cb.lower(root.get(condition)), containsLikePattern));
+            //return cb.or(predicates.toArray(new Predicate[predicates.size()]));
+            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
     }
 }

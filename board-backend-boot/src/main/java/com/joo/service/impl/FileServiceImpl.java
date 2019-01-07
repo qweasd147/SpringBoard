@@ -7,7 +7,6 @@ import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
 import com.joo.service.FileService;
-import org.apache.lucene.search.grouping.CollectedSearchGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -11,6 +11,7 @@ import com.joo.web.controller.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class BoardController implements BaseController{
     }
 
     @GetMapping("/board/{boardId}")
-    public ResponseEntity selectBoardOne(@RequestBody BoardSearchDto searchDto,
+    public ResponseEntity selectBoardOne(@ModelAttribute BoardSearchDto searchDto,
                                          @PathVariable int boardId){
 
         BoardDto boardDto = boardService.selectBoardOne(boardId);
@@ -52,9 +53,10 @@ public class BoardController implements BaseController{
         return successRespResult(boardDto);
     }
 
-    @RequestMapping(value = "/board", headers = "content-type=multipart/*", method = RequestMethod.POST)
+    //@PostMapping(value = "/board")
+    @PostMapping(value = "/board", consumes = "*/*")
     public ResponseEntity insertBoard(
-            @Valid @RequestBody BoardDto boardDto
+            @Valid @ModelAttribute BoardDto boardDto
             , BindingResult br
             , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles
             //, @AuthenticationPrincipal CustomUserDetails customUserDetails
@@ -71,7 +73,7 @@ public class BoardController implements BaseController{
     }
 
     @PostMapping(value = "/board/{boardId}", headers = "content-type=multipart/*")
-    public ResponseEntity updateBoard(@RequestBody @Valid BoardDto boardDto, BindingResult br
+    public ResponseEntity updateBoard(@ModelAttribute @Valid BoardDto boardDto, BindingResult br
             , @PathVariable Long boardId
             , @RequestParam(value="deleteFile[]", required=false) List<Integer> deleteFiles
             , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
