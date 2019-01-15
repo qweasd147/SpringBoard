@@ -4,6 +4,7 @@ import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
+import com.joo.model.state.BoardState;
 import com.joo.repository.BoardRepository;
 import com.joo.service.BaseService;
 import com.joo.service.BoardService;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
 
         Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);
+        //Page<BoardEntity> boardList = boardRepository.findAllWithFiles(BoardState.ENABLE.getState(),pageable);
 
         Map<String, Object> listData = new HashMap<>();
 
@@ -48,18 +51,25 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     }
 
     @Override
+    @Transactional
     public BoardDto selectBoardOne(int boardId) {
         BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new RuntimeException("못찾음"));
 
-        boardEntity.setHits(boardEntity.getHits()+1);
-        boardRepository.save(boardEntity);
+        //boardEntity.setHits(boardEntity.getHits()+1);
+        //boardRepository.save(boardEntity);
+
+        boardRepository.incrementHits((long) boardId);
+
         return boardEntity.toDto();
     }
 
     @Override
     public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
         List<FileDto> fileDtoList = fileService.uploadFilesInPhysical(uploadFile);
+
         boardDto.setFileList(fileDtoList);
+        fileDtoList.forEach((fileDto)->fileDto.setBoardDto(boardDto));
+
         return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
@@ -96,7 +106,6 @@ public class BoardServiceImpl extends BaseService implements BoardService{
             }
 
             //return cb.or(cb.like(cb.lower(root.get(condition)), containsLikePattern));
-            //return cb.or(predicates.toArray(new Predicate[predicates.size()]));
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
     }

@@ -35,6 +35,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
         logger.error("SQL EXCEPTION!!!");
         logger.error(ex.getMessage());
 
+        printToConsole(ex);
+
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
         return getRespResult(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -46,6 +48,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
         logger.error("RuntimeException!!!");
         logger.error(ex.getMessage());
 
+        printToConsole(ex);
+
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
         return getRespResult(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -56,6 +60,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
 
         logger.error("Business EXCEPTION!!!");
         logger.error(ex.getMessage());
+
+        printToConsole(ex);
 
         HttpStatus httpStatus = findHttpStatusByCode(ex.getCode());
 
@@ -69,6 +75,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
 
         logger.error("ValidateException EXCEPTION!!!");
         logger.error(ex.getMessage());
+
+        printToConsole(ex);
 
         BindingResult br = ex.getBindResult();
         List<FieldError> errorList = br.getFieldErrors();
@@ -104,6 +112,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
                     .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
         }else{
             return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    private void printToConsole(Throwable throwable){
+        if(logger.isDebugEnabled()){
+            throwable.printStackTrace();
         }
     }
 }
