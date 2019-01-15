@@ -12,25 +12,25 @@ const METHOD = {
 }
 
 export function requestGET(...params){
-    const ajaxParams = handleParams(params);
+    const ajaxParams = handleParams(...params);
     
     return axios.get(...ajaxParams);
 }
 
 export function requestPOST(...params){
-    const ajaxParams = handleParams(params);
+    const ajaxParams = handleParams(...params);
     
     return axios.post(...ajaxParams);
 }
 
 export function requestPUT(...params){
-    const ajaxParams = handleParams(params);
+    const ajaxParams = handleParams(...params);
     
     return axios.put(...ajaxParams);
 }
 
 export function requestDELETE(...params){
-    const ajaxParams = handleParams(params);
+    const ajaxParams = handleParams(...params);
     
     return axios.delete(...ajaxParams);
 }
@@ -42,7 +42,7 @@ export function requestDELETE(...params){
  * @param {*} option 
  */
 function handleParams(apiURL, data, option={}){
-    addAuthFromCookie(option);
+    //addAuthFromCookie(option);
 
     if(data)
         return [HOST_NAME+apiURL, data, option]

@@ -2,6 +2,8 @@ package com.joo.model.entity;
 
 
 import com.joo.model.dto.FileDto;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -18,10 +20,10 @@ public class FileEntity extends BaseEntity<String>{
     private long fileSize;
     private int state;
 
-    @ManyToOne(targetEntity = BoardEntity.class)
-    @JoinColumn(name="board_idx")
+    @ManyToOne
+    @JoinColumn(name="board_idx", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BoardEntity boardEntity;
-
 
     public BoardEntity getBoardEntity() {
         return boardEntity;

@@ -23,8 +23,10 @@ public class BaseModel implements Serializable{
 
     protected static final <T, R> R convertType(T obj, Class<R> clazz, BiFunction<T, R, R> handleConvertAfter){
         R convertResult = convertType(obj, clazz);
-        if(Objects.nonNull(handleConvertAfter))
+        if(Objects.nonNull(handleConvertAfter)){
             return handleConvertAfter.apply(obj, convertResult);
-        else    return convertResult;
+        }else{
+            return convertResult;
+        }
     }
 }
