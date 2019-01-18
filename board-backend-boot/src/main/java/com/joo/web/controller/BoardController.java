@@ -75,7 +75,7 @@ public class BoardController implements BaseController{
     @PostMapping(value = "/board/{boardId}", headers = "content-type=multipart/*")
     public ResponseEntity updateBoard(@ModelAttribute @Valid BoardDto boardDto, BindingResult br
             , @PathVariable Long boardId
-            , @RequestParam(value="deleteFile[]", required=false) List<Integer> deleteFiles
+            , @RequestParam(value="deleteFile[]", required=false) List<Long> deleteFiles
             , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
 
         if(br.hasErrors()){

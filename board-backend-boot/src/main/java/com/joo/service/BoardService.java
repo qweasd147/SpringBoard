@@ -46,7 +46,7 @@ public interface BoardService {
      * @param detachFileList
      * @return
      */
-    BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFiles, List<Integer> detachFileList);
+    BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFiles, List<Long> detachFileList);
 
     /**
      * 게시물 하나를 삭제한다.

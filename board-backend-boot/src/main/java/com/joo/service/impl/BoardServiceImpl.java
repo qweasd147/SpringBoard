@@ -6,6 +6,7 @@ import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.state.BoardState;
 import com.joo.repository.BoardRepository;
+import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
 import com.joo.service.BoardService;
 import com.joo.service.FileService;
@@ -28,13 +29,17 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     BoardRepository boardRepository;
 
     @Autowired
+    FileRepository fileRepository;
+
+    @Autowired
     FileService fileService;
 
     @Override
     public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
 
-        Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);
-        //Page<BoardEntity> boardList = boardRepository.findAllWithFiles(BoardState.ENABLE.getState(),pageable);
+        //Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);                //내가 원하는 컬럼만 추출할수 없음
+        //Page<BoardEntity> boardList = boardRepository.findAllWithFiles(BoardState.ENABLE.getState(),pageable);        //검색 조건을 동적으로 만들 수 없음
+        Page<BoardEntity> boardList = boardRepository.findAllDynamic(boardSearchDto, BoardState.ENABLE, pageable);  //결국 query dsl
 
         Map<String, Object> listData = new HashMap<>();
 
@@ -53,7 +58,9 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     @Override
     @Transactional
     public BoardDto selectBoardOne(int boardId) {
-        BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new RuntimeException("못찾음"));
+        //BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new NoSuchElementException("게시글 없음"));
+        BoardEntity boardEntity = boardRepository.findByIdAndState((long) boardId, BoardState.ENABLE.getState())
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음"));
 
         //boardEntity.setHits(boardEntity.getHits()+1);
         //boardRepository.save(boardEntity);
@@ -74,17 +81,24 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     }
 
     @Override
-    public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Integer> detachFileList) {
+    public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
 
         List<FileDto> fileDtoList = fileService.uploadFilesInPhysical(uploadFile);
         boardDto.setFileList(fileDtoList);
+
+        fileRepository.deleteAllByIdInQuery(detachFileList);
 
         return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
     @Override
     public int deleteBoardById(int boardId) {
-        boardRepository.deleteById((long) boardId);
+
+        BoardEntity boardEntity = boardRepository.findByIdAndState((long) boardId, BoardState.ENABLE.getState())
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없음"));
+
+        boardEntity.setState(BoardState.DELETE.getState());
+        boardRepository.save(boardEntity);
         return 1;
     }
 
