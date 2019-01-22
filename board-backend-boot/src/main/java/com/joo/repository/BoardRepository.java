@@ -23,8 +23,7 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, JpaSp
             "ORDER BY board.idx desc",
             countQuery="SELECT count(board) FROM BoardEntity board WHERE board.state = :state"
     )
-
     Page<BoardEntity> findAllWithFiles(@Param("state") int state, Pageable pageable);
 
-    Optional<BoardEntity> findByIdAndState(Long id, long boardState);
+    Optional<BoardEntity> findByIdxAndState(Long id, long boardState);
 }

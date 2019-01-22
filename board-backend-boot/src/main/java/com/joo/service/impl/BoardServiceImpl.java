@@ -9,7 +9,7 @@ import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
 import com.joo.service.BoardService;
-import com.joo.service.FileService;
+import com.joo.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,13 +26,13 @@ import java.util.*;
 public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Autowired
-    BoardRepository boardRepository;
+    private BoardRepository boardRepository;
 
     @Autowired
-    FileRepository fileRepository;
+    private FileRepository fileRepository;
 
     @Autowired
-    FileService fileService;
+    private FileUtils fileUtils;
 
     @Override
     public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
@@ -59,7 +59,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     @Transactional
     public BoardDto selectBoardOne(int boardId) {
         //BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new NoSuchElementException("게시글 없음"));
-        BoardEntity boardEntity = boardRepository.findByIdAndState((long) boardId, BoardState.ENABLE.getState())
+        BoardEntity boardEntity = boardRepository.findByIdxAndState((long) boardId, BoardState.ENABLE.getState())
                 .orElseThrow(() -> new NoSuchElementException("게시글 없음"));
 
         //boardEntity.setHits(boardEntity.getHits()+1);
@@ -72,7 +72,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Override
     public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
-        List<FileDto> fileDtoList = fileService.uploadFilesInPhysical(uploadFile);
+        List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
 
         boardDto.setFileList(fileDtoList);
         fileDtoList.forEach((fileDto)->fileDto.setBoardDto(boardDto));
@@ -83,23 +83,26 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     @Override
     public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
 
-        List<FileDto> fileDtoList = fileService.uploadFilesInPhysical(uploadFile);
+        List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
+
+        BoardEntity boardEntity = boardRepository.findByIdxAndState(boardDto.getIdx(), BoardState.ENABLE.getState())
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음"));
+
+
         boardDto.setFileList(fileDtoList);
 
         fileRepository.deleteAllByIdInQuery(detachFileList);
-
         return boardRepository.save(boardDto.toEntity()).toDto();
     }
 
     @Override
-    public int deleteBoardById(int boardId) {
+    public void deleteBoardById(int boardId) {
 
-        BoardEntity boardEntity = boardRepository.findByIdAndState((long) boardId, BoardState.ENABLE.getState())
+        BoardEntity boardEntity = boardRepository.findByIdxAndState((long) boardId, BoardState.ENABLE.getState())
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없음"));
 
         boardEntity.setState(BoardState.DELETE.getState());
         boardRepository.save(boardEntity);
-        return 1;
     }
 
     /**

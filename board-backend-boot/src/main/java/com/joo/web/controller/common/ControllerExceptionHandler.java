@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Exception 공통 handler
@@ -53,6 +54,19 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
         Result<?> failResult = Result.getFailResult("99", "에러남", null);
 
         return getRespResult(failResult, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = { NoSuchElementException.class })
+    public ResponseEntity handleNoSuchElementException(RuntimeException ex){
+
+        logger.warn("NoSuchElementException!!!");
+        logger.warn(ex.getMessage());
+
+        printToConsole(ex);
+
+        Result<?> failResult = Result.getFailResult("99", "요청 데이터를 찾을 수 없습니다.", null);
+
+        return getRespResult(failResult, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = { BusinessException.class })

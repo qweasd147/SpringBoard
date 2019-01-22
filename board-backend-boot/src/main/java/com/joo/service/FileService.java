@@ -9,14 +9,6 @@ import java.util.List;
 public interface FileService {
 
     /**
-     * 파일 목록을 서버에 저장한다.
-     * DB에 저장x
-     * @param files
-     * @return
-     */
-    List<FileDto> uploadFilesInPhysical(MultipartFile[] files);
-
-    /**
      * 단건 파일 하나를 조회한다.
      * @param boardIdx
      * @param fileIdx
@@ -63,11 +55,4 @@ public interface FileService {
      * @param boardIdx
      */
     void deleteFileMappingByBoardID(int boardIdx);
-
-    /**
-     * 해당 파일의 리소스 정보를 얻는다.
-     * @param fileDto
-     * @return
-     */
-    Resource getFileResouce(FileDto fileDto);
 }

@@ -1,16 +1,14 @@
 package com.joo.repository.dsl;
 
-import com.joo.common.EnumCodeType;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
+import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.state.BoardState;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.types.PathMetadata;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.StringExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,6 +19,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+
+import java.util.List;
 
 import static com.joo.model.entity.QBoardEntity.boardEntity;
 import static com.joo.model.entity.QFileEntity.fileEntity;
@@ -69,8 +69,16 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
             }
         }
 
-        QueryResults<BoardDto> queryResult = queryFactory.select(Projections.constructor(BoardDto.class))
+
+        QueryResults<BoardDto> queryResult =
+                queryFactory
+                .select(Projections.fields(BoardDto.class
+                        , boardEntity.idx, boardEntity.subject, boardEntity.contents
+                        , boardEntity.createdBy, boardEntity.createdDate, boardEntity.lastModifiedBy, boardEntity.lastModifiedDate
+                        //, fileEntity.idx, fileEntity.contentType, fileEntity.fileSize)
+                ))
                 .from(boardEntity)
+                //.leftJoin(boardEntity.fileList, fileEntity)
                 .where(dynamicCondition)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

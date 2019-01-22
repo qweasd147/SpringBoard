@@ -7,6 +7,7 @@ import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
 import com.joo.service.BoardService;
 import com.joo.service.FileService;
+import com.joo.utils.FileUtils;
 import com.joo.web.controller.common.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -31,6 +32,9 @@ public class BoardController implements BaseController{
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private FileUtils fileUtils;
 
     @GetMapping("/board")
     public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable, BindingResult br){
@@ -103,7 +107,7 @@ public class BoardController implements BaseController{
 
         if(fileDto == null)  throw new BusinessException("HTTP_404", "잘못된 파일정보 다운로드 요청."+fileDto.toString());
 
-        Resource fileResource = fileService.getFileResouce(fileDto);
+        Resource fileResource = fileUtils.getFileResouce(fileDto);
 
         return getRespResource(fileDto.getOriginFileName(), fileResource);
     }

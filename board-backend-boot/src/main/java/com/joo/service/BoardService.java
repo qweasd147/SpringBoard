@@ -53,5 +53,5 @@ public interface BoardService {
      * @param boardId
      * @return
      */
-    int deleteBoardById(int boardId);
+    void deleteBoardById(int boardId);
 }

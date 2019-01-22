@@ -15,4 +15,10 @@ public interface FileRepository extends CrudRepository<FileEntity, Long> {
     @Modifying
     @Query("update FileEntity fileEntity SET fileEntity.state = 1 where fileEntity.idx in :idxList")
     void deleteAllByIdInQuery(@Param("idxList") List<Long> idxList);
+
+    @Query(value =
+            "SELECT fileEntity FROM FileEntity fileEntity " +
+            "WHERE fileEntity.state = :state and fileEntity.board_idx = :boardIdx"
+    )
+    List<FileEntity> findFromBoard(@Param("state") int state, @Param("boardIdx") long boardIdx);
 }
