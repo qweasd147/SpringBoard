@@ -29,7 +29,7 @@ public interface BoardService {
      * @param boardId
      * @return
      */
-    BoardDto selectBoardOne(int boardId);
+    BoardDto selectBoardOne(Long boardId);
 
     /**
      * 게시물 하나를 등록한다.

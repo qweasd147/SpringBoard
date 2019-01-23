@@ -86,7 +86,8 @@ public class BoardEntity extends BaseEntity<String>{
         this.tagList = tagList;
     }
 
-    public BoardDto toDto(){
+    @Override
+    public BoardDto toDto() {
         return convertType(this, BoardDto.class);
     }
 }

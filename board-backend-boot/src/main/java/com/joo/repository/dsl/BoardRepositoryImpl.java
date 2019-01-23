@@ -20,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 
-import java.util.List;
-
 import static com.joo.model.entity.QBoardEntity.boardEntity;
 import static com.joo.model.entity.QFileEntity.fileEntity;
 
@@ -59,7 +57,8 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
         if(StringUtils.isNotEmpty(boardSearchDto.getSearchCondition())){
 
             try {
-                StringExpression searchFiled = (StringExpression) boardEntity.getClass().getDeclaredField(boardSearchDto.getSearchCondition()).get(this);
+                //검색 할 컬럼을 동적으로 가져온다. String이어야 하고, validate는 상위에서 검사함
+                StringExpression searchFiled = (StringExpression) boardEntity.getClass().getDeclaredField(boardSearchDto.getSearchCondition()).get(boardEntity);
                 dynamicCondition = dynamicCondition.and(searchFiled.like("%" + boardSearchDto.getSearchKeyWord() + "%"));
             } catch (NoSuchFieldException ignore) {
                 logger.warn("찾을 수 없는 필드 : " + boardSearchDto.getSearchCondition());
@@ -73,7 +72,7 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
         QueryResults<BoardDto> queryResult =
                 queryFactory
                 .select(Projections.fields(BoardDto.class
-                        , boardEntity.idx, boardEntity.subject, boardEntity.contents
+                        , boardEntity.idx, boardEntity.subject, boardEntity.contents, boardEntity.hits
                         , boardEntity.createdBy, boardEntity.createdDate, boardEntity.lastModifiedBy, boardEntity.lastModifiedDate
                         //, fileEntity.idx, fileEntity.contentType, fileEntity.fileSize)
                 ))

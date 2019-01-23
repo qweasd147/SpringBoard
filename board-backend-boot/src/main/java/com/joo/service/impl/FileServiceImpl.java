@@ -3,6 +3,7 @@ package com.joo.service.impl;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.FileDto;
 import com.joo.model.entity.FileEntity;
+import com.joo.model.state.BoardState;
 import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
@@ -36,49 +37,19 @@ public class FileServiceImpl extends BaseService implements FileService{
     private BoardRepository boardRepository;
 
     @Override
-    public FileDto selectFileOne(int boardIdx, int fileIdx) {
-
-        FileDto fileDto = fileRepository.findById((long) fileIdx).orElseThrow(() -> new RuntimeException("못찾음")).toDto();
-        BoardDto boardDto = fileDto.getBoardDto();
-        if(boardDto.getIdx() != boardIdx){
-            new RuntimeException("못찾음");
-        }
-
-        return fileDto;
+    public FileDto selectFileOne(Long boardIdx, Long fileIdx) {
+        return fileRepository
+                .findByBoardEntity_IdxAndIdxAndState(boardIdx, fileIdx, BoardState.ENABLE.getState())
+                .orElseThrow(() -> new NoSuchElementException("파일을 찾을 수 없음")).toDto();
     }
 
     @Override
-    public List<FileDto> selectFileList(int boardIdx) {
+    public List<FileDto> selectFileList(Long boardIdx) {
 
         List<FileEntity> fileEntityList =
                 boardRepository
-                    .findById((long) boardIdx)
+                    .findById(boardIdx)
                     .orElseThrow(() -> new RuntimeException("못찾음")).getFileList();
         return fileEntityList.stream().map(FileEntity::toDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<FileDto> selectBasicFileList(int boardIdx) {
-        return null;
-    }
-
-    @Override
-    public List<FileDto> insertFileList(List<FileDto> fileDtoList) {
-        return null;
-    }
-
-    @Override
-    public void insertFileMapping(int boardIdx, List<FileDto> fileDtoList) {
-
-    }
-
-    @Override
-    public void deleteFileMappingByFileID(List<Integer> fileIdxList) {
-
-    }
-
-    @Override
-    public void deleteFileMappingByBoardID(int boardIdx) {
-        //fileRepository.deleteById();
     }
 }

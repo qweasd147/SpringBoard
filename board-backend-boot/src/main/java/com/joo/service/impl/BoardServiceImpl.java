@@ -4,6 +4,7 @@ import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
+import com.joo.model.entity.FileEntity;
 import com.joo.model.state.BoardState;
 import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BoardServiceImpl extends BaseService implements BoardService{
@@ -57,41 +59,57 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Override
     @Transactional
-    public BoardDto selectBoardOne(int boardId) {
+    public BoardDto selectBoardOne(Long boardId) {
         //BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new NoSuchElementException("게시글 없음"));
-        BoardEntity boardEntity = boardRepository.findByIdxAndState((long) boardId, BoardState.ENABLE.getState())
-                .orElseThrow(() -> new NoSuchElementException("게시글 없음"));
-
         //boardEntity.setHits(boardEntity.getHits()+1);
         //boardRepository.save(boardEntity);
 
-        boardRepository.incrementHits((long) boardId);
+        boardRepository.incrementHits(boardId);
 
-        return boardEntity.toDto();
+        return boardRepository.findByIdxAndState(boardId, BoardState.ENABLE.getState())
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음")).toDto();
     }
 
     @Override
     public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
         List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
 
+        BoardEntity boardEntity = boardDto.toEntity();
+        List<FileEntity> fileEntityList = fileDtoList
+                .stream()
+                .map(FileDto::toEntity)
+                .collect(Collectors.toList());
+
+        fileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
+        boardEntity.setFileList(fileEntityList);
+
         boardDto.setFileList(fileDtoList);
         fileDtoList.forEach((fileDto)->fileDto.setBoardDto(boardDto));
 
-        return boardRepository.save(boardDto.toEntity()).toDto();
+        //return boardRepository.save(boardDto.toEntity()).toDto();     TODO : 현재 modelMapper를 쓰는데 여기서 순환참조를 제대로 연결 못하고있음....
+        return boardRepository.save(boardEntity).toDto();
     }
 
     @Override
     public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
 
-        List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
+        List<FileDto> newFileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
 
-        BoardEntity boardEntity = boardRepository.findByIdxAndState(boardDto.getIdx(), BoardState.ENABLE.getState())
-                .orElseThrow(() -> new NoSuchElementException("게시글 없음"));
+        List<FileDto> fileDtoFromDB = fileRepository.findByBoardEntity_IdxAndState(boardDto.getIdx(), BoardState.ENABLE.getState())
+                .orElse(new ArrayList<>()).stream()
+                .map(FileEntity::toDto)
+                .map(fileDto -> {
+                    //삭제 목록중 있을 시 삭제 flag를 바꾼다.
+                    if(detachFileList.contains(boardDto.getIdx())){
+                        fileDto.setState(BoardState.DELETE.getState());
+                    }
+                    return fileDto;
+                })
+                .collect(Collectors.toList());
 
+        fileDtoFromDB.addAll(newFileDtoList);
+        boardDto.setFileList(fileDtoFromDB);
 
-        boardDto.setFileList(fileDtoList);
-
-        fileRepository.deleteAllByIdInQuery(detachFileList);
         return boardRepository.save(boardDto.toEntity()).toDto();
     }
 

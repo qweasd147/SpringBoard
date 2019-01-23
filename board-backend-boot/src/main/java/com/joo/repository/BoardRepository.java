@@ -25,5 +25,5 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, JpaSp
     )
     Page<BoardEntity> findAllWithFiles(@Param("state") int state, Pageable pageable);
 
-    Optional<BoardEntity> findByIdxAndState(Long id, long boardState);
+    Optional<BoardEntity> findByIdxAndState(Long id, int state);
 }

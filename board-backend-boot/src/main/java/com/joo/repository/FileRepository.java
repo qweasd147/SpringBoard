@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FileRepository extends CrudRepository<FileEntity, Long> {
 
@@ -16,9 +17,7 @@ public interface FileRepository extends CrudRepository<FileEntity, Long> {
     @Query("update FileEntity fileEntity SET fileEntity.state = 1 where fileEntity.idx in :idxList")
     void deleteAllByIdInQuery(@Param("idxList") List<Long> idxList);
 
-    @Query(value =
-            "SELECT fileEntity FROM FileEntity fileEntity " +
-            "WHERE fileEntity.state = :state and fileEntity.board_idx = :boardIdx"
-    )
-    List<FileEntity> findFromBoard(@Param("state") int state, @Param("boardIdx") long boardIdx);
+    Optional<List<FileEntity>> findByBoardEntity_IdxAndState(Long board_idx, int state);
+
+    Optional<FileEntity> findByBoardEntity_IdxAndIdxAndState(Long board_idx, Long idx, int state);
 }

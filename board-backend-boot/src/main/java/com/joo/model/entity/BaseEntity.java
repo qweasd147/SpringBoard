@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity<T> extends BaseModel{
+public abstract class BaseEntity<T> extends BaseModel{
 
     @Column(nullable = false, updatable = false)
     @CreatedBy
@@ -61,4 +61,6 @@ public class BaseEntity<T> extends BaseModel{
     public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    public abstract <T> T toDto();
 }

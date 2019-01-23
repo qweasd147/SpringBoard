@@ -50,7 +50,7 @@ public class BoardController implements BaseController{
 
     @GetMapping("/board/{boardId}")
     public ResponseEntity selectBoardOne(@ModelAttribute BoardSearchDto searchDto,
-                                         @PathVariable int boardId){
+                                         @PathVariable Long boardId){
 
         BoardDto boardDto = boardService.selectBoardOne(boardId);
 
@@ -101,7 +101,7 @@ public class BoardController implements BaseController{
     }
 
     @GetMapping("/board/download/{boardId}/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable int boardId, @PathVariable int fileId){
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long boardId, @PathVariable Long fileId){
 
         FileDto fileDto = fileService.selectFileOne(boardId, fileId);
 

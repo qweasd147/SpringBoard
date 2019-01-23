@@ -89,6 +89,7 @@ public class FileEntity extends BaseEntity<String>{
         this.state = state;
     }
 
+    @Override
     public FileDto toDto(){
         return convertType(this, FileDto.class);
     }
