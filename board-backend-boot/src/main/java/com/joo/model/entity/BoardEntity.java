@@ -1,6 +1,7 @@
 package com.joo.model.entity;
 
 import com.joo.model.dto.BoardDto;
+import com.joo.model.dto.FileDto;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -89,5 +90,19 @@ public class BoardEntity extends BaseEntity<String>{
     @Override
     public BoardDto toDto() {
         return convertType(this, BoardDto.class);
+    }
+
+    /**
+     * 순환 참조를 포함하여 dto화 시킨다.
+     * @return
+     */
+    public BoardDto toDtoWithCircular() {
+
+        BoardDto boardDto = this.toDto();
+        List<FileDto> fileDtoList = boardDto.getFileList();
+        if(fileDtoList != null)
+            fileDtoList.forEach(fileDto -> fileDto.setBoardDto(boardDto));
+
+        return boardDto;
     }
 }

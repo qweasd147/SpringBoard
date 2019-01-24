@@ -1,11 +1,10 @@
 package com.joo.model.dto;
 
-import com.joo.model.BaseModel;
 import com.joo.model.entity.BoardSearchEntity;
 
 import java.io.Serializable;
 
-public class BoardSearchDto extends BaseModel implements Serializable{
+public class BoardSearchDto extends BaseDto implements Serializable{
 
     private static final long serialVersionUID = -8216665660181770998L;
 
@@ -40,6 +39,7 @@ public class BoardSearchDto extends BaseModel implements Serializable{
         this.searchKeyWord = searchKeyWord;
     }
 
+    @Override
     public BoardSearchEntity toEntity(){
         return convertType(this, BoardSearchEntity.class);
     }

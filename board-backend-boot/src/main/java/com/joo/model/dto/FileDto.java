@@ -1,13 +1,13 @@
 package com.joo.model.dto;
 
-import com.joo.model.BaseModel;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.List;
 
-public class FileDto extends BaseModel implements Serializable{
+public class FileDto extends BaseDto implements Serializable{
 
     private static final long serialVersionUID = 2956026631315470683L;
 
@@ -84,6 +84,7 @@ public class FileDto extends BaseModel implements Serializable{
         this.boardDto = boardDto;
     }
 
+    @Override
     public FileEntity toEntity(){
         return convertType(this, FileEntity.class);
     }

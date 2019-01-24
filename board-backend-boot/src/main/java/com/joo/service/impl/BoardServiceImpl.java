@@ -72,6 +72,8 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Override
     public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
+        //TODO : 순환 참조 로직을 어디다 둘 지 고민중
+        /*
         List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
 
         BoardEntity boardEntity = boardDto.toEntity();
@@ -85,30 +87,37 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
         boardDto.setFileList(fileDtoList);
         fileDtoList.forEach((fileDto)->fileDto.setBoardDto(boardDto));
-
-        //return boardRepository.save(boardDto.toEntity()).toDto();     TODO : 현재 modelMapper를 쓰는데 여기서 순환참조를 제대로 연결 못하고있음....
         return boardRepository.save(boardEntity).toDto();
+        */
+
+        List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
+        boardDto.setFileList(fileDtoList);
+        return boardRepository.save(boardDto.toEntityWithCircular()).toDto();
+
     }
 
     @Override
     public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
+        //TODO : 순환 참조 로직을 어디다 둘 지 고민중
+        List<FileEntity> newFileEntityList = fileUtils.uploadFilesInPhysical(uploadFile)
+                .stream().map(FileDto::toEntity).collect(Collectors.toList());
 
-        List<FileDto> newFileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
-
-        List<FileDto> fileDtoFromDB = fileRepository.findByBoardEntity_IdxAndState(boardDto.getIdx(), BoardState.ENABLE.getState())
+        List<FileEntity> oldFileEntityList = fileRepository.findByBoardEntity_IdxAndState(boardDto.getIdx(), BoardState.ENABLE.getState())
                 .orElse(new ArrayList<>()).stream()
-                .map(FileEntity::toDto)
-                .map(fileDto -> {
+                .map(fileEntity -> {
                     //삭제 목록중 있을 시 삭제 flag를 바꾼다.
-                    if(detachFileList.contains(boardDto.getIdx())){
-                        fileDto.setState(BoardState.DELETE.getState());
+                    if (detachFileList.contains(boardDto.getIdx())) {
+                        fileEntity.setState(BoardState.DELETE.getState());
                     }
-                    return fileDto;
+                    return fileEntity;
                 })
                 .collect(Collectors.toList());
 
-        fileDtoFromDB.addAll(newFileDtoList);
-        boardDto.setFileList(fileDtoFromDB);
+
+        newFileEntityList.addAll(oldFileEntityList);
+
+        BoardEntity boardEntity = boardDto.toEntity();
+        newFileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
 
         return boardRepository.save(boardDto.toEntity()).toDto();
     }

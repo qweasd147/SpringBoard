@@ -1,16 +1,15 @@
 package com.joo.model.dto;
 
 
-import com.joo.model.BaseModel;
 import com.joo.model.entity.BoardEntity;
+import com.joo.model.entity.FileEntity;
 import com.joo.model.state.BoardState;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
-public class BoardDto extends BaseModel implements Serializable {
+public class BoardDto extends BaseDto implements Serializable {
 
     private static final long serialVersionUID = 6348958289640869735L;
 
@@ -85,7 +84,21 @@ public class BoardDto extends BaseModel implements Serializable {
         this.tagList = tagList;
     }
 
+    @Override
     public BoardEntity toEntity(){
         return convertType(this, BoardEntity.class);
+    }
+
+    /**
+     * 순환 참조를 포함하여 dto화 시킨다.
+     * @return
+     */
+    public BoardEntity toEntityWithCircular() {
+        BoardEntity boardEntity = this.toEntity();
+
+        List<FileEntity> fileEntityList = boardEntity.getFileList();
+        if(fileEntityList != null)
+            fileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
+        return boardEntity;
     }
 }
