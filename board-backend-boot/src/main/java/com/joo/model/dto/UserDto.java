@@ -6,7 +6,7 @@ import com.joo.model.BaseModel;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class UserDto extends BaseModel implements Serializable{
+public class UserDto extends BaseDto<String> implements Serializable{
 
     private static final long serialVersionUID = 7432896190010419477L;
 
@@ -140,5 +140,10 @@ public class UserDto extends BaseModel implements Serializable{
         this.state = state;
 
         return this;
+    }
+
+    @Override
+    public <T> T toEntity() {
+        return null;
     }
 }

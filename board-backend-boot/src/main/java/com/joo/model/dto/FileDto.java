@@ -1,13 +1,10 @@
 package com.joo.model.dto;
 
-import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 
-public class FileDto extends BaseDto implements Serializable{
+public class FileDto extends BaseDto<String> implements Serializable{
 
     private static final long serialVersionUID = 2956026631315470683L;
 

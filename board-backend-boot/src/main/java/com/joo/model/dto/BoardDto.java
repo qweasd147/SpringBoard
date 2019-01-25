@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
-public class BoardDto extends BaseDto implements Serializable {
+public class BoardDto extends BaseDto<String> implements Serializable {
 
     private static final long serialVersionUID = 6348958289640869735L;
 

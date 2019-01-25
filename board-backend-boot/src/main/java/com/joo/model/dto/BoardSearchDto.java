@@ -4,7 +4,7 @@ import com.joo.model.entity.BoardSearchEntity;
 
 import java.io.Serializable;
 
-public class BoardSearchDto extends BaseDto implements Serializable{
+public class BoardSearchDto extends BaseDto<String> implements Serializable{
 
     private static final long serialVersionUID = -8216665660181770998L;
 
