@@ -57,7 +57,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
     }
 
     @ExceptionHandler(value = { NoSuchElementException.class })
-    public ResponseEntity handleNoSuchElementException(RuntimeException ex){
+    public ResponseEntity handleNoSuchElementException(NoSuchElementException ex){
 
         logger.warn("NoSuchElementException!!!");
         logger.warn(ex.getMessage());

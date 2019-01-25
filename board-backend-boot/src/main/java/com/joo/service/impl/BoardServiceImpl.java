@@ -47,7 +47,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
         listData.put("boardList", boardList.getContent());
         listData.put("count", boardList.getTotalElements());    //전체 데이터 수
-        listData.put("page", boardList.getNumber());            //현재 페이지
+        listData.put("page", boardList.getNumber()+1);          //현재 페이지
 
         return listData;
     }
@@ -66,7 +66,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
         boardRepository.incrementHits(boardId);
 
-        return boardRepository.findByIdxAndState(boardId, BoardState.ENABLE.getState())
+        return boardRepository.findEnableBoardByState(boardId)
                 .orElseThrow(() -> new NoSuchElementException("게시글 없음")).toDto();
     }
 
@@ -93,39 +93,29 @@ public class BoardServiceImpl extends BaseService implements BoardService{
         List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
         boardDto.setFileList(fileDtoList);
         return boardRepository.save(boardDto.toEntityWithCircular()).toDto();
-
     }
 
     @Override
     public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
-        //TODO : 순환 참조 로직을 어디다 둘 지 고민중
+
         List<FileEntity> newFileEntityList = fileUtils.uploadFilesInPhysical(uploadFile)
                 .stream().map(FileDto::toEntity).collect(Collectors.toList());
 
-        List<FileEntity> oldFileEntityList = fileRepository.findByBoardEntity_IdxAndState(boardDto.getIdx(), BoardState.ENABLE.getState())
-                .orElse(new ArrayList<>()).stream()
-                .map(fileEntity -> {
-                    //삭제 목록중 있을 시 삭제 flag를 바꾼다.
-                    if (detachFileList.contains(boardDto.getIdx())) {
-                        fileEntity.setState(BoardState.DELETE.getState());
-                    }
-                    return fileEntity;
-                })
-                .collect(Collectors.toList());
-
-
-        newFileEntityList.addAll(oldFileEntityList);
-
         BoardEntity boardEntity = boardDto.toEntity();
         newFileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
+        boardEntity.setFileList(newFileEntityList);
 
-        return boardRepository.save(boardDto.toEntity()).toDto();
+        fileRepository.deleteAllByIdInQuery(detachFileList);
+        boardRepository.save(boardEntity);
+
+        return boardRepository.findEnableBoardByState(boardEntity.getIdx())
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없음")).toDto();
     }
 
     @Override
-    public void deleteBoardById(int boardId) {
+    public void deleteBoardById(Long boardId) {
 
-        BoardEntity boardEntity = boardRepository.findByIdxAndState((long) boardId, BoardState.ENABLE.getState())
+        BoardEntity boardEntity = boardRepository.findEnableBoardByState(boardId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없음"));
 
         boardEntity.setState(BoardState.DELETE.getState());

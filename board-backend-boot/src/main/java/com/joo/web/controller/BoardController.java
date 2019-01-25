@@ -93,7 +93,7 @@ public class BoardController implements BaseController{
     }
 
     @DeleteMapping("/board/{boardId}")
-    public ResponseEntity deleteBoard(@PathVariable int boardId){
+    public ResponseEntity deleteBoard(@PathVariable Long boardId){
 
         boardService.deleteBoardById(boardId);
 
