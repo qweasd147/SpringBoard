@@ -36,7 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         //pageable
         PageableHandlerMethodArgumentResolver pageResolver = new PageableHandlerMethodArgumentResolver();
         pageResolver.setOneIndexedParameters(true); //시작 인덱스를 0이 아닌 1로
-        pageResolver.setPageParameterName("page");
+        pageResolver.setPageParameterName("pageIdx");
         pageResolver.setSizeParameterName("size");
         pageResolver.setFallbackPageable(PageRequest.of(0,10, Sort.Direction.DESC, "idx"));    //default값
         resolvers.add(pageResolver);
