@@ -5,14 +5,15 @@ import com.joo.exception.ValidateException;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
+import com.joo.model.dto.limited.LimitedBoardDto;
 import com.joo.service.BoardService;
 import com.joo.service.FileService;
 import com.joo.utils.FileUtils;
 import com.joo.web.controller.common.BaseController;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,8 @@ public class BoardController implements BaseController{
     @Autowired
     private FileUtils fileUtils;
 
+    private final ModelMapper modelMapper = new ModelMapper();
+
     @GetMapping("/board")
     public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable, BindingResult br){
 
@@ -54,7 +57,10 @@ public class BoardController implements BaseController{
 
         BoardDto boardDto = boardService.selectBoardOne(boardId);
 
-        return successRespResult(boardDto);
+        //전체 정보가 아닌 제한된 정보만 넘겨준다.
+        LimitedBoardDto limitedBoardDto = modelMapper.map(boardDto, LimitedBoardDto.class);
+
+        return successRespResult(limitedBoardDto);
     }
 
     //@PostMapping(value = "/board")

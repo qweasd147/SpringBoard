@@ -65,9 +65,8 @@ public class BoardServiceImpl extends BaseService implements BoardService{
         //boardRepository.save(boardEntity);
 
         boardRepository.incrementHits(boardId);
-
-        return boardRepository.findEnableBoardByState(boardId)
-                .orElseThrow(() -> new NoSuchElementException("게시글 없음")).toDto();
+        return boardRepository.findEnableBoardByBoardIdx(boardId)
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardId)).toDto();
     }
 
     @Override
@@ -108,15 +107,15 @@ public class BoardServiceImpl extends BaseService implements BoardService{
         fileRepository.deleteAllByIdInQuery(detachFileList);
         boardRepository.save(boardEntity);
 
-        return boardRepository.findEnableBoardByState(boardEntity.getIdx())
-                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없음")).toDto();
+        return boardRepository.findEnableBoardByBoardIdx(boardEntity.getIdx())
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardEntity.getIdx())).toDto();
     }
 
     @Override
     public void deleteBoardById(Long boardId) {
 
-        BoardEntity boardEntity = boardRepository.findEnableBoardByState(boardId)
-                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없음"));
+        BoardEntity boardEntity = boardRepository.findEnableBoardByBoardIdx(boardId)
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardId));
 
         boardEntity.setState(BoardState.DELETE.getState());
         boardRepository.save(boardEntity);

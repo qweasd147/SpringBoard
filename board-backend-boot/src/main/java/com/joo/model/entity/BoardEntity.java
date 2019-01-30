@@ -20,6 +20,7 @@ public class BoardEntity extends BaseEntity<String>{
 
     @Column(nullable = false)
     @NotNull
+    @Lob
     private String contents;
     private int hits;
     private int state;

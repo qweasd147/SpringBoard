@@ -1,5 +1,6 @@
 package com.joo.repository;
 
+import com.joo.model.dto.limited.LimitedBoard;
 import com.joo.model.entity.BoardEntity;
 import com.joo.repository.dsl.BoardRepositoryCustom;
 import org.springframework.data.domain.Page;
@@ -25,11 +26,20 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, JpaSp
     )
     Page<BoardEntity> findAllWithFiles(@Param("state") int state, Pageable pageable);
 
+    //interface로 잘 받아지나 테스트
     @Query("SELECT boardEntity " +
             "FROM BoardEntity boardEntity " +
                 "LEFT JOIN boardEntity.fileList fileEntity " +
                     "ON (boardEntity.idx = fileEntity.boardEntity) AND fileEntity.state = 0 " +
             "WHERE boardEntity.idx = :boardIdx AND boardEntity.state = 0"
     )
-    Optional<BoardEntity> findEnableBoardByState(@Param("boardIdx" )Long boardIdx);
+    Optional<LimitedBoard> findEnableBoardByBoardIdx_(@Param("boardIdx")Long boardIdx);
+
+    @Query("SELECT boardEntity " +
+            "FROM BoardEntity boardEntity " +
+            "LEFT JOIN boardEntity.fileList fileEntity " +
+            "ON (boardEntity.idx = fileEntity.boardEntity) AND fileEntity.state = 0 " +
+            "WHERE boardEntity.idx = :boardIdx AND boardEntity.state = 0"
+    )
+    Optional<BoardEntity> findEnableBoardByBoardIdx(@Param("boardIdx")Long boardIdx);
 }
