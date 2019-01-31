@@ -5,7 +5,7 @@ import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 import com.joo.model.state.BoardState;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,10 +14,9 @@ public class BoardDto extends BaseDto<String> implements Serializable {
     private static final long serialVersionUID = 6348958289640869735L;
 
     private Long idx;
-
-    @NotNull
+    @NotBlank(message = "제목 입력")
     private String subject;
-    @NotNull
+    @NotBlank(message = "내용 입력")
     private String contents;
     private int hits;
     private BoardState boardState;

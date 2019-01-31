@@ -7,19 +7,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 /**
  * Exception 공통 handler
@@ -92,21 +94,19 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
 
         printToConsole(ex);
 
-        BindingResult br = ex.getBindResult();
-        List<FieldError> errorList = br.getFieldErrors();
-
+        List<ValidateException.Error> errors = ex.getErrors();
         //debug 이상 레벨이고, list가 존재할 시, 반복문 진행
-        if(logger.isDebugEnabled() && !errorList.isEmpty()){
-            for(int i=0;i<errorList.size();i++){
-                FieldError fieldErr = errorList.get(i);
+        if(logger.isDebugEnabled() && !errors.isEmpty()){
+            for(int i=0;i<errors.size();i++){
+                ValidateException.Error error = errors.get(i);
 
-                logger.debug("필드 : " + fieldErr.getField());
-                logger.debug("코드 : " + fieldErr.getCode());
-                logger.debug("메세지 : " + fieldErr.getDefaultMessage());
+                logger.debug("필드 : " + error.getField());
+                logger.debug("코드 : " + error.getCode());
+                logger.debug("메세지 : " + error.getMessage());
             }
         }
 
-        Result<?> failResult = Result.getFailResult("HTTP_422", "잘못된 요청", ex.getVo());
+        Result<?> failResult = Result.getFailResult("HTTP_422", "잘못된 요청", ex.wrapData());
 
         return getRespResult(failResult, HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -133,5 +133,22 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler i
         if(logger.isDebugEnabled()){
             throwable.printStackTrace();
         }
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+        BindingResult br = ex.getBindingResult();
+        List<FieldError> fieldErrors = br.getFieldErrors();
+
+        List<ValidateException.Error> errors = fieldErrors.stream().map(fieldError -> {
+            String field = fieldError.getField();
+            String code = fieldError.getCode();
+            String msg = fieldError.getDefaultMessage();
+
+            return new ValidateException.Error(field, code, msg);
+        }).collect(Collectors.toList());
+
+        return this.handleValidateException(new ValidateException(errors, br.getTarget()));
     }
 }

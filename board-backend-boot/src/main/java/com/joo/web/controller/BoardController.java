@@ -1,7 +1,6 @@
 package com.joo.web.controller;
 
 import com.joo.exception.BusinessException;
-import com.joo.exception.ValidateException;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,11 +38,7 @@ public class BoardController implements BaseController{
     private final ModelMapper modelMapper = new ModelMapper();
 
     @GetMapping("/board")
-    public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable, BindingResult br){
-
-        if(br.hasErrors()){
-            throw new ValidateException(br, searchDto);
-        }
+    public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable){
 
         Map<String, ?> listData = boardService.selectBoardList(searchDto, pageable);
 
@@ -67,14 +61,9 @@ public class BoardController implements BaseController{
     @PostMapping(value = "/board", consumes = "*/*")
     public ResponseEntity insertBoard(
             @Valid @ModelAttribute BoardDto boardDto
-            , BindingResult br
             , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles
             //, @AuthenticationPrincipal CustomUserDetails customUserDetails
             ){
-
-        if(br.hasErrors()){
-            throw new ValidateException(br, boardDto);
-        }
 
         //boardEntity.setWriter(customUserDetails.getNickName());
         boardService.insertBoard(boardDto, uploadFiles);
@@ -83,14 +72,10 @@ public class BoardController implements BaseController{
     }
 
     @PostMapping(value = "/board/{boardId}", headers = "content-type=multipart/*")
-    public ResponseEntity updateBoard(@ModelAttribute @Valid BoardDto boardDto, BindingResult br
+    public ResponseEntity updateBoard(@ModelAttribute @Valid BoardDto boardDto
             , @PathVariable Long boardId
             , @RequestParam(value="deleteFile[]", required=false) List<Long> deleteFiles
             , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
-
-        if(br.hasErrors()){
-            throw new ValidateException(br, boardDto);
-        }
 
         boardDto.setIdx(boardId);
         boardService.updateBoard(boardDto, uploadFiles, deleteFiles);
