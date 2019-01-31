@@ -4,6 +4,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.model.*;
 import com.github.scribejava.core.oauth.OAuth20Service;
+import com.joo.common.state.CommonState;
 import com.joo.model.dto.UserDto;
 import com.joo.service.user.UserService;
 import com.joo.utils.WebUtil;
@@ -229,7 +230,7 @@ public abstract class LoginFactory implements LoginAPI{
 		if(userVoFromDB == null){
 			//기존에 등록된 정보가 없으면 새롭게 등록한다.
 			userService.regist(userDtoFromThird);
-			userDtoFromThird.setState(UserDto.State.ENABLED);
+			userDtoFromThird.setState(CommonState.ENABLE);
 
 			userVoFromDB = userDtoFromThird;
 		}

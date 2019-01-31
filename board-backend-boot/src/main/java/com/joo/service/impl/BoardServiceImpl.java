@@ -1,11 +1,11 @@
 package com.joo.service.impl;
 
+import com.joo.common.state.CommonState;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
-import com.joo.model.state.BoardState;
 import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
@@ -40,8 +40,8 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
 
         //Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);                //내가 원하는 컬럼만 추출할수 없음
-        //Page<BoardEntity> boardList = boardRepository.findAllWithFiles(BoardState.ENABLE.getState(),pageable);        //검색 조건을 동적으로 만들 수 없음
-        Page<BoardEntity> boardList = boardRepository.findAllDynamic(boardSearchDto, BoardState.ENABLE, pageable);  //결국 query dsl
+        //Page<BoardEntity> boardList = boardRepository.findAllWithFiles(CommonState.ENABLE,pageable);                  //검색 조건을 동적으로 만들 수 없음
+        Page<BoardEntity> boardList = boardRepository.findAllDynamic(boardSearchDto, CommonState.ENABLE, pageable); //결국 query dsl
 
         Map<String, Object> listData = new HashMap<>();
 
@@ -117,7 +117,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
         BoardEntity boardEntity = boardRepository.findEnableBoardByBoardIdx(boardId)
                 .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardId));
 
-        boardEntity.setState(BoardState.DELETE.getState());
+        boardEntity.setState(CommonState.DELETE);
         boardRepository.save(boardEntity);
     }
 

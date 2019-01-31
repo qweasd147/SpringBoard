@@ -1,5 +1,6 @@
 package com.joo.model.dto;
 
+import com.joo.common.state.CommonState;
 import com.joo.model.entity.FileEntity;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ public class FileDto extends BaseDto<String> implements Serializable{
     private String originFileName;
     private String saveFileName;
     private long fileSize;
-    private int state;
+    private CommonState state;
     private BoardDto boardDto;
 
     public Long getIdx() {
@@ -65,11 +66,11 @@ public class FileDto extends BaseDto<String> implements Serializable{
         this.fileSize = fileSize;
     }
 
-    public int getState() {
+    public CommonState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CommonState state) {
         this.state = state;
     }
 

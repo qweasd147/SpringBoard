@@ -1,6 +1,7 @@
 package com.joo.model.entity;
 
 
+import com.joo.common.state.CommonState;
 import com.joo.model.dto.FileDto;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -18,7 +19,7 @@ public class FileEntity extends BaseEntity<String>{
     private String originFileName;
     private String saveFileName;
     private long fileSize;
-    private int state;
+    private CommonState state;
 
     @ManyToOne
     @JoinColumn(name="board_idx", nullable = false)
@@ -81,11 +82,11 @@ public class FileEntity extends BaseEntity<String>{
         this.fileSize = fileSize;
     }
 
-    public int getState() {
+    public CommonState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CommonState state) {
         this.state = state;
     }
 

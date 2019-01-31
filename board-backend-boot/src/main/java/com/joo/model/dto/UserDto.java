@@ -1,45 +1,12 @@
 package com.joo.model.dto;
 
-import com.joo.common.EnumCodeType;
-import com.joo.model.BaseModel;
+import com.joo.common.state.CommonState;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 public class UserDto extends BaseDto<String> implements Serializable{
 
     private static final long serialVersionUID = 7432896190010419477L;
-
-    public enum State implements EnumCodeType {
-        ENABLED(0), LOCKED(1), EXPIRED(2);
-
-        private int state;
-
-        State(int state) {
-            this.state = state;
-        }
-
-        public int getState() {
-            return state;
-        }
-
-        public static State findState(int stateVal){
-            return Arrays.stream(State.values())
-                    .filter(userState -> userState.getState() == stateVal)
-                    .findFirst()
-                    .orElse(LOCKED);
-        }
-
-        @Override
-        public String getCode() {
-            return String.valueOf(this.state);
-        }
-
-        @Override
-        public String getDescription() {
-            return this.name();
-        }
-    }
 
     private int idx;
     private String serviceName;		//default, kakao, naver 등
@@ -48,12 +15,12 @@ public class UserDto extends BaseDto<String> implements Serializable{
     private String nickName;
     private String email;
     private String thirdPartyToken;
-    private State state;
+    private CommonState state;
 
 
     public UserDto() {}
 
-    public UserDto(int idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, State state) {
+    public UserDto(int idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, CommonState state) {
         this.idx = idx;
         this.serviceName = serviceName;
         this.id = id;
@@ -132,11 +99,11 @@ public class UserDto extends BaseDto<String> implements Serializable{
         this.thirdPartyToken = thirdPartyToken;
     }
 
-    public State getState() {
+    public CommonState getState() {
         return state;
     }
 
-    public UserDto setState(State state) {
+    public UserDto setState(CommonState state) {
         this.state = state;
 
         return this;

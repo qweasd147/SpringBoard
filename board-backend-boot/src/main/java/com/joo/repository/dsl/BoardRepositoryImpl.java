@@ -1,10 +1,9 @@
 package com.joo.repository.dsl;
 
+import com.joo.common.state.CommonState;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
-import com.joo.model.dto.FileDto;
 import com.joo.model.entity.BoardEntity;
-import com.joo.model.state.BoardState;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -35,7 +34,7 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
     }
 
     @Override
-    public Page<BoardEntity> findAllDynamic(BoardSearchDto boardSearchDto, BoardState boardState, Pageable pageable) {
+    public Page<BoardEntity> findAllDynamic(BoardSearchDto boardSearchDto, CommonState boardState, Pageable pageable) {
 
         /*
         JPAQuery<Tuple> query = queryFactory
@@ -51,7 +50,7 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
         */
 
         //기본 검색 조건
-        BooleanExpression dynamicCondition = boardEntity.state.eq(boardState.getState());
+        BooleanExpression dynamicCondition = boardEntity.state.eq(boardState);
 
         //검색 조건에 따른 동적 검색 조건
         if(StringUtils.isNotEmpty(boardSearchDto.getSearchCondition())){

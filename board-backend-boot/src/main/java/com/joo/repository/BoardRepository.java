@@ -1,5 +1,6 @@
 package com.joo.repository;
 
+import com.joo.common.state.CommonState;
 import com.joo.model.dto.limited.LimitedBoard;
 import com.joo.model.entity.BoardEntity;
 import com.joo.repository.dsl.BoardRepositoryCustom;
@@ -24,22 +25,23 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, JpaSp
             "ORDER BY board.idx desc",
             countQuery="SELECT count(board) FROM BoardEntity board WHERE board.state = :state"
     )
-    Page<BoardEntity> findAllWithFiles(@Param("state") int state, Pageable pageable);
+    Page<BoardEntity> findAllWithFiles(@Param("state") CommonState state, Pageable pageable);
 
-    //interface로 잘 받아지나 테스트
+    //interface로 잘 받아지나 테스트 + FETCH랑 비교
     @Query("SELECT boardEntity " +
             "FROM BoardEntity boardEntity " +
                 "LEFT JOIN boardEntity.fileList fileEntity " +
-                    "ON (boardEntity.idx = fileEntity.boardEntity) AND fileEntity.state = 0 " +
-            "WHERE boardEntity.idx = :boardIdx AND boardEntity.state = 0"
+                    "ON (boardEntity.idx = fileEntity.boardEntity) AND fileEntity.state = com.joo.common.state.CommonState.ENABLE " +
+            "WHERE boardEntity.idx = :boardIdx AND boardEntity.state = com.joo.common.state.CommonState.ENABLE"
     )
     Optional<LimitedBoard> findEnableBoardByBoardIdx_(@Param("boardIdx")Long boardIdx);
 
     @Query("SELECT boardEntity " +
             "FROM BoardEntity boardEntity " +
-            "LEFT JOIN boardEntity.fileList fileEntity " +
-            "ON (boardEntity.idx = fileEntity.boardEntity) AND fileEntity.state = 0 " +
-            "WHERE boardEntity.idx = :boardIdx AND boardEntity.state = 0"
+                "JOIN FETCH boardEntity.fileList fileEntity " +
+            "WHERE boardEntity.idx = :boardIdx " +
+                "AND boardEntity.state = com.joo.common.state.CommonState.ENABLE " +
+                "AND fileEntity.state = com.joo.common.state.CommonState.ENABLE"
     )
     Optional<BoardEntity> findEnableBoardByBoardIdx(@Param("boardIdx")Long boardIdx);
 }

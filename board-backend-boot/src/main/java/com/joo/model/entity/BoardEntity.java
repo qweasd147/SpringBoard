@@ -1,5 +1,6 @@
 package com.joo.model.entity;
 
+import com.joo.common.state.CommonState;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.FileDto;
 
@@ -23,7 +24,7 @@ public class BoardEntity extends BaseEntity<String>{
     @Lob
     private String contents;
     private int hits;
-    private int state;
+    private CommonState state;
 
     //board 조회 시 file도 같이 조회, 삭제 시 연관 파일 삭제, boardEntity 변수로 맵핑
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "boardEntity")
@@ -64,11 +65,11 @@ public class BoardEntity extends BaseEntity<String>{
         this.hits = hits;
     }
 
-    public int getState() {
+    public CommonState getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(CommonState state) {
         this.state = state;
     }
 

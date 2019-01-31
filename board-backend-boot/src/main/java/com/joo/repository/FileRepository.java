@@ -1,5 +1,6 @@
 package com.joo.repository;
 
+import com.joo.common.state.CommonState;
 import com.joo.model.entity.FileEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,10 +15,10 @@ public interface FileRepository extends CrudRepository<FileEntity, Long> {
 
     @Transactional
     @Modifying
-    @Query("update FileEntity fileEntity SET fileEntity.state = 1 where fileEntity.idx in :idxList")
+    @Query("update FileEntity fileEntity SET fileEntity.state = com.joo.common.state.CommonState.DELETE where fileEntity.idx in :idxList")
     void deleteAllByIdInQuery(@Param("idxList") List<Long> idxList);
 
-    Optional<List<FileEntity>> findByBoardEntity_IdxAndState(Long board_idx, int state);
+    Optional<List<FileEntity>> findByBoardEntity_IdxAndState(Long board_idx, CommonState state);
 
-    Optional<FileEntity> findByBoardEntity_IdxAndIdxAndState(Long board_idx, Long idx, int state);
+    Optional<FileEntity> findByBoardEntity_IdxAndIdxAndState(Long board_idx, Long idx, CommonState state);
 }

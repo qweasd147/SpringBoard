@@ -1,9 +1,9 @@
 package com.joo.model.dto;
 
 
+import com.joo.common.state.CommonState;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
-import com.joo.model.state.BoardState;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -19,7 +19,7 @@ public class BoardDto extends BaseDto<String> implements Serializable {
     @NotBlank(message = "내용 입력")
     private String contents;
     private int hits;
-    private BoardState boardState;
+    private CommonState state;
     private List<FileDto> fileList;
     private List<?> tagList;
 
@@ -55,16 +55,12 @@ public class BoardDto extends BaseDto<String> implements Serializable {
         this.hits = hits;
     }
 
-    public BoardState getState() {
-        return boardState;
+    public CommonState getState() {
+        return state;
     }
 
-    public void setState(BoardState boardState) {
-        this.boardState = boardState;
-    }
-
-    public void setState(int state) {
-        this.boardState = BoardState.getStateByCode(state);
+    public void setState(CommonState boardState) {
+        this.state = boardState;
     }
 
     public List<FileDto> getFileList() {
