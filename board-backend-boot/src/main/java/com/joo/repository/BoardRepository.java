@@ -38,10 +38,10 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long>, JpaSp
 
     @Query("SELECT boardEntity " +
             "FROM BoardEntity boardEntity " +
-                "JOIN FETCH boardEntity.fileList fileEntity " +
+                "LEFT JOIN FETCH boardEntity.fileList fileEntity " +
             "WHERE boardEntity.idx = :boardIdx " +
                 "AND boardEntity.state = com.joo.common.state.CommonState.ENABLE " +
-                "AND fileEntity.state = com.joo.common.state.CommonState.ENABLE"
+                "AND (fileEntity.state = com.joo.common.state.CommonState.ENABLE OR fileEntity.state IS NULL)"
     )
     Optional<BoardEntity> findEnableBoardByBoardIdx(@Param("boardIdx")Long boardIdx);
 }
