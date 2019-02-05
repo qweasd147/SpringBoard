@@ -1,5 +1,6 @@
 package com.joo.model.entity;
 
+import com.joo.common.converter.CommonStateImpl;
 import com.joo.common.state.CommonState;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.FileDto;
@@ -24,6 +25,7 @@ public class BoardEntity extends BaseEntity<String>{
     @Lob
     private String contents;
     private int hits;
+    @Convert(converter = CommonStateImpl.class)
     private CommonState state;
 
     //board 조회 시 file도 같이 조회, 삭제 시 연관 파일 삭제, boardEntity 변수로 맵핑

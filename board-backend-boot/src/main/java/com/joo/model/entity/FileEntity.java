@@ -1,6 +1,7 @@
 package com.joo.model.entity;
 
 
+import com.joo.common.converter.CommonStateImpl;
 import com.joo.common.state.CommonState;
 import com.joo.model.dto.FileDto;
 import org.hibernate.annotations.OnDelete;
@@ -19,6 +20,7 @@ public class FileEntity extends BaseEntity<String>{
     private String originFileName;
     private String saveFileName;
     private long fileSize;
+    @Convert(converter = CommonStateImpl.class)
     private CommonState state;
 
     @ManyToOne
