@@ -28,13 +28,10 @@ class SelectBoard extends React.Component {
             boardID
             , fileID
         });
-        
-        const serverHost = process.env.REACT_APP_SERVER_HOST || "";
 
         this.setState({
-            downloadURL : serverHost+"/api/board/download/"+boardID+"/"+fileID
+            downloadURL : `${process.env.REACT_APP_SERVER_HOST}${process.env.REACT_APP_BOARD_API}download/${boardID}/${fileID}`
         });
-        
     }
 
     handleUpdateView(e){

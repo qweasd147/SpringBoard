@@ -19,7 +19,7 @@ import { dataLoading, dataLoadingComplete
     , waitHandler, successHandler, failHandler, getErrMsg } from './Common';
 import { requestGET, requestPOST, requestPUT, requestDELETE } from '../utils/ajaxUtils';
 
-const BOARD_API = "/api/board/";
+const BOARD_API = process.env.REACT_APP_BOARD_API;
 
 //글 목록
 export function BoardListRequest(pageNum, condition, searchWord) {
@@ -103,7 +103,7 @@ export function insertBoardSuccess(data) {
 }
 
 export function insertBoardFail(msg) {
-    return failHandler(msg, false, {
+    return failHandler(msg, true, {
         type: INSERT_BOARD_FAIL
         , msg
     });

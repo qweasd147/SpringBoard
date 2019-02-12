@@ -42,7 +42,7 @@ export function requestDELETE(...params){
  * @param {*} option 
  */
 function handleParams(apiURL, data, option={}){
-    //addAuthFromCookie(option);
+    addAuthFromCookie(option);
 
     if(data)
         return [HOST_NAME+apiURL, data, option]
