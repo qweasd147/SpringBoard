@@ -2,8 +2,10 @@ package com.joo.api.login;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.joo.api.common.Result;
 import com.joo.api.common.controller.BaseController;
@@ -75,6 +77,31 @@ public class LoginController implements BaseController{
         new HandleLoginFactory(loginFactoryList).setLoginURLParams(model);
 
         return "loginList";
+    }
+
+    /**
+     * 로그인 페이지로 이동 요청 바인딩
+     * @return
+     */
+    @RequestMapping("/login/page/{serviceName}")
+    public String redirectLoginPage(HttpServletRequest req, @PathVariable("serviceName") String serviceName) {
+
+        String beanName = serviceName+"Login";
+        LoginAPI serviceFactory = (LoginAPI) WebUtil.getBean(req, beanName);
+        HttpSession session = req.getSession();
+
+        if(serviceFactory == null){
+            //TODO : null값 일 시, redirect 처리 어찌 해야할지
+            logger.error("bean을 찾을 수 없음! :"+beanName);
+            return "redirect:"+cbDomain;
+        }
+
+        String state = UUID.randomUUID().toString();
+        WebUtil.setSession(LoginAPI.LOGIN_SESSION_STATE_KEY, state);
+
+        String authURL = serviceFactory.getAuthorizationUrl(session, state);
+
+        return "redirect:"+authURL;
     }
 
     /**

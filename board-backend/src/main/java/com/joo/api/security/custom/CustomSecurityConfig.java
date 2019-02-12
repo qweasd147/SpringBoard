@@ -56,6 +56,7 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter{
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()                     //Preflight 요청은 따로 제한 x
                 .antMatchers("/api/authen/logout/").authenticated()                  //로그아웃은 인증된 사용자여야함
+                .antMatchers("/api/authen/login/page/**").permitAll()                //외부 로그인 요청페이지
                 .antMatchers("/api/authen/login/**/callback").permitAll()           //로그인 처리 로직. 보안관련은 내부에서 검사함
                 .antMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/**").authenticated()

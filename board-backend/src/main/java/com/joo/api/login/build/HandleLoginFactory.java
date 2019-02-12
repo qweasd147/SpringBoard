@@ -20,6 +20,7 @@ import java.util.*;
  *
  * TODO : 근데 의도에 맞을려면 deep copy 해야함... 일단 보류
  * TODO : 현재 Model객체에 직접 접근하여 값을 넣는 부분도 있긴 한데 바꾸긴 해야하는데 일단 보류
+ * TODO : 생각 할 수록 불필요할꺼 같음.. 걷어낼 예정
  * @author joo
  *
  */

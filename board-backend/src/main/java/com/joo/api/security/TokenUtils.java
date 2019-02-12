@@ -209,8 +209,8 @@ public class TokenUtils {
         final Date expireDate = claims.getExpiration();
         final Date createDate = new Date((Long) claims.get("created"));
 
-        // 만기일 < 생성일 or 현재시간 < 만기일  ==> 토큰 만료
-        return expireDate.before(createDate) || this.createCurrentDate().before(expireDate);
+        // 만기일 < 생성일 or 현재시간 > 만기일  ==> 토큰 만료
+        return expireDate.before(createDate) || this.createCurrentDate().after(expireDate);
     }
 
     private Boolean isCreatedBeforeLastPasswordReset(
