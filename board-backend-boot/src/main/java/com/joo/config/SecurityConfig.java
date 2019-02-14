@@ -1,0 +1,171 @@
+package com.joo.config;
+
+import com.joo.model.dto.UserDto;
+import com.joo.security.CustomUserDetails;
+import com.joo.security.EntryPointHandler;
+import com.joo.security.TokenFilter;
+import com.joo.security.TokenUtils;
+import com.joo.security.oauth.client.ClientResourceDetails;
+import com.joo.security.oauth.client.GoogleClientResource;
+import com.joo.security.oauth.client.KaKaoClientResource;
+import com.joo.security.oauth.client.NaverClientResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsUtils;
+import org.springframework.web.filter.CompositeFilter;
+
+import javax.servlet.Filter;
+import java.util.*;
+
+@Configuration
+@EnableWebSecurity
+@EnableOAuth2Client
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Qualifier("oauth2ClientContext")
+    @Autowired
+    private OAuth2ClientContext oAuth2ClientContext;
+
+    @Autowired
+    private EntryPointHandler entryPointHandler;
+
+    @Autowired
+    private TokenFilter tokenFilter;
+
+    @Autowired
+    private TokenUtils tokenUtils;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        //토큰 방식으로도 충분하므로 csrf 공격은 생각안해도됨(disable)
+        http.csrf().disable()
+                .headers().cacheControl().disable().and()
+                .exceptionHandling().authenticationEntryPoint(this.entryPointHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()   //사용자의 쿠키에 세션을 저장하지 않겠다
+                .authorizeRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()                     //Preflight 요청은 따로 제한 x
+                .antMatchers("/api/authen/logout/").authenticated()                  //로그아웃은 인증된 사용자여야함
+                .antMatchers("/api/authen/login/page/**").permitAll()                //외부 로그인 요청페이지
+                .antMatchers("/api/authen/login/**/callback").permitAll()           //로그인 처리 로직. 보안관련은 내부에서 검사함
+                .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/**").authenticated()
+                .antMatchers(HttpMethod.DELETE, "/api/**").authenticated()
+                .anyRequest().denyAll();
+
+        http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(oauth2Filter(), BasicAuthenticationFilter.class);
+        http.cors().configurationSource(request -> getCorsConfigurationSource());
+    }
+
+    @Bean
+    public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(filter);
+        registration.setOrder(-100);
+        return registration;
+    }
+
+    private Filter oauth2Filter() {
+        CompositeFilter filter = new CompositeFilter();
+        List<Filter> filters = new ArrayList<>();
+        filters.add(oauth2Filter(naver()));
+        filters.add(oauth2Filter(google()));
+        filters.add(oauth2Filter(kakao()));
+        filter.setFilters(filters);
+        return filter;
+    }
+
+    private Filter oauth2Filter(ClientResourceDetails clientDetails) {
+        OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(clientDetails.getLoginRequestPage());
+        OAuth2RestTemplate template = new OAuth2RestTemplate(clientDetails.getClient(), oAuth2ClientContext);
+
+        filter.setRestTemplate(template);
+        filter.setTokenServices(new UserInfoTokenServices(clientDetails.getResource().getUserInfoUri(), clientDetails.getClient().getClientId()));
+
+        filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
+            Map<String, String> userDetailsMap = (Map<String, String>) ((OAuth2Authentication) authentication).getUserAuthentication().getDetails();
+
+            UserDto userDto = clientDetails.makeUserDto(userDetailsMap);
+            CustomUserDetails customUserDetails = new CustomUserDetails(userDto);
+
+            String jwtToken = this.tokenUtils.createToken(customUserDetails);
+
+            response.setHeader("Authorization", jwtToken);
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        });
+        filter.setAuthenticationFailureHandler((request, response, exception) -> response.sendRedirect("/error"));
+
+        return filter;
+    }
+
+    @Bean
+    @ConfigurationProperties("naver")
+    public ClientResourceDetails naver() {
+        return new NaverClientResource();
+    }
+
+    @Bean
+    @ConfigurationProperties("google")
+    public ClientResourceDetails google() {
+        return new GoogleClientResource();
+    }
+
+    @Bean
+    @ConfigurationProperties("kakao")
+    public ClientResourceDetails kakao() {
+        return new KaKaoClientResource();
+    }
+
+    @Bean
+    CorsConfiguration getCorsConfigurationSource() {
+        final List<String> allowedHeaders = Arrays.asList(
+                HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS
+                , HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS
+                , HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN
+                , HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS
+                , HttpHeaders.ORIGIN
+                , HttpHeaders.CACHE_CONTROL
+                , HttpHeaders.CONTENT_TYPE
+                , HttpHeaders.AUTHORIZATION);
+
+        final List<String> allowedMethods = Arrays.asList(
+                HttpMethod.GET.name()
+                , HttpMethod.POST.name()
+                , HttpMethod.PUT.name()
+                , HttpMethod.DELETE.name()
+                , HttpMethod.PATCH.name()
+                , HttpMethod.OPTIONS.name()
+        );
+
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(allowedHeaders);
+        configuration.setAllowedMethods(allowedMethods);
+        configuration.setMaxAge(3600L);
+
+        return configuration;
+    }
+}

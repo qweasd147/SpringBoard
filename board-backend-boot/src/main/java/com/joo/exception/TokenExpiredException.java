@@ -1,9 +1,8 @@
 package com.joo.exception;
 
-//import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.AuthenticationException;
 
-//public class TokenExpiredException extends AuthenticationException {
-public class TokenExpiredException extends RuntimeException {
+public class TokenExpiredException extends AuthenticationException {
 
     public static final String EXCEPTION_CODE = "expired_token";
     private Object token;

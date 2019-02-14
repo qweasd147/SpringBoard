@@ -9,23 +9,33 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class GoogleAPI extends LoginFactory {
 	
 	private static final Logger logger = LoggerFactory.getLogger(GoogleAPI.class);
 	
 	//TODO : host값을 어디서 초기화 해야 하는지 고민중
 	private String host = "http://localhost";
-	
+
+	@Value("${google.client.Id}")
 	private String serviceName;
+	@Value("${google.client.Id}")
 	private String clientId;
+	@Value("${google.client.secret}")
 	private String clientSecret;
+	//@Value("${google.callbackURL}")
+	@Value("#{appProperty['google.callbackURL']}")
 	private String redirectURL;
+	@Value("${v1.google.accesstokenEndpoint}")
 	private String accessTokenEndPoint;
+	@Value("${v1.google.authorizationBaseURL}")
 	private String authorizationBaseURL;
 	
 	@Override

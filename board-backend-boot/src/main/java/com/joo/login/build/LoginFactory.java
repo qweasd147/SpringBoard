@@ -40,7 +40,7 @@ public abstract class LoginFactory implements LoginAPI{
 	private static final JSONParser JSON_PARSER = new JSONParser();
 
 	//request 주소를 담은 프로퍼티
-	@Resource(name="requestURL")
+	@Resource(name="classpath:thirdparty.request.properties")
 	private Properties properties;
 
 	@Value("#{appProperty['login.isCheckState']}")
