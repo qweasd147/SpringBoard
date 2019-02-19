@@ -35,7 +35,7 @@ public class TokenFilter extends OncePerRequestFilter {
     private final String tokenHeader;
     private final String TOKEN_PREFIX = "Bearer ";
 
-    public TokenFilter(@Value("#{appProperty['jwt.header']}")String tokenHeader) {
+    public TokenFilter(@Value("jwt.header")String tokenHeader) {
         this.tokenHeader = tokenHeader;
     }
 

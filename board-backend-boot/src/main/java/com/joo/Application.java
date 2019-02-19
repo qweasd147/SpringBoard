@@ -14,13 +14,17 @@ public class Application {
 		+ "classpath:thirdparty.security.properties";
 	*/
 
+
+	//private static final String PROPERTIES = "spring.config.location=classpath:login.security.yml";
 	private static final String PROPERTIES = "spring.config.location=classpath:/login.security.yml";
 
 
 	public static void main(String[] args) {
-		//SpringApplication.run(Application.class, args);
+		SpringApplication.run(Application.class, args);
+		/*
 		new SpringApplicationBuilder(Application.class)
 				.properties(PROPERTIES)
 				.run(args);
+				*/
 	}
 }

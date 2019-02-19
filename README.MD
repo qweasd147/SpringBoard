@@ -3,7 +3,7 @@
 Spring + react를 사용해서 기초 게시판 제작
 
 # 1 backend
-oracle + spring + spring security + 외부 로그인 시스템(OAuth 2.0 서드파티 로그인 사용. kakao, google, naver)
+RDBMS + spring + spring security + 외부 로그인 시스템(OAuth 2.0 서드파티 인증 사용. kakao, google, naver)
 
 ## 1.1 spring security 주요 설정
 

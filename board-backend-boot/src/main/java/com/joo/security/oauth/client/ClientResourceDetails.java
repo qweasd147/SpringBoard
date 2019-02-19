@@ -16,7 +16,7 @@ public abstract class ClientResourceDetails implements SocialHandler {
     @NestedConfigurationProperty
     private ResourceServerProperties resource = new ResourceServerProperties();
 
-    private String loginRequestPage;
+    protected String loginRequestPage;
 
     public AuthorizationCodeResourceDetails getClient() {
         return this.client;

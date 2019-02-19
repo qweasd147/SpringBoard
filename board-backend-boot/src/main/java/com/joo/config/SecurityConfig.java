@@ -5,12 +5,10 @@ import com.joo.security.CustomUserDetails;
 import com.joo.security.EntryPointHandler;
 import com.joo.security.TokenFilter;
 import com.joo.security.TokenUtils;
-import com.joo.security.oauth.client.ClientResourceDetails;
-import com.joo.security.oauth.client.GoogleClientResource;
-import com.joo.security.oauth.client.KaKaoClientResource;
-import com.joo.security.oauth.client.NaverClientResource;
+import com.joo.security.oauth.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -43,10 +41,6 @@ import java.util.*;
 @EnableOAuth2Client
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Qualifier("oauth2ClientContext")
-    @Autowired
-    private OAuth2ClientContext oAuth2ClientContext;
-
     @Autowired
     private EntryPointHandler entryPointHandler;
 
@@ -55,6 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private TokenUtils tokenUtils;
+
+    @Autowired
+    ClientResourceHandler clientResourceHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -89,53 +86,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private Filter oauth2Filter() {
         CompositeFilter filter = new CompositeFilter();
-        List<Filter> filters = new ArrayList<>();
-        filters.add(oauth2Filter(naver()));
-        filters.add(oauth2Filter(google()));
-        filters.add(oauth2Filter(kakao()));
+        List<Filter> filters = clientResourceHandler.oauth2Filters();
         filter.setFilters(filters);
         return filter;
-    }
-
-    private Filter oauth2Filter(ClientResourceDetails clientDetails) {
-        OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(clientDetails.getLoginRequestPage());
-        OAuth2RestTemplate template = new OAuth2RestTemplate(clientDetails.getClient(), oAuth2ClientContext);
-
-        filter.setRestTemplate(template);
-        filter.setTokenServices(new UserInfoTokenServices(clientDetails.getResource().getUserInfoUri(), clientDetails.getClient().getClientId()));
-
-        filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
-            Map<String, String> userDetailsMap = (Map<String, String>) ((OAuth2Authentication) authentication).getUserAuthentication().getDetails();
-
-            UserDto userDto = clientDetails.makeUserDto(userDetailsMap);
-            CustomUserDetails customUserDetails = new CustomUserDetails(userDto);
-
-            String jwtToken = this.tokenUtils.createToken(customUserDetails);
-
-            response.setHeader("Authorization", jwtToken);
-            response.setStatus(HttpStatus.NO_CONTENT.value());
-        });
-        filter.setAuthenticationFailureHandler((request, response, exception) -> response.sendRedirect("/error"));
-
-        return filter;
-    }
-
-    @Bean
-    @ConfigurationProperties("naver")
-    public ClientResourceDetails naver() {
-        return new NaverClientResource();
-    }
-
-    @Bean
-    @ConfigurationProperties("google")
-    public ClientResourceDetails google() {
-        return new GoogleClientResource();
-    }
-
-    @Bean
-    @ConfigurationProperties("kakao")
-    public ClientResourceDetails kakao() {
-        return new KaKaoClientResource();
     }
 
     @Bean

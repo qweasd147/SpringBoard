@@ -2,12 +2,20 @@ package com.joo.security.oauth.client;
 
 import com.joo.model.dto.UserDto;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@ConfigurationProperties("kakao")
+@Component
 public class KaKaoClientResource extends ClientResourceDetails{
+
+    public KaKaoClientResource(@Value("${kakao.resource.loginRequestPage}") String loginRequestPage) {
+        this.loginRequestPage = loginRequestPage;
+    }
 
     @Override
     public UserDto makeUserDto(Map<String, String> userDetailsMap) {

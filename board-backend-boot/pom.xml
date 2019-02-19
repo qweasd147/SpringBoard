@@ -169,6 +169,14 @@
 			<version>0.6.0</version>
 		</dependency>
 
+		<!-- ConfigrationProperties.
+		https://docs.spring.io/spring-boot/docs/1.3.0.RELEASE/reference/html/configuration-metadata.html#configuration-metadata-annotation-processor -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
 	</dependencies>
 
 	<build>
