@@ -21,6 +21,7 @@ import java.util.Map;
 @Component
 public class ClientResourceHandler {
 
+    /*
     @Autowired
     GoogleClientResource googleClientResource;
 
@@ -29,6 +30,10 @@ public class ClientResourceHandler {
 
     @Autowired
     NaverClientResource naverClientResource;
+    */
+
+    @Autowired
+    List<? extends ClientResourceDetails> clientResourceDetails;
 
     @Autowired
     private TokenUtils tokenUtils;
@@ -40,9 +45,13 @@ public class ClientResourceHandler {
     public List<Filter> oauth2Filters(){
 
         List<Filter> filters = new ArrayList<>();
+        /*
         filters.add(oauth2Filter(googleClientResource));
         filters.add(oauth2Filter(kaKaoClientResource));
         filters.add(oauth2Filter(naverClientResource));
+        */
+
+        clientResourceDetails.forEach(clientResourceDetail-> filters.add(oauth2Filter(clientResourceDetail)));
 
         return filters;
     }
