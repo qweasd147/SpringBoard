@@ -1,6 +1,7 @@
 package com.joo.security.oauth.client;
 
 import com.joo.model.dto.UserDto;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -16,21 +17,23 @@ public class NaverClientResource extends ClientResourceDetails{
     }
 
     @Override
-    public UserDto makeUserDto(Map<String, String> userDetailsMap) {
+    public UserDto makeUserDto(Map<String, Object> userDetailsMap) {
 
-        String id = userDetailsMap.get("id");
-        String name = userDetailsMap.get("name");
-        String nickName = userDetailsMap.get("nickname");
-        String email = userDetailsMap.get("email");
+        Map<String, String> respMap = (Map<String, String>) userDetailsMap.get("response");
+
+        String id = respMap.get("id");
+        String name = respMap.get("name");
+        String nickName = respMap.get("nickname");
+        String email = respMap.get("email");
 
         UserDto userDto = new UserDto();
 
         userDto.setId(id)
-                .setName(name)
-                .setNickName(nickName)
-                .setEmail(email)
-                .setServiceName("naver");
+            .setName(name)
+            .setNickName(nickName)
+            .setEmail(email)
+            .setServiceName("naver");
 
-            return userDto;
+        return userDto;
     }
 }

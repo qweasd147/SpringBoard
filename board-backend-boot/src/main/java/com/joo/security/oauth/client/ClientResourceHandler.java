@@ -10,27 +10,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.token.AccessTokenProvider;
+import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class ClientResourceHandler {
-
-    /*
-    @Autowired
-    GoogleClientResource googleClientResource;
-
-    @Autowired
-    KaKaoClientResource kaKaoClientResource;
-
-    @Autowired
-    NaverClientResource naverClientResource;
-    */
 
     @Autowired
     List<? extends ClientResourceDetails> clientResourceDetails;
@@ -43,14 +40,7 @@ public class ClientResourceHandler {
     private OAuth2ClientContext oAuth2ClientContext;
 
     public List<Filter> oauth2Filters(){
-
         List<Filter> filters = new ArrayList<>();
-        /*
-        filters.add(oauth2Filter(googleClientResource));
-        filters.add(oauth2Filter(kaKaoClientResource));
-        filters.add(oauth2Filter(naverClientResource));
-        */
-
         clientResourceDetails.forEach(clientResourceDetail-> filters.add(oauth2Filter(clientResourceDetail)));
 
         return filters;
@@ -59,13 +49,20 @@ public class ClientResourceHandler {
     private Filter oauth2Filter(ClientResourceDetails clientDetails) {
 
         OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(clientDetails.getLoginRequestPage());
-        OAuth2RestTemplate template = new OAuth2RestTemplate(clientDetails.getClient(), oAuth2ClientContext);
+        AuthorizationCodeResourceDetails resource = clientDetails.getClient();
+        OAuth2RestTemplate template = new OAuth2RestTemplate(resource, oAuth2ClientContext);
+
+        AccessTokenProviderChain accessTokenProvider = new AccessTokenProviderChain(Arrays.<AccessTokenProvider>asList(
+                new CustomAuthorizationCodeAccessTokenProvider(), new ImplicitAccessTokenProvider(),
+                new ResourceOwnerPasswordAccessTokenProvider(), new ClientCredentialsAccessTokenProvider()));
+
+        template.setAccessTokenProvider(accessTokenProvider);
 
         filter.setRestTemplate(template);
         filter.setTokenServices(new UserInfoTokenServices(clientDetails.getResource().getUserInfoUri(), clientDetails.getClient().getClientId()));
 
         filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
-            Map<String, String> userDetailsMap = (Map<String, String>) ((OAuth2Authentication) authentication).getUserAuthentication().getDetails();
+            Map<String, Object> userDetailsMap = (Map<String, Object>) ((OAuth2Authentication) authentication).getUserAuthentication().getDetails();
 
             UserDto userDto = clientDetails.makeUserDto(userDetailsMap);
             CustomUserDetails customUserDetails = new CustomUserDetails(userDto);

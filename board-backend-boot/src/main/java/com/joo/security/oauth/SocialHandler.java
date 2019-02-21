@@ -6,5 +6,5 @@ import java.util.Map;
 
 public interface SocialHandler {
 
-    UserDto makeUserDto(Map<String, String> userDetailsMap);
+    UserDto makeUserDto(Map<String, Object> userDetailsMap);
 }
