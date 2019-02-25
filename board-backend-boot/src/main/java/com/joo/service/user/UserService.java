@@ -3,6 +3,7 @@ package com.joo.service.user;
 
 import com.joo.model.dto.UserDto;
 
+@Deprecated
 public interface UserService {
 
     /**

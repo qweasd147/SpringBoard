@@ -4,7 +4,8 @@ import com.joo.model.dto.UserDto;
 import com.joo.service.user.UserService;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
+@Deprecated
 public class UserServiceImpl implements UserService {
 
     @Override

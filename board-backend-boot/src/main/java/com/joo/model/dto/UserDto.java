@@ -1,6 +1,7 @@
 package com.joo.model.dto;
 
 import com.joo.common.state.CommonState;
+import com.joo.model.entity.UserEntity;
 
 import java.io.Serializable;
 
@@ -8,7 +9,7 @@ public class UserDto extends BaseDto<String> implements Serializable{
 
     private static final long serialVersionUID = 7432896190010419477L;
 
-    private int idx;
+    private Long idx;
     private String serviceName;		//default, kakao, naver 등
     private String id;
     private String name;
@@ -20,7 +21,7 @@ public class UserDto extends BaseDto<String> implements Serializable{
 
     public UserDto() {}
 
-    public UserDto(int idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, CommonState state) {
+    public UserDto(Long idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, CommonState state) {
         this.idx = idx;
         this.serviceName = serviceName;
         this.id = id;
@@ -31,22 +32,22 @@ public class UserDto extends BaseDto<String> implements Serializable{
         this.state = state;
     }
 
-    public UserDto(UserDto userVo) {
-        this.idx = userVo.getIdx();
-        this.serviceName = userVo.serviceName;
-        this.id = userVo.id;
-        this.name = userVo.name;
-        this.nickName = userVo.nickName;
-        this.email = userVo.email;
-        this.thirdPartyToken = userVo.thirdPartyToken;
-        this.state = userVo.state;
+    public UserDto(UserDto userDto) {
+        this.idx = userDto.getIdx();
+        this.serviceName = userDto.serviceName;
+        this.id = userDto.id;
+        this.name = userDto.name;
+        this.nickName = userDto.nickName;
+        this.email = userDto.email;
+        this.thirdPartyToken = userDto.thirdPartyToken;
+        this.state = userDto.state;
     }
 
-    public int getIdx() {
+    public Long getIdx() {
         return idx;
     }
 
-    public void setIdx(int idx) {
+    public void setIdx(Long idx) {
         this.idx = idx;
     }
 
@@ -110,7 +111,7 @@ public class UserDto extends BaseDto<String> implements Serializable{
     }
 
     @Override
-    public <T> T toEntity() {
-        return null;
+    public UserEntity toEntity() {
+        return convertType(this, UserEntity.class);
     }
 }
