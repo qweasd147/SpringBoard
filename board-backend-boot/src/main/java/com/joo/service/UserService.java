@@ -11,4 +11,6 @@ public interface UserService {
     UserDto update(UserDto userDto);
 
     void remove(Long userIdx);
+
+    UserDto findByIdx(Long idx);
 }

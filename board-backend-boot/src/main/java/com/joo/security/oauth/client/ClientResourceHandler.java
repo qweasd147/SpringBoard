@@ -3,10 +3,11 @@ package com.joo.security.oauth.client;
 import com.joo.model.dto.UserDto;
 import com.joo.security.CustomUserDetails;
 import com.joo.security.TokenUtils;
+import com.joo.utils.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
+import javax.servlet.http.Cookie;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +37,17 @@ public class ClientResourceHandler {
     @Autowired
     private TokenUtils tokenUtils;
 
+    private static final Integer TOKEN_EXPIRATION = TokenUtils.expiration;
+
+    @Value("${jwt.header}")
+    private String tokenHeader;
+
     @Qualifier("oauth2ClientContext")
     @Autowired
     private OAuth2ClientContext oAuth2ClientContext;
+
+    @Value("${redirect.domain}")
+    private String redirectDomainAfterLogin;
 
     public List<Filter> oauth2Filters(){
         List<Filter> filters = new ArrayList<>();
@@ -65,12 +75,25 @@ public class ClientResourceHandler {
             Map<String, Object> userDetailsMap = (Map<String, Object>) ((OAuth2Authentication) authentication).getUserAuthentication().getDetails();
 
             UserDto userDto = clientDetails.makeUserDto(userDetailsMap);
+
+            OAuth2AccessToken acecessToken = template.getAccessToken();
+            userDto.setThirdPartyToken(acecessToken.getValue());
+
             CustomUserDetails customUserDetails = new CustomUserDetails(userDto);
 
             String jwtToken = this.tokenUtils.createToken(customUserDetails);
 
+            /*
             response.setHeader("Authorization", jwtToken);
             response.setStatus(HttpStatus.NO_CONTENT.value());
+            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+            */
+
+            //CookieUtils.setCookie(tokenHeader, jwtToken, TOKEN_EXPIRATION);
+            Cookie cookie = CookieUtils.makeCookie(tokenHeader, jwtToken, "/", TOKEN_EXPIRATION);
+
+            response.addCookie(cookie);
+            response.sendRedirect(redirectDomainAfterLogin);
         });
         //TODO : error 페이지 처리
         filter.setAuthenticationFailureHandler((request, response, exception) -> response.sendRedirect("/error"));

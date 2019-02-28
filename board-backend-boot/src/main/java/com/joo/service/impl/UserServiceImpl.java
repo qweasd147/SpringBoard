@@ -6,9 +6,11 @@ import com.joo.repository.UserRepository;
 import com.joo.service.BaseService;
 import com.joo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
+@Service
 public class UserServiceImpl extends BaseService implements UserService {
 
     @Autowired
@@ -39,5 +41,10 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     public void remove(Long userIdx) {
         userRepository.deleteAllByIdInQuery(Arrays.asList(userIdx));
+    }
+
+    @Override
+    public UserDto findByIdx(Long idx) {
+        return userRepository.findByIdx(idx).toDto();
     }
 }

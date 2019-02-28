@@ -1,7 +1,7 @@
 package com.joo.security;
 
 import com.joo.model.dto.UserDto;
-import com.joo.service.user.UserService;
+import com.joo.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserDto userDto = userService.getUserByIdx(Integer.parseInt(username));
+        UserDto userDto = userService.findByIdx(Long.parseLong(username));
 
         if(userDto == null){
             logger.debug("사용자 없음! : "+username);

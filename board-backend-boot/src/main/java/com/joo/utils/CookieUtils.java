@@ -23,6 +23,15 @@ public class CookieUtils {
         resp.addCookie(cookie);
     }
 
+    public static Cookie makeCookie(String key, String value, String path, int maxAge){
+        Cookie cookie = new Cookie(key, value);
+
+        cookie.setPath(path);
+        cookie.setMaxAge(maxAge);
+
+        return cookie;
+    }
+
     public static Cookie getCookie(String key){
 
         Cookie[] cookies = WebUtil.getRequest().getCookies();

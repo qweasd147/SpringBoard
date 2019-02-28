@@ -7,6 +7,7 @@ import com.joo.model.dto.UserDto;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Entity
 public class UserEntity extends BaseEntity<String> {
 
     @Id
