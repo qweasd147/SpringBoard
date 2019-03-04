@@ -8,7 +8,7 @@ const SERVER_HOST = process.env.REACT_APP_SERVER_HOST;
 class Login extends React.Component{
 
     componentWillMount(){
-        this.props.thirdPartyUrlRequest();
+        //this.props.thirdPartyUrlRequest();
     }
 
     render(){
