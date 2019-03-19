@@ -16,7 +16,7 @@ public class KaKaoClientResource extends ClientResourceDetails{
     }
 
     @Override
-    public UserDto makeUserDto(Map<String, Object> userDetailsMap) {
+    public UserDto makeUserDto(Map<String, Object> userDetailsMap, String accessToken) {
 
         Map<String, String> properties = (Map<String, String>) userDetailsMap.get("properties");
 
@@ -25,12 +25,13 @@ public class KaKaoClientResource extends ClientResourceDetails{
         String nickName = properties.get("nickname");
         String email = userDetailsMap.get("kaccount_email").toString();
 
-        UserDto userDto = new UserDto();
-
-        return userDto.setId(id)
-            .setName(name)
-            .setNickName(nickName)
-            .setEmail(email)
-            .setServiceName("kakao");
+        return UserDto.builder()
+            .id(id)
+            .name(name)
+            .nickName(nickName)
+            .email(email)
+            .thirdPartyToken(accessToken)
+            .serviceName("kakao")
+            .build();
     }
 }

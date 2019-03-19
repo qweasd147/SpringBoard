@@ -1,5 +1,6 @@
 package com.joo.security;
 
+import com.joo.model.dto.UserDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,12 @@ public class TokenFilter extends OncePerRequestFilter {
 
         Objects.requireNonNull(tokenStatus, "not found token status from token. "+token);
 
-        userDetails.setThirdPartyToken(thirdPartyToken);
-        userDetails.setState(tokenStatus.getUserStateFromTokenStatus());
+        UserDto userDto = CustomUserDetails.builder(userDetails)
+                .thirdPartyToken(thirdPartyToken)
+                .state(tokenStatus.getUserStateFromTokenStatus())
+                .build();
+
+        userDetails = new CustomUserDetails(userDto);
 
         if(tokenStatus == TOKEN_STATUS.ENABLED){
             logger.debug("pass validate");

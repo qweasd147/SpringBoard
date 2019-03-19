@@ -2,9 +2,15 @@ package com.joo.model.dto;
 
 import com.joo.common.state.CommonState;
 import com.joo.model.entity.UserEntity;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@Getter
+@NoArgsConstructor
 public class UserDto extends BaseDto<String> implements Serializable{
 
     private static final long serialVersionUID = 7432896190010419477L;
@@ -18,9 +24,7 @@ public class UserDto extends BaseDto<String> implements Serializable{
     private String thirdPartyToken;
     private CommonState state;
 
-
-    public UserDto() {}
-
+    @Builder
     public UserDto(Long idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, CommonState state) {
         this.idx = idx;
         this.serviceName = serviceName;
@@ -41,73 +45,6 @@ public class UserDto extends BaseDto<String> implements Serializable{
         this.email = userDto.email;
         this.thirdPartyToken = userDto.thirdPartyToken;
         this.state = userDto.state;
-    }
-
-    public Long getIdx() {
-        return idx;
-    }
-
-    public void setIdx(Long idx) {
-        this.idx = idx;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-    public UserDto setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-
-        return this;
-    }
-    public String getId() {
-        return id;
-    }
-    public UserDto setId(String id) {
-        this.id = id;
-
-        return this;
-    }
-    public String getName() {
-        return name;
-    }
-    public UserDto setName(String name) {
-        this.name = name;
-
-        return this;
-    }
-    public String getNickName() {
-        return nickName;
-    }
-    public UserDto setNickName(String nickName) {
-        this.nickName = nickName;
-
-        return this;
-    }
-    public String getEmail() {
-        return email;
-    }
-    public UserDto setEmail(String email) {
-        this.email = email;
-
-        return this;
-    }
-
-    public String getThirdPartyToken() {
-        return thirdPartyToken;
-    }
-
-    public void setThirdPartyToken(String thirdPartyToken) {
-        this.thirdPartyToken = thirdPartyToken;
-    }
-
-    public CommonState getState() {
-        return state;
-    }
-
-    public UserDto setState(CommonState state) {
-        this.state = state;
-
-        return this;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class NaverClientResource extends ClientResourceDetails{
     }
 
     @Override
-    public UserDto makeUserDto(Map<String, Object> userDetailsMap) {
+    public UserDto makeUserDto(Map<String, Object> userDetailsMap, String accessToken) {
 
         Map<String, String> respMap = (Map<String, String>) userDetailsMap.get("response");
 
@@ -26,14 +26,13 @@ public class NaverClientResource extends ClientResourceDetails{
         String nickName = respMap.get("nickname");
         String email = respMap.get("email");
 
-        UserDto userDto = new UserDto();
-
-        userDto.setId(id)
-            .setName(name)
-            .setNickName(nickName)
-            .setEmail(email)
-            .setServiceName("naver");
-
-        return userDto;
+        return UserDto.builder()
+            .id(id)
+            .name(name)
+            .nickName(nickName)
+            .email(email)
+            .thirdPartyToken(accessToken)
+            .serviceName("naver")
+            .build();
     }
 }

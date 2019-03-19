@@ -74,10 +74,8 @@ public class ClientResourceHandler {
         filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
             Map<String, Object> userDetailsMap = (Map<String, Object>) ((OAuth2Authentication) authentication).getUserAuthentication().getDetails();
 
-            UserDto userDto = clientDetails.makeUserDto(userDetailsMap);
-
-            OAuth2AccessToken acecessToken = template.getAccessToken();
-            userDto.setThirdPartyToken(acecessToken.getValue());
+            String accessToken = template.getAccessToken().getValue();
+            UserDto userDto = clientDetails.makeUserDto(userDetailsMap, accessToken);
 
             CustomUserDetails customUserDetails = new CustomUserDetails(userDto);
 

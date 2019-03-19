@@ -31,5 +31,5 @@ public abstract class ClientResourceDetails implements SocialHandler {
     }
 
     @Override
-    public abstract UserDto makeUserDto(Map<String, Object> userDetailsMap);
+    public abstract UserDto makeUserDto(Map<String, Object> userDetailsMap, String accessToken);
 }
