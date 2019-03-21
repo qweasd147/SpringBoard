@@ -3,10 +3,15 @@ package com.joo.model.dto;
 import com.joo.common.state.EnumCodeType;
 import com.joo.model.BaseModel;
 import com.joo.model.dto.validator.AvailableCondition;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Arrays;
 
+@Getter
+@NoArgsConstructor
 public class BoardSearchDto extends BaseModel implements Serializable{
 
     private static final long serialVersionUID = -8216665660181770998L;
@@ -55,28 +60,10 @@ public class BoardSearchDto extends BaseModel implements Serializable{
         }
     }
 
-
-    public int getBoardIdx() {
-        return boardIdx;
-    }
-
-    public void setBoardIdx(int boardIdx) {
+    @Builder
+    public BoardSearchDto(int boardIdx, String searchCondition, String searchKeyWord) {
         this.boardIdx = boardIdx;
-    }
-
-    public String getSearchCondition() {
-        return searchCondition;
-    }
-
-    public void setSearchCondition(String searchCondition) {
         this.searchCondition = searchCondition;
-    }
-
-    public String getSearchKeyWord() {
-        return searchKeyWord;
-    }
-
-    public void setSearchKeyWord(String searchKeyWord) {
         this.searchKeyWord = searchKeyWord;
     }
 }

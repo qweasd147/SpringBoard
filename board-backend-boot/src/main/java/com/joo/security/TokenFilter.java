@@ -75,7 +75,7 @@ public class TokenFilter extends OncePerRequestFilter {
 
         Objects.requireNonNull(tokenStatus, "not found token status from token. "+token);
 
-        UserDto userDto = CustomUserDetails.builder(userDetails)
+        UserDto userDto = userDetails.toBuilder()
                 .thirdPartyToken(thirdPartyToken)
                 .state(tokenStatus.getUserStateFromTokenStatus())
                 .build();

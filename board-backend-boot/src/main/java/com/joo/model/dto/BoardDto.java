@@ -4,11 +4,18 @@ package com.joo.model.dto;
 import com.joo.common.state.CommonState;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class BoardDto extends BaseDto<String> implements Serializable {
 
     private static final long serialVersionUID = 6348958289640869735L;
@@ -23,59 +30,14 @@ public class BoardDto extends BaseDto<String> implements Serializable {
     private List<FileDto> fileList;
     private List<?> tagList;
 
-    public Long getIdx() {
-        return idx;
-    }
-
-    public void setIdx(Long idx) {
+    @Builder(toBuilder = true)
+    public BoardDto(Long idx, String subject, String contents, int hits, CommonState state, List<FileDto> fileList, List<?> tagList) {
         this.idx = idx;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
         this.subject = subject;
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    public void setContents(String contents) {
         this.contents = contents;
-    }
-
-    public int getHits() {
-        return hits;
-    }
-
-    public void setHits(int hits) {
         this.hits = hits;
-    }
-
-    public CommonState getState() {
-        return state;
-    }
-
-    public void setState(CommonState boardState) {
-        this.state = boardState;
-    }
-
-    public List<FileDto> getFileList() {
-        return fileList;
-    }
-
-    public void setFileList(List<FileDto> fileList) {
+        this.state = state;
         this.fileList = fileList;
-    }
-
-    public List<?> getTagList() {
-        return tagList;
-    }
-
-    public void setTagList(List<?> tagList) {
         this.tagList = tagList;
     }
 

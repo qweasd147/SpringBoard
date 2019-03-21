@@ -4,12 +4,18 @@ import com.joo.common.converter.CommonStateImpl;
 import com.joo.common.state.CommonState;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.FileDto;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
+@Getter
+@Setter
 public class BoardEntity extends BaseEntity<String>{
 
     @Id
@@ -35,59 +41,13 @@ public class BoardEntity extends BaseEntity<String>{
     @Transient
     private List<?> tagList;
 
-    public Long getIdx() {
-        return idx;
-    }
-
-    public void setIdx(Long idx) {
-        this.idx = idx;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
+    @Builder(toBuilder = true)
+    public BoardEntity(String subject, String contents, int hits, CommonState state, List<FileEntity> fileList, List<?> tagList) {
         this.subject = subject;
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    public void setContents(String contents) {
         this.contents = contents;
-    }
-
-    public int getHits() {
-        return hits;
-    }
-
-    public void setHits(int hits) {
         this.hits = hits;
-    }
-
-    public CommonState getState() {
-        return state;
-    }
-
-    public void setState(CommonState state) {
         this.state = state;
-    }
-
-    public List<FileEntity> getFileList() {
-        return fileList;
-    }
-
-    public void setFileList(List<FileEntity> fileList) {
         this.fileList = fileList;
-    }
-
-    public List<?> getTagList() {
-        return tagList;
-    }
-
-    public void setTagList(List<?> tagList) {
         this.tagList = tagList;
     }
 
@@ -104,9 +64,16 @@ public class BoardEntity extends BaseEntity<String>{
 
         BoardDto boardDto = this.toDto();
         List<FileDto> fileDtoList = boardDto.getFileList();
-        if(fileDtoList != null)
-            fileDtoList.forEach(fileDto -> fileDto.setBoardDto(boardDto));
 
-        return boardDto;
+        if(fileDtoList != null){
+            fileDtoList = fileDtoList
+                .stream()
+                .map(FileDto::toBuilder)
+                .map(fileDtoBuilder -> fileDtoBuilder.boardDto(boardDto))
+                .map(fileDtoBuilder -> fileDtoBuilder.build())
+                .collect(Collectors.toList());
+        }
+
+        return boardDto.toBuilder().fileList(fileDtoList).build();
     }
 }

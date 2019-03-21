@@ -25,6 +25,7 @@ public class CustomUserDetails extends UserDto implements UserDetails {
         this.authorities = authorities;
     }
 
+    /*
     public static UserDtoBuilder builder(UserDto userDto){
         return UserDto.builder()
             .idx(userDto.getIdx())
@@ -36,6 +37,7 @@ public class CustomUserDetails extends UserDto implements UserDetails {
             .thirdPartyToken(userDto.getThirdPartyToken())
             .state(userDto.getState());
     }
+    */
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

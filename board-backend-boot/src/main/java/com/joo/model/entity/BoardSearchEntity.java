@@ -2,37 +2,22 @@ package com.joo.model.entity;
 
 import com.joo.model.BaseModel;
 import com.joo.model.dto.BoardSearchDto;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.io.Serializable;
 
+@Getter
 public class BoardSearchEntity extends BaseModel implements Serializable{
 
     private Long boardIdx;
-
     private String searchCondition = "";
     private String searchKeyWord = "";
 
-    public Long getBoardIdx() {
-        return boardIdx;
-    }
-
-    public void setBoardIdx(Long boardIdx) {
+    @Builder
+    public BoardSearchEntity(Long boardIdx, String searchCondition, String searchKeyWord) {
         this.boardIdx = boardIdx;
-    }
-
-    public String getSearchCondition() {
-        return searchCondition;
-    }
-
-    public void setSearchCondition(String searchCondition) {
         this.searchCondition = searchCondition;
-    }
-
-    public String getSearchKeyWord() {
-        return searchKeyWord;
-    }
-
-    public void setSearchKeyWord(String searchKeyWord) {
         this.searchKeyWord = searchKeyWord;
     }
 

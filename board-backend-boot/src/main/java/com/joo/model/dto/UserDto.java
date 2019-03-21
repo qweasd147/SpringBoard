@@ -2,7 +2,6 @@ package com.joo.model.dto;
 
 import com.joo.common.state.CommonState;
 import com.joo.model.entity.UserEntity;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +23,7 @@ public class UserDto extends BaseDto<String> implements Serializable{
     private String thirdPartyToken;
     private CommonState state;
 
-    @Builder
+    @Builder(toBuilder = true)
     public UserDto(Long idx, String serviceName, String id, String name, String nickName, String email, String thirdPartyToken, CommonState state) {
         this.idx = idx;
         this.serviceName = serviceName;
