@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 public abstract class BaseDto<T> extends BaseModel implements Serializable {
 
     private T createdBy;

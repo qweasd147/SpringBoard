@@ -90,7 +90,7 @@ public class BoardServiceImpl extends BaseService implements BoardService{
         */
 
         List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
-        boardDto.setFileList(fileDtoList);
+        boardDto.addFiles(fileDtoList);
         return boardRepository.save(boardDto.toEntityWithCircular()).toDto();
     }
 

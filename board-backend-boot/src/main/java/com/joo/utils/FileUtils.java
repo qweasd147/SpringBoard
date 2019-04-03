@@ -61,13 +61,13 @@ public class FileUtils {
                 throw new RuntimeException("파일 올리기 오류");
             }
 
-            FileDto fileDto = new FileDto();
-
-            fileDto.setContentType(file.getContentType());
-            fileDto.setFilePath(baseUploadPath.toAbsolutePath().toString());
-            fileDto.setOriginFileName(originFileName);
-            fileDto.setSaveFileName(saveFileName);
-            fileDto.setFileSize(file.getSize());
+            FileDto fileDto = FileDto.builder()
+                .contentType(file.getContentType())
+                .filePath(baseUploadPath.toAbsolutePath().toString())
+                .originFileName(originFileName)
+                .saveFileName(saveFileName)
+                .fileSize(file.getSize())
+                .build();
 
             uploadedList.add(fileDto);
         }

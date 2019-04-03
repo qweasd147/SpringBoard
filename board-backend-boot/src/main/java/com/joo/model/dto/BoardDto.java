@@ -11,15 +11,16 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class BoardDto extends BaseDto<String> implements Serializable {
 
     private static final long serialVersionUID = 6348958289640869735L;
 
+    @Setter
     private Long idx;
     @NotBlank(message = "제목 입력")
     private String subject;
@@ -27,11 +28,11 @@ public class BoardDto extends BaseDto<String> implements Serializable {
     private String contents;
     private int hits;
     private CommonState state;
-    private List<FileDto> fileList;
+    private List<FileDto> fileList = new ArrayList<>();
     private List<?> tagList;
 
     @Builder(toBuilder = true)
-    public BoardDto(Long idx, String subject, String contents, int hits, CommonState state, List<FileDto> fileList, List<?> tagList) {
+    private BoardDto(Long idx, String subject, String contents, int hits, CommonState state, List<FileDto> fileList, List<?> tagList) {
         this.idx = idx;
         this.subject = subject;
         this.contents = contents;
@@ -57,5 +58,17 @@ public class BoardDto extends BaseDto<String> implements Serializable {
         if(fileEntityList != null)
             fileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
         return boardEntity;
+    }
+
+    public List<FileDto> addFile(FileDto fileDto){
+        fileList.add(fileDto);
+
+        return fileList;
+    }
+
+    public List<FileDto> addFiles(List<FileDto> fileDtos){
+        fileList.addAll(fileDtos);
+
+        return fileList;
     }
 }
