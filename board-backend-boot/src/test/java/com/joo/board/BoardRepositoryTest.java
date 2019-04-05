@@ -41,7 +41,8 @@ public class BoardRepositoryTest {
 
         //검색된 파일이 모두 사용 가능한것만 검색 된건지 테스트
         boolean isDisableFileExist = fileList.stream()
-                .filter(file -> file.getState() != CommonState.ENABLE)
+                .map(FileEntity::getState)
+                .filter(fileState -> fileState != CommonState.ENABLE)
                 .findAny().isPresent();
 
         assertTrue(isDisableFileExist);
