@@ -14,7 +14,7 @@ spring, oracle, mybatis, junit, docker
 spring-boot, mariaDB, JPA, junit, docker
 
 # 1.2 spring-security 주요 설정
-[spring-security 주요 설정](https://github.com/qweasd147/SpringBoard/docs/spring-security.MD)
+[spring-security 주요 설정](https://github.com/qweasd147/SpringBoard/blob/master/docs/spring-security.MD)
 
 # 2 frontend
 기존 React로 만든거에서 살짝 수정해서 그냥 사용
