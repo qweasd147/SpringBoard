@@ -7,26 +7,29 @@ import com.joo.model.dto.UserDto;
 import com.joo.security.CustomUserDetails;
 import com.joo.security.TokenUtils;
 import com.joo.web.controller.BoardController;
-import com.joo.web.controller.common.ControllerExceptionHandler;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class BoardControllerTest {
+@ActiveProfiles("hsqldb")
+@AutoConfigureMockMvc
+public class BoardControllerTest extends AbstractControllerTest{
 
     private static final String BOARD_API = "/api/v1/board";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -34,22 +37,19 @@ public class BoardControllerTest {
     @InjectMocks
     private BoardController boardController;
 
-    private MockMvc mockMvc;
+    //private MockMvc mockMvc;
 
     private UserDto normalUserDto;
     private UserDto invalidUserDto;
 
-    @Value("jwt.header")
+    @Value("${jwt.header}")
     private String tokenHeader;
 
-    @Autowired
+    @Mock
     private TokenUtils tokenUtils;
 
-    public void init(){
-        mockMvc = MockMvcBuilders.standaloneSetup(boardController)
-            .setControllerAdvice(new ControllerExceptionHandler())
-            .build();
-
+    @Override
+    public void handleBefore() {
         normalUserDto = UserDto.builder()
             .idx(-99L)
             .id("mockID")
@@ -60,13 +60,23 @@ public class BoardControllerTest {
             .build();
 
         invalidUserDto = UserDto.builder()
-                .idx(-98L)
-                .id("invalidMockID")
-                .name("invalidMockName")
-                .nickName("invalidMockNickName")
-                .serviceName("invalidMockService")
-                .state(CommonState.EXPIRED)
-                .build();
+            .idx(-98L)
+            .id("invalidMockID")
+            .name("invalidMockName")
+            .nickName("invalidMockNickName")
+            .serviceName("invalidMockService")
+            .state(CommonState.EXPIRED)
+            .build();
+    }
+
+    @Override
+    public void handleAfter() {
+
+    }
+
+    @Override
+    public Object[] getTargetControllers() {
+        return new Object[]{boardController};
     }
 
     @Test
@@ -81,6 +91,21 @@ public class BoardControllerTest {
 
         resultActions
             .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("정상적인 게시물 리스트 검색 테스트")
+    public void search() throws Exception {
+
+        String normalBoardListAPI = BOARD_API + "?searchCondition=subject&searchKeyWord=name";
+
+        MvcResult result =
+            this.mockMvc.perform(get(normalBoardListAPI))
+                .andDo(print())
+                .andExpect(status().isOk())
+                //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
+                .andReturn();
+
     }
 
 
