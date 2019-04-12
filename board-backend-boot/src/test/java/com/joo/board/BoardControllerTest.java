@@ -13,12 +13,16 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,9 +30,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 
-@RunWith(MockitoJUnitRunner.class)
-@ActiveProfiles("hsqldb")
-@AutoConfigureMockMvc
+//@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+//@ActiveProfiles("hsqldb")
+//@AutoConfigureMockMvc
 public class BoardControllerTest extends AbstractControllerTest{
 
     private static final String BOARD_API = "/api/v1/board";
@@ -45,11 +51,12 @@ public class BoardControllerTest extends AbstractControllerTest{
     @Value("${jwt.header}")
     private String tokenHeader;
 
-    @Mock
+    @Autowired
     private TokenUtils tokenUtils;
 
     @Override
     public void handleBefore() {
+
         normalUserDto = UserDto.builder()
             .idx(-99L)
             .id("mockID")
@@ -83,9 +90,9 @@ public class BoardControllerTest extends AbstractControllerTest{
     @DisplayName("정상적인 글쓰기 테스트")
     public void regist() throws Exception {
         BoardDto boardDto = BoardDto.builder()
-                .subject("mock를 통한 게시판 제목 입력")
-                .contents("mock를 통한 게시판 내용 입력")
-                .build();
+            .subject("mock를 통한 게시판 제목 입력")
+            .contents("mock를 통한 게시판 내용 입력")
+            .build();
 
         ResultActions resultActions = requestRegistWithAuthToken(boardDto);
 
@@ -111,13 +118,16 @@ public class BoardControllerTest extends AbstractControllerTest{
 
     private ResultActions requestRegistWithAuthToken(BoardDto boardDto) throws Exception {
 
-        return mockMvc
-            .perform(
-                multipart(BOARD_API)
-                .file(null)
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = multipart(BOARD_API)
+                //.file(null)
                 //.contentType(MediaType.MULTIPART_FORM_DATA)   //TODO : content type이 multipart로 보장되는지 확인
-                .content(OBJECT_MAPPER.writeValueAsBytes(boardDto))
-                .headers(getHeaderWithAuthToken()))
+                //.content(OBJECT_MAPPER.writeValueAsBytes(boardDto))
+                .param("subject","mock를 통한 게시판 제목 입력")
+                .param("contents","mock를 통한 게시판 내용 입력")
+                .headers(getHeaderWithAuthToken());
+
+        return mockMvc
+            .perform(mockHttpServletRequestBuilder)
             .andDo(print());
     }
 
