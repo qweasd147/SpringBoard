@@ -23,19 +23,16 @@ public class FileServiceImpl extends BaseService implements FileService{
     private BoardRepository boardRepository;
 
     @Override
-    public FileDto selectFileOne(Long boardIdx, Long fileIdx) {
+    public FileEntity selectFileOne(Long boardIdx, Long fileIdx) {
         return fileRepository
                 .findByBoardEntity_IdxAndIdxAndState(boardIdx, fileIdx, CommonState.ENABLE)
-                .orElseThrow(() -> new NoSuchElementException("파일을 찾을 수 없음")).toDto();
+                .orElseThrow(() -> new NoSuchElementException("파일을 찾을 수 없음"));
     }
 
     @Override
-    public List<FileDto> selectFileList(Long boardIdx) {
-
-        List<FileEntity> fileEntityList =
-                boardRepository
-                    .findById(boardIdx)
-                    .orElseThrow(() -> new RuntimeException("못찾음")).getFileList();
-        return fileEntityList.stream().map(FileEntity::toDto).collect(Collectors.toList());
+    public List<FileEntity> selectFileList(Long boardIdx) {
+        return boardRepository
+                .findById(boardIdx)
+                .orElseThrow(() -> new RuntimeException("못찾음")).getFileList();
     }
 }

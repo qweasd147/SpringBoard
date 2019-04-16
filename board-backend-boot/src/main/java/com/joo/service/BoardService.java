@@ -2,6 +2,7 @@ package com.joo.service;
 
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
+import com.joo.model.entity.BoardEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +30,7 @@ public interface BoardService {
      * @param boardId
      * @return
      */
-    BoardDto selectBoardOne(Long boardId);
+    BoardEntity selectBoardOne(Long boardId);
 
     /**
      * 게시물 하나를 등록한다.
@@ -37,7 +38,7 @@ public interface BoardService {
      * @param uploadFiles
      * @return
      */
-    BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFiles);
+    BoardEntity insertBoard(BoardDto boardDto, MultipartFile[] uploadFiles);
 
     /**
      * 게시물 하나를 수정한다.
@@ -46,7 +47,7 @@ public interface BoardService {
      * @param detachFileList
      * @return
      */
-    BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFiles, List<Long> detachFileList);
+    BoardEntity updateBoard(BoardDto boardDto, MultipartFile[] uploadFiles, List<Long> detachFileList);
 
     /**
      * 게시물 하나를 삭제한다.

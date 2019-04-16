@@ -1,6 +1,7 @@
 package com.joo.security;
 
 import com.joo.model.dto.UserDto;
+import com.joo.model.entity.UserEntity;
 import com.joo.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +24,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserDto userDto = userService.findByIdx(Long.parseLong(username));
+        UserEntity userEntity = userService.findByIdx(Long.parseLong(username));
 
-        if(userDto == null){
+        if(userEntity == null){
             logger.debug("사용자 없음! : "+username);
             throw new UsernameNotFoundException("사용자 없음!");
         }
 
-        CustomUserDetails userDetails = new CustomUserDetails(userDto);
+        CustomUserDetails userDetails = new CustomUserDetails(UserDto.of(userEntity));
 
         //TODO : 해당 사용자의 권한 정보 입력
         userDetails.setAuthorities(Collections.EMPTY_SET);

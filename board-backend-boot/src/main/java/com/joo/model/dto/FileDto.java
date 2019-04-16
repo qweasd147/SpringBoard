@@ -36,8 +36,27 @@ public class FileDto extends BaseDto<String> implements Serializable{
         this.boardDto = boardDto;
     }
 
+    public static  FileDto of(FileEntity fileDto){
+        return FileDto.builder()
+            .contentType(fileDto.getContentType())
+            .filePath(fileDto.getFilePath())
+            .originFileName(fileDto.getOriginFileName())
+            .saveFileName(fileDto.getSaveFileName())
+            .fileSize(fileDto.getFileSize())
+            .state(fileDto.getState())
+            .build();
+    }
+
     @Override
     public FileEntity toEntity(){
-        return convertType(this, FileEntity.class);
+        return FileEntity.builder()
+            .contentType(this.contentType)
+            .filePath(this.filePath)
+            .originFileName(this.originFileName)
+            .saveFileName(this.saveFileName)
+            .fileSize(this.fileSize)
+            .state(this.state)
+            .boardEntity(this.boardDto.toEntity())
+            .build();
     }
 }

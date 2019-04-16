@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -44,7 +45,19 @@ public class BoardDto extends BaseDto<String> implements Serializable {
 
     @Override
     public BoardEntity toEntity(){
-        return convertType(this, BoardEntity.class);
+
+        List<FileEntity> fileEntities = fileList.stream()
+                .map(FileDto::toEntity)
+                .collect(Collectors.toList());
+
+        return BoardEntity.builder()
+            .subject(this.subject)
+            .contents(this.contents)
+            .hits(this.hits)
+            .state(this.state)
+            .fileList(fileEntities)
+            .tagList(this.tagList)
+            .build();
     }
 
     /**

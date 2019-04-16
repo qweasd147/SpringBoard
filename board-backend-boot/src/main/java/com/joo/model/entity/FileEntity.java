@@ -43,9 +43,4 @@ public class FileEntity extends BaseEntity<String>{
         this.state = state;
         this.boardEntity = boardEntity;
     }
-
-    @Override
-    public FileDto toDto(){
-        return convertType(this, FileDto.class);
-    }
 }

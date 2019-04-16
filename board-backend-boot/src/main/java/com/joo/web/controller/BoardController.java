@@ -5,6 +5,8 @@ import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.FileDto;
 import com.joo.model.dto.limited.LimitedBoardDto;
+import com.joo.model.entity.BoardEntity;
+import com.joo.model.entity.FileEntity;
 import com.joo.service.BoardService;
 import com.joo.service.FileService;
 import com.joo.utils.FileUtils;
@@ -49,10 +51,10 @@ public class BoardController implements BaseController{
     public ResponseEntity selectBoardOne(@ModelAttribute BoardSearchDto searchDto,
                                          @PathVariable Long boardId){
 
-        BoardDto boardDto = boardService.selectBoardOne(boardId);
+        BoardEntity boardEntity = boardService.selectBoardOne(boardId);
 
         //전체 정보가 아닌 제한된 정보만 넘겨준다.
-        LimitedBoardDto limitedBoardDto = modelMapper.map(boardDto, LimitedBoardDto.class);
+        LimitedBoardDto limitedBoardDto = modelMapper.map(boardEntity, LimitedBoardDto.class);
 
         return successRespResult(limitedBoardDto);
     }
@@ -94,12 +96,12 @@ public class BoardController implements BaseController{
     @GetMapping("/board/download/{boardId}/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long boardId, @PathVariable Long fileId){
 
-        FileDto fileDto = fileService.selectFileOne(boardId, fileId);
+        FileEntity fileEntity = fileService.selectFileOne(boardId, fileId);
 
-        if(fileDto == null)  throw new BusinessException("HTTP_404", "잘못된 파일정보 다운로드 요청."+fileDto.toString());
+        if(fileEntity == null)  throw new BusinessException("HTTP_404", "잘못된 파일정보 다운로드 요청."+fileEntity.toString());
 
-        Resource fileResource = fileUtils.getFileResouce(fileDto);
+        Resource fileResource = fileUtils.getFileResouce(FileDto.of(fileEntity));
 
-        return getRespResource(fileDto.getOriginFileName(), fileResource);
+        return getRespResource(fileEntity.getOriginFileName(), fileResource);
     }
 }

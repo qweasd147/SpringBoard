@@ -56,9 +56,4 @@ public class UserEntity extends BaseEntity<String> {
         this.thirdPartyToken = thirdPartyToken;
         this.state = state;
     }
-
-    @Override
-    public UserDto toDto() {
-        return convertType(this, UserDto.class);
-    }
 }

@@ -17,25 +17,25 @@ public class UserServiceImpl extends BaseService implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDto insertUser(UserDto userDto) {
-        return userRepository.save(userDto.toEntity()).toDto();
+    public UserEntity insertUser(UserDto userDto) {
+        return userRepository.save(userDto.toEntity());
     }
 
     @Override
-    public UserDto insertIfNotExist(UserDto userDto) {
+    public UserEntity insertIfNotExist(UserDto userDto) {
 
         UserEntity userEntity = userRepository.findByServiceNameAndId(userDto.getServiceName(), userDto.getId());
 
         if(userEntity == null){
-            return userRepository.save(userDto.toEntity()).toDto();
+            return userRepository.save(userDto.toEntity());
         }else {
-            return userEntity.toDto();
+            return userEntity;
         }
     }
 
     @Override
-    public UserDto update(UserDto userDto) {
-        return userRepository.save(userDto.toEntity()).toDto();
+    public UserEntity update(UserDto userDto) {
+        return userRepository.save(userDto.toEntity());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     @Override
-    public UserDto findByIdx(Long idx) {
-        return userRepository.findByIdx(idx).toDto();
+    public UserEntity findByIdx(Long idx) {
+        return userRepository.findByIdx(idx);
     }
 }

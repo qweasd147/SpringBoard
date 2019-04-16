@@ -61,6 +61,4 @@ public abstract class BaseEntity<T> extends BaseModel{
     public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
-
-    public abstract <T> T toDto();
 }

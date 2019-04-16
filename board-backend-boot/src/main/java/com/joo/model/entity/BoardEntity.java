@@ -6,7 +6,7 @@ import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.FileDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Getter
-@Setter
+@NoArgsConstructor
 public class BoardEntity extends BaseEntity<String>{
 
     @Id
@@ -51,29 +51,19 @@ public class BoardEntity extends BaseEntity<String>{
         this.tagList = tagList;
     }
 
-    @Override
-    public BoardDto toDto() {
-        return convertType(this, BoardDto.class);
+    public List<FileEntity> addFile(FileEntity fileEntity){
+        fileList.add(fileEntity);
+
+        return fileList;
     }
 
-    /**
-     * 순환 참조를 포함하여 dto화 시킨다.
-     * @return
-     */
-    public BoardDto toDtoWithCircular() {
+    public List<FileEntity> addFiles(List<FileEntity> fileEntities){
+        fileList.addAll(fileEntities);
 
-        BoardDto boardDto = this.toDto();
-        List<FileDto> fileDtoList = boardDto.getFileList();
+        return fileList;
+    }
 
-        if(fileDtoList != null){
-            fileDtoList = fileDtoList
-                .stream()
-                .map(FileDto::toBuilder)
-                .map(fileDtoBuilder -> fileDtoBuilder.boardDto(boardDto))
-                .map(fileDtoBuilder -> fileDtoBuilder.build())
-                .collect(Collectors.toList());
-        }
-
-        return boardDto.toBuilder().fileList(fileDtoList).build();
+    public void delete(){
+        this.state = CommonState.DELETE;
     }
 }

@@ -20,8 +20,4 @@ public class BoardSearchEntity extends BaseModel implements Serializable{
         this.searchCondition = searchCondition;
         this.searchKeyWord = searchKeyWord;
     }
-
-    public BoardSearchDto toDto(){
-        return convertType(this, BoardSearchDto.class);
-    }
 }

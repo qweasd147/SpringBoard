@@ -46,8 +46,29 @@ public class UserDto extends BaseDto<String> implements Serializable{
         this.state = userDto.state;
     }
 
+    public static UserDto of(UserEntity userEntity){
+        return UserDto.builder()
+            .idx(userEntity.getIdx())
+            .serviceName(userEntity.getServiceName())
+            .id(userEntity.getId())
+            .name(userEntity.getName())
+            .nickName(userEntity.getNickName())
+            .email(userEntity.getEmail())
+            .thirdPartyToken(userEntity.getThirdPartyToken())
+            .state(userEntity.getState())
+            .build();
+    }
+
     @Override
     public UserEntity toEntity() {
-        return convertType(this, UserEntity.class);
+        return UserEntity.builder()
+            .serviceName(this.serviceName)
+            .id(this.id)
+            .name(this.name)
+            .nickName(this.nickName)
+            .email(this.email)
+            .thirdPartyToken(this.thirdPartyToken)
+            .state(this.state)
+            .build();
     }
 }

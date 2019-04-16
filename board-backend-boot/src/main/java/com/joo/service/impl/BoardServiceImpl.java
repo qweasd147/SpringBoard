@@ -59,18 +59,18 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Override
     @Transactional
-    public BoardDto selectBoardOne(Long boardId) {
+    public BoardEntity selectBoardOne(Long boardId) {
         //BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new NoSuchElementException("게시글 없음"));
         //boardEntity.setHits(boardEntity.getHits()+1);
         //boardRepository.save(boardEntity);
 
         boardRepository.incrementHits(boardId);
         return boardRepository.findEnableBoardByBoardIdx(boardId)
-                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardId)).toDto();
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardId));
     }
 
     @Override
-    public BoardDto insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
+    public BoardEntity insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
         //TODO : 순환 참조 로직을 어디다 둘 지 고민중
         /*
         List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
@@ -91,34 +91,33 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
         List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
         boardDto.addFiles(fileDtoList);
-        return boardRepository.save(boardDto.toEntityWithCircular()).toDto();
+        return boardRepository.save(boardDto.toEntityWithCircular());
     }
 
     @Override
-    public BoardDto updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
+    public BoardEntity updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
 
         List<FileEntity> newFileEntityList = fileUtils.uploadFilesInPhysical(uploadFile)
                 .stream().map(FileDto::toEntity).collect(Collectors.toList());
 
         BoardEntity boardEntity = boardDto.toEntity();
         newFileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
-        boardEntity.setFileList(newFileEntityList);
+        boardEntity.addFiles(newFileEntityList);
 
         fileRepository.deleteAllByIdInQuery(detachFileList);
         boardRepository.save(boardEntity);
 
         return boardRepository.findEnableBoardByBoardIdx(boardEntity.getIdx())
-                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardEntity.getIdx())).toDto();
+                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardEntity.getIdx()));
     }
 
     @Override
     public void deleteBoardById(Long boardId) {
-
         BoardEntity boardEntity = boardRepository.findEnableBoardByBoardIdx(boardId)
                 .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardId));
 
-        boardEntity.setState(CommonState.DELETE);
-        boardRepository.save(boardEntity);
+        boardEntity.delete();
+        //boardRepository.save(boardEntity);
     }
 
     /**

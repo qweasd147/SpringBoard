@@ -1,16 +1,17 @@
 package com.joo.service;
 
 import com.joo.model.dto.UserDto;
+import com.joo.model.entity.UserEntity;
 
 public interface UserService {
 
-    UserDto insertUser(UserDto userDto);
+    UserEntity insertUser(UserDto userDto);
 
-    UserDto insertIfNotExist(UserDto userDto);
+    UserEntity insertIfNotExist(UserDto userDto);
 
-    UserDto update(UserDto userDto);
+    UserEntity update(UserDto userDto);
 
     void remove(Long userIdx);
 
-    UserDto findByIdx(Long idx);
+    UserEntity findByIdx(Long idx);
 }
