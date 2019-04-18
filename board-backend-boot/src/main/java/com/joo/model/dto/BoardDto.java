@@ -64,15 +64,19 @@ public class BoardDto extends BaseDto<String> implements Serializable {
      * 순환 참조를 포함하여 dto화 시킨다.
      * @return
      */
+    @Deprecated
     public BoardEntity toEntityWithCircular() {
         BoardEntity boardEntity = this.toEntity();
 
         List<FileEntity> fileEntityList = boardEntity.getFileList();
         if(fileEntityList != null)
-            fileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
+            fileEntityList.forEach(fileEntity -> {
+                fileEntity = fileEntity.toBuilder().boardEntity(boardEntity).build();
+            });
+
         return boardEntity;
     }
-
+    /*
     public List<FileDto> addFile(FileDto fileDto){
         fileList.add(fileDto);
 
@@ -84,4 +88,5 @@ public class BoardDto extends BaseDto<String> implements Serializable {
 
         return fileList;
     }
+    */
 }

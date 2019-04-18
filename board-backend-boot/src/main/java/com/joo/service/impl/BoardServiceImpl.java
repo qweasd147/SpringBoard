@@ -89,9 +89,16 @@ public class BoardServiceImpl extends BaseService implements BoardService{
         return boardRepository.save(boardEntity).toDto();
         */
 
-        List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
-        boardDto.addFiles(fileDtoList);
-        return boardRepository.save(boardDto.toEntityWithCircular());
+        List<FileEntity> fileEntities = fileUtils.uploadFilesInPhysical(uploadFile)
+                .stream()
+                .map(FileDto::toEntity)
+                .collect(Collectors.toList());
+
+        BoardEntity boardEntity = boardDto.toEntity();
+        boardEntity = boardEntity.toBuilder().state(CommonState.ENABLE).build();
+        boardEntity.addFiles(fileEntities);
+
+        return boardRepository.save(boardEntity);
     }
 
     @Override
@@ -101,12 +108,12 @@ public class BoardServiceImpl extends BaseService implements BoardService{
                 .stream().map(FileDto::toEntity).collect(Collectors.toList());
 
         BoardEntity boardEntity = boardDto.toEntity();
-        newFileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
+
+        boardEntity.deleteFiles(detachFileList);        //TODO : 삭제 처리가 일괄 처리되는지 확인!
+        //fileRepository.deleteAllByIdInQuery(detachFileList);
         boardEntity.addFiles(newFileEntityList);
 
-        fileRepository.deleteAllByIdInQuery(detachFileList);
-        boardRepository.save(boardEntity);
-
+        //boardRepository.save(boardEntity);
         return boardRepository.findEnableBoardByBoardIdx(boardEntity.getIdx())
                 .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardEntity.getIdx()));
     }

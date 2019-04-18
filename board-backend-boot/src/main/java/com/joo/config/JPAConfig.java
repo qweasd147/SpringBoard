@@ -27,6 +27,7 @@ public class JPAConfig {
 
     @Bean
     public AuditorAware auditorAware(){
+        //TODO : spring security 와 연동해서 현재 로그인한 사용자 가져오기
         return () -> Optional.of("TestAccount");
     }
 

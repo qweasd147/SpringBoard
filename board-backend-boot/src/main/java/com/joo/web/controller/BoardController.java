@@ -11,7 +11,6 @@ import com.joo.service.BoardService;
 import com.joo.service.FileService;
 import com.joo.utils.FileUtils;
 import com.joo.web.controller.common.BaseController;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +36,7 @@ public class BoardController implements BaseController{
     @Autowired
     private FileUtils fileUtils;
 
-    private final ModelMapper modelMapper = new ModelMapper();
+    //private final ModelMapper modelMapper = new ModelMapper();
 
     @GetMapping("/board")
     public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable){
@@ -54,7 +53,8 @@ public class BoardController implements BaseController{
         BoardEntity boardEntity = boardService.selectBoardOne(boardId);
 
         //전체 정보가 아닌 제한된 정보만 넘겨준다.
-        LimitedBoardDto limitedBoardDto = modelMapper.map(boardEntity, LimitedBoardDto.class);
+        //LimitedBoardDto limitedBoardDto = modelMapper.map(boardEntity, LimitedBoardDto.class);
+        LimitedBoardDto limitedBoardDto = LimitedBoardDto.of(boardEntity);
 
         return successRespResult(limitedBoardDto);
     }
