@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Autowired
@@ -58,7 +59,6 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     }
 
     @Override
-    @Transactional
     public BoardEntity selectBoardOne(Long boardId) {
         //BoardEntity boardEntity = boardRepository.findById((long) boardId).orElseThrow(() -> new NoSuchElementException("게시글 없음"));
         //boardEntity.setHits(boardEntity.getHits()+1);
@@ -71,24 +71,6 @@ public class BoardServiceImpl extends BaseService implements BoardService{
 
     @Override
     public BoardEntity insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
-        //TODO : 순환 참조 로직을 어디다 둘 지 고민중
-        /*
-        List<FileDto> fileDtoList = fileUtils.uploadFilesInPhysical(uploadFile);
-
-        BoardEntity boardEntity = boardDto.toEntity();
-        List<FileEntity> fileEntityList = fileDtoList
-                .stream()
-                .map(FileDto::toEntity)
-                .collect(Collectors.toList());
-
-        fileEntityList.forEach(fileEntity -> fileEntity.setBoardEntity(boardEntity));
-        boardEntity.setFileList(fileEntityList);
-
-        boardDto.setFileList(fileDtoList);
-        fileDtoList.forEach((fileDto)->fileDto.setBoardDto(boardDto));
-        return boardRepository.save(boardEntity).toDto();
-        */
-
         List<FileEntity> fileEntities = fileUtils.uploadFilesInPhysical(uploadFile)
                 .stream()
                 .map(FileDto::toEntity)

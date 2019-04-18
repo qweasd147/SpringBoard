@@ -35,8 +35,8 @@ public class BoardEntity extends BaseEntity<String>{
     @Convert(converter = CommonStateImpl.class)
     private CommonState state = CommonState.ENABLE;
 
-    //board 조회 시 file도 같이 조회, 삭제 시 연관 파일 삭제, boardEntity 변수로 맵핑
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "boardEntity")
+    //board 조회 시 file도 같이 조회, save 시 하위 객체로 insert, boardEntity 변수로 맵핑
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, mappedBy = "boardEntity")
     private List<FileEntity> fileList = new ArrayList<>();
 
     @Transient
@@ -80,11 +80,9 @@ public class BoardEntity extends BaseEntity<String>{
     }
 
     public void deleteFiles(List<Long> fileIdxs){
-        List<FileEntity> newFiles = this.fileList.stream()
-                .filter((fileEntity) -> !Objects.isNull(fileEntity.getIdx()))//새로 추가 예정인 파일은 필터링
-                .filter(fileEntity -> fileIdxs.contains(fileEntity.getIdx()))
-                .collect(Collectors.toList());
-
-        this.fileList = newFiles;
+        this.fileList.stream()
+            .filter((fileEntity) -> !Objects.isNull(fileEntity.getIdx()))//새로 추가 예정인 파일은 필터링
+            .filter(fileEntity -> fileIdxs.contains(fileEntity.getIdx()))
+            .forEach( fileEntity -> fileEntity.delete());
     }
 }

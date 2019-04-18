@@ -3,10 +3,8 @@ package com.joo.model.entity;
 
 import com.joo.common.converter.CommonStateImpl;
 import com.joo.common.state.CommonState;
-import com.joo.model.dto.FileDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -41,5 +39,9 @@ public class FileEntity extends BaseEntity<String>{
         this.fileSize = fileSize;
         this.state = state;
         this.boardEntity = boardEntity;
+    }
+
+    public void delete(){
+        this.state = CommonState.DELETE;
     }
 }
