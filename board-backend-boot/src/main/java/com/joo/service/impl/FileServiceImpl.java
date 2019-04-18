@@ -1,25 +1,23 @@
 package com.joo.service.impl;
 
 import com.joo.common.state.CommonState;
-import com.joo.model.dto.FileDto;
 import com.joo.model.entity.FileEntity;
 import com.joo.repository.BoardRepository;
 import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
 import com.joo.service.FileService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
+@AllArgsConstructor
 public class FileServiceImpl extends BaseService implements FileService{
 
-    @Autowired
     private FileRepository fileRepository;
-
-    @Autowired
     private BoardRepository boardRepository;
 
     @Override

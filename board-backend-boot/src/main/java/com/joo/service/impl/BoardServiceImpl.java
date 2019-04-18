@@ -11,7 +11,7 @@ import com.joo.repository.FileRepository;
 import com.joo.service.BaseService;
 import com.joo.service.BoardService;
 import com.joo.utils.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,15 +26,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class BoardServiceImpl extends BaseService implements BoardService{
 
-    @Autowired
     private BoardRepository boardRepository;
-
-    @Autowired
     private FileRepository fileRepository;
-
-    @Autowired
     private FileUtils fileUtils;
 
     @Override

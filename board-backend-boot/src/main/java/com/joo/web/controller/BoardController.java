@@ -11,6 +11,7 @@ import com.joo.service.BoardService;
 import com.joo.service.FileService;
 import com.joo.utils.FileUtils;
 import com.joo.web.controller.common.BaseController;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +26,11 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/api/v1")
 @CrossOrigin(origins = "*")
+@AllArgsConstructor
 public class BoardController implements BaseController{
 
-    @Autowired
     private BoardService boardService;
-
-    @Autowired
     private FileService fileService;
-
-    @Autowired
     private FileUtils fileUtils;
 
     //private final ModelMapper modelMapper = new ModelMapper();

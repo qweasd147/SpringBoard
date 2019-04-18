@@ -5,15 +5,15 @@ import com.joo.model.entity.UserEntity;
 import com.joo.repository.UserRepository;
 import com.joo.service.BaseService;
 import com.joo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl extends BaseService implements UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
     @Override
