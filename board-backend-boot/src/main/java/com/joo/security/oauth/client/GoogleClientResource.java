@@ -18,15 +18,11 @@ public class GoogleClientResource extends ClientResourceDetails{
 
     @Override
     public UserDto makeUserDto(Map<String, Object> userDetailsMap, String accessToken) {
-        List<Map<String, Object>> emails = (List<Map<String, Object>>) userDetailsMap.get("emails");    //TODO : google에선 emails로 넘어오는데, 왜 이렇게 array로 넘겨주는지는 알아봐야함
-        Map<String, String> nameInfo = (Map<String, String>)userDetailsMap.get("name");
-
         String id = userDetailsMap.get("id").toString();
-        String name = nameInfo.get("familyName").toString() + nameInfo.get("givenName").toString();
+        String name = (String) userDetailsMap.get("name");
         String nickName = userDetailsMap.get("displayName").toString();
 
-        Map<String, Object> firstEmail = emails.get(0);
-        String email = firstEmail.get("value").toString();
+        String email = (String) userDetailsMap.get("email");
 
         return UserDto.builder()
             .id(id)
