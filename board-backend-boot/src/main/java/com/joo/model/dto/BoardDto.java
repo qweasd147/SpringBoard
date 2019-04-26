@@ -46,17 +46,11 @@ public class BoardDto extends BaseDto<String> implements Serializable {
     @Override
     public BoardEntity toEntity(){
 
-        List<FileEntity> fileEntities = fileList.stream()
-                .map(FileDto::toEntity)
-                .collect(Collectors.toList());
-
         return BoardEntity.builder()
             .subject(this.subject)
             .contents(this.contents)
             .hits(this.hits)
             .state(this.state)
-            .fileList(fileEntities)
-            .tagList(this.tagList)
             .build();
     }
 

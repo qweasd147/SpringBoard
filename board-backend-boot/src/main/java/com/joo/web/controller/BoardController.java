@@ -1,9 +1,7 @@
 package com.joo.web.controller;
 
 import com.joo.exception.BusinessException;
-import com.joo.model.dto.BoardDto;
-import com.joo.model.dto.BoardSearchDto;
-import com.joo.model.dto.FileDto;
+import com.joo.model.dto.*;
 import com.joo.model.dto.limited.LimitedBoardDto;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
@@ -59,25 +57,26 @@ public class BoardController implements BaseController{
     //@PostMapping(value = "/board")
     @PostMapping(value = "/board", consumes = "*/*")
     public ResponseEntity insertBoard(
-            @Valid @ModelAttribute BoardDto boardDto
-            , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles
+            //@Valid @ModelAttribute BoardDto boardDto
+            //, @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles
+            @Valid @ModelAttribute BoardWriteRequestDto boardWriteRequestDto
             //, @AuthenticationPrincipal CustomUserDetails customUserDetails
             ){
 
         //boardEntity.setWriter(customUserDetails.getNickName());
-        boardService.insertBoard(boardDto, uploadFiles);
+        boardService.insertBoard(boardWriteRequestDto);
 
         return createRespResult();
     }
 
-    @PostMapping(value = "/board/{boardId}", headers = "content-type=multipart/*")
-    public ResponseEntity updateBoard(@ModelAttribute @Valid BoardDto boardDto
-            , @PathVariable Long boardId
-            , @RequestParam(value="deleteFile[]", required=false) List<Long> deleteFiles
-            , @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles){
+    @PostMapping(value = "/board/{idx}", headers = "content-type=multipart/*")
+    public ResponseEntity updateBoard(@PathVariable Long idx
+            //, @RequestParam(value="deleteFile[]", required=false) List<Long> deleteFiles
+            //, @RequestParam(value="uploadFile[]", required=false) MultipartFile[] uploadFiles
+            //, @ModelAttribute @Valid BoardDto boardDto
+            , @Valid @ModelAttribute BoardUpdateRequestDto boardUpdateRequestDto){
 
-        boardDto.setIdx(boardId);
-        boardService.updateBoard(boardDto, uploadFiles, deleteFiles);
+        boardService.updateBoard(idx, boardUpdateRequestDto);
 
         return successRespResult();
     }

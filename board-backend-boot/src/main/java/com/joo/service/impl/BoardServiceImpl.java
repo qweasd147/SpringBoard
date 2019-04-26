@@ -1,9 +1,7 @@
 package com.joo.service.impl;
 
 import com.joo.common.state.CommonState;
-import com.joo.model.dto.BoardDto;
-import com.joo.model.dto.BoardSearchDto;
-import com.joo.model.dto.FileDto;
+import com.joo.model.dto.*;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 import com.joo.repository.BoardRepository;
@@ -66,34 +64,39 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     }
 
     @Override
-    public BoardEntity insertBoard(BoardDto boardDto, MultipartFile[] uploadFile) {
-        List<FileEntity> fileEntities = fileUtils.uploadFilesInPhysical(uploadFile)
+    public BoardEntity insertBoard(BoardWriteRequestDto boardWriteRequestDto) {
+
+        MultipartFile[] uploadFiles = boardWriteRequestDto.getUploadFiles().stream().toArray(MultipartFile[]::new);
+
+        List<FileEntity> fileEntities = fileUtils.uploadFilesInPhysical(uploadFiles)
                 .stream()
                 .map(FileDto::toEntity)
                 .collect(Collectors.toList());
 
-        BoardEntity boardEntity = boardDto.toEntity();
-        boardEntity = boardEntity.toBuilder().state(CommonState.ENABLE).build();
+        BoardEntity boardEntity = boardWriteRequestDto.toEntity();
         boardEntity.addFiles(fileEntities);
 
         return boardRepository.save(boardEntity);
     }
 
     @Override
-    public BoardEntity updateBoard(BoardDto boardDto, MultipartFile[] uploadFile, List<Long> detachFileList) {
+    public BoardEntity updateBoard(Long boardIdx, BoardUpdateRequestDto boardUpdateRequestDto) {
 
-        List<FileEntity> newFileEntityList = fileUtils.uploadFilesInPhysical(uploadFile)
+        BoardEntity boardEntity = boardRepository.findEnableBoardByBoardIdx(boardIdx)
+                .orElseThrow(() -> new NoSuchElementException("수정 할 게시글 없음 board idx : " + boardIdx));
+
+        MultipartFile[] uploadFiles = boardUpdateRequestDto.getUploadFiles()
+                .stream().toArray(MultipartFile[]::new);
+        List<FileEntity> newFileEntityList = fileUtils.uploadFilesInPhysical(uploadFiles)
                 .stream().map(FileDto::toEntity).collect(Collectors.toList());
 
-        BoardEntity boardEntity = boardDto.toEntity();
-
-        boardEntity.deleteFiles(detachFileList);        //TODO : 삭제 처리가 일괄 처리되는지 확인!
+        boardEntity.update(boardUpdateRequestDto.getSubject(), boardUpdateRequestDto.getContents());
+        boardEntity.deleteFiles(boardUpdateRequestDto.getDeleteFiles());        //TODO : 삭제 처리가 일괄 처리되는지 확인!
         //fileRepository.deleteAllByIdInQuery(detachFileList);
         boardEntity.addFiles(newFileEntityList);
 
         //boardRepository.save(boardEntity);
-        return boardRepository.findEnableBoardByBoardIdx(boardEntity.getIdx())
-                .orElseThrow(() -> new NoSuchElementException("게시글 없음 board idx:"+boardEntity.getIdx()));
+        return boardEntity;
     }
 
     @Override

@@ -43,13 +43,11 @@ public class BoardEntity extends BaseEntity<String>{
     private List<?> tagList;
 
     @Builder(toBuilder = true)
-    public BoardEntity(String subject, String contents, int hits, CommonState state, List<FileEntity> fileList, List<?> tagList) {
+    public BoardEntity(String subject, String contents, int hits, CommonState state) {
         this.subject = subject;
         this.contents = contents;
         this.hits = hits;
         this.state = state;
-        this.fileList = fileList;
-        this.tagList = tagList;
     }
 
     public List<FileEntity> addFile(FileEntity fileEntity){
@@ -84,5 +82,10 @@ public class BoardEntity extends BaseEntity<String>{
             .filter((fileEntity) -> !Objects.isNull(fileEntity.getIdx()))//새로 추가 예정인 파일은 필터링
             .filter(fileEntity -> fileIdxs.contains(fileEntity.getIdx()))
             .forEach( fileEntity -> fileEntity.delete());
+    }
+
+    public void update(String subject, String contents){
+        this.subject = subject;
+        this.contents = contents;
     }
 }
