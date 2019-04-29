@@ -97,7 +97,7 @@ class WriteBoard extends React.Component {
         });
 
         $.each(_dropFiles,function(idx,item){
-            formData.append('uploadFile[]',_dropFiles[idx]);
+            formData.append('uploadFiles',_dropFiles[idx]);
         });
 
         $.each(_deleteFiles,function(idx,item){
