@@ -13,10 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.*;
 
 @Component
@@ -54,10 +51,18 @@ public class FileUtils {
                 //중복된 파일명이 있을 시, 덮어씌움. uuid로 저장해서 사실상 그럴일 없다고 가정해도 됨
                 Files.copy(fileInputStream, baseUploadPath.resolve(saveFileName),
                         StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
+            } catch (NoSuchFileException ne) {
+                logger.error("파일 저장 에러. 파일을 찾을 수 없음");
+                logger.error("save file name : " + saveFileName + ", origin file name : " + originFileName);
+                logger.error("파일 경로 : " + baseUploadPath.toAbsolutePath().toString());
+                logger.error(ne.getMessage());
+
+                throw new RuntimeException("파일 올리기 오류");
+            } catch (IOException ioe) {
                 logger.error("파일 저장 에러");
                 logger.error("save file name : " + saveFileName + ", origin file name : " + originFileName);
-                logger.error(e.getMessage());
+                logger.error(ioe.getMessage());
+
                 throw new RuntimeException("파일 올리기 오류");
             }
 
