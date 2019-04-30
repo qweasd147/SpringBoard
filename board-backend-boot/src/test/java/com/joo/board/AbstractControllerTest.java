@@ -1,6 +1,7 @@
 package com.joo.board;
 
 import com.joo.web.controller.common.ControllerExceptionHandler;
+import com.joo.web.controller.common.WebControllerAdvice;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public abstract class AbstractControllerTest {
     public void init(){
         mockMvc = MockMvcBuilders.standaloneSetup(getTargetControllers())
                 .setControllerAdvice(new ControllerExceptionHandler())
+                .setControllerAdvice(new WebControllerAdvice())
                 .build();
 
         handleBefore();

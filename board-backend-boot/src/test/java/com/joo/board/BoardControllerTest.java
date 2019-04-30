@@ -1,11 +1,13 @@
 package com.joo.board;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joo.common.state.CommonState;
 import com.joo.model.dto.BoardDto;
 import com.joo.model.dto.UserDto;
 import com.joo.security.CustomUserDetails;
 import com.joo.security.TokenUtils;
+import com.joo.service.BoardService;
 import com.joo.web.controller.BoardController;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -18,23 +20,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import java.io.File;
+import java.io.FileInputStream;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.hamcrest.CoreMatchers.is;
 
 
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@ActiveProfiles("hsqldb")
-//@AutoConfigureMockMvc
 public class BoardControllerTest extends AbstractControllerTest{
 
     private static final String BOARD_API = "/api/v1/board";
@@ -43,7 +49,8 @@ public class BoardControllerTest extends AbstractControllerTest{
     @InjectMocks
     private BoardController boardController;
 
-    //private MockMvc mockMvc;
+    @Mock
+    private BoardService boardService;
 
     private UserDto normalUserDto;
     private UserDto invalidUserDto;
@@ -117,18 +124,14 @@ public class BoardControllerTest extends AbstractControllerTest{
 
 
     private ResultActions requestRegistWithAuthToken(BoardDto boardDto) throws Exception {
-
-        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = multipart(BOARD_API)
-                //.file(null)
-                //.contentType(MediaType.MULTIPART_FORM_DATA)   //TODO : content type이 multipart로 보장되는지 확인
-                //.content(OBJECT_MAPPER.writeValueAsBytes(boardDto))
-                .param("subject","mock를 통한 게시판 제목 입력")
-                .param("contents","mock를 통한 게시판 내용 입력")
-                .headers(getHeaderWithAuthToken());
-
-        return mockMvc
-            .perform(mockHttpServletRequestBuilder)
-            .andDo(print());
+        return mockMvc.perform(multipart(BOARD_API)
+                //.file(mockFile)
+                //.content(OBJECT_MAPPER.writeValueAsString(postReq))
+                .param("subject", "mock를 통한 게시판 제목 입력")
+                .param("contents", "mock를 통한 게시판 내용 입력")
+                .characterEncoding("utf-8").headers(getHeaderWithAuthToken()))
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
 
     /**
