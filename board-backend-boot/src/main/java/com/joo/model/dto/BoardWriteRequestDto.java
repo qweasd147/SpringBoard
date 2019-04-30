@@ -2,7 +2,6 @@ package com.joo.model.dto;
 
 import com.joo.common.state.CommonState;
 import com.joo.model.entity.BoardEntity;
-import com.joo.model.entity.FileEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +24,6 @@ public class BoardWriteRequestDto implements Serializable {
     private String contents;
     private List<?> tagList;
     private List<MultipartFile> uploadFiles = new ArrayList<>();
-    private CommonState state = CommonState.ENABLE;
 
 
     @Builder
@@ -40,7 +38,7 @@ public class BoardWriteRequestDto implements Serializable {
         return BoardEntity.builder()
             .subject(this.subject)
             .contents(this.contents)
-            .state(this.state)
+            .state(CommonState.ENABLE)
             .build();
     }
 }
