@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -36,7 +37,7 @@ public class TokenFilter extends OncePerRequestFilter {
     private final String tokenHeader;
     private final String TOKEN_PREFIX = "Bearer ";
 
-    public TokenFilter(@Value("jwt.header")String tokenHeader) {
+    public TokenFilter(@Value("${jwt.header}")String tokenHeader) {
         this.tokenHeader = tokenHeader;
     }
 
@@ -54,8 +55,12 @@ public class TokenFilter extends OncePerRequestFilter {
         }
 
         if(token != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            //토큰 정보가 있지만 spring context에 올려져 있지 않을 시 올려놓는다.
-            setAuthInfo(request, response, token);
+            try{
+                //토큰 정보가 있지만 spring context에 올려져 있지 않을 시 올려놓는다.
+                setAuthInfo(request, response, token);
+            }catch (UsernameNotFoundException e){
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "사용자 정보를 찾을 수 없음");
+            }
         }else {
             logger.debug("사용자 정보 없음");
         }
@@ -92,7 +97,7 @@ public class TokenFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } else if(tokenStatus == TOKEN_STATUS.EXPIRED){
-            response.sendError(401);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 토큰");
         } else{
             logger.debug("validate 통과 실패! "+userDetails.toString());
         }
