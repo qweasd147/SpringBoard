@@ -3,11 +3,20 @@ package com.joo.board;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joo.common.state.CommonState;
+import com.joo.config.SecurityConfig;
 import com.joo.model.dto.BoardDto;
+import com.joo.model.dto.BoardSearchDto;
+import com.joo.model.dto.BoardWriteRequestDto;
 import com.joo.model.dto.UserDto;
+import com.joo.model.entity.BoardEntity;
+import com.joo.model.entity.UserEntity;
+import com.joo.repository.UserRepository;
 import com.joo.security.CustomUserDetails;
+import com.joo.security.CustomUserDetailsService;
+import com.joo.security.TokenFilter;
 import com.joo.security.TokenUtils;
 import com.joo.service.BoardService;
+import com.joo.service.UserService;
 import com.joo.web.controller.BoardController;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +28,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
@@ -30,7 +45,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,6 +59,7 @@ import static org.hamcrest.CoreMatchers.is;
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMockMvc
 public class BoardControllerTest extends AbstractControllerTest{
 
     private static final String BOARD_API = "/api/v1/board";
@@ -49,8 +68,14 @@ public class BoardControllerTest extends AbstractControllerTest{
     @InjectMocks
     private BoardController boardController;
 
+    @InjectMocks
+    private TokenFilter tokenFilter;
+
     @Mock
     private BoardService boardService;
+
+    @Mock
+    private CustomUserDetailsService userDetailsService;
 
     private UserDto normalUserDto;
     private UserDto invalidUserDto;
@@ -61,31 +86,48 @@ public class BoardControllerTest extends AbstractControllerTest{
     @Autowired
     private TokenUtils tokenUtils;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
     @Override
     public void handleBefore() {
 
-        normalUserDto = UserDto.builder()
-            .idx(-99L)
-            .id("mockID")
-            .name("mockName")
-            .nickName("mockNickName")
-            .serviceName("mockService")
-            .state(CommonState.ENABLE)
-            .build();
+        UserDto normalReqUserDto = UserDto.builder()
+                .id("mockID")
+                .name("mockName")
+                .nickName("mockNickName")
+                .email("mockEmail@email.com")
+                .serviceName("mockService")
+                .state(CommonState.ENABLE)
+                .build();
 
-        invalidUserDto = UserDto.builder()
-            .idx(-98L)
-            .id("invalidMockID")
-            .name("invalidMockName")
-            .nickName("invalidMockNickName")
-            .serviceName("invalidMockService")
-            .state(CommonState.EXPIRED)
-            .build();
+        UserDto invalidReqUserDto = UserDto.builder()
+                .id("invalidMockID")
+                .name("invalidMockName")
+                .nickName("invalidMockNickName")
+                .email("mockEmail@email.com")
+                .serviceName("invalidMockService")
+                .state(CommonState.EXPIRED)
+                .build();
+
+        //내부 spring security에서 검색 할 수 있게 등록
+        UserEntity normalUserEntity = userService.insertIfNotExist(normalReqUserDto);
+        UserEntity invalidUserEntity = userService.insertIfNotExist(invalidReqUserDto);
+
+        normalUserDto = UserDto.of(normalUserEntity);
+        invalidUserDto = UserDto.of(invalidUserEntity);
+
     }
+
 
     @Override
     public void handleAfter() {
-
+        userRepository.deleteById(normalUserDto.getIdx());
+        userRepository.deleteById(invalidUserDto.getIdx());
     }
 
     @Override
@@ -96,22 +138,58 @@ public class BoardControllerTest extends AbstractControllerTest{
     @Test
     @DisplayName("정상적인 글쓰기 테스트")
     public void regist() throws Exception {
-        BoardDto boardDto = BoardDto.builder()
-            .subject("mock를 통한 게시판 제목 입력")
-            .contents("mock를 통한 게시판 내용 입력")
-            .build();
 
-        ResultActions resultActions = requestRegistWithAuthToken(boardDto);
+        BoardWriteRequestDto reqDto = BoardWriteRequestDto.builder()
+                .subject("mock을 통한 게시판 제목 입력")
+                .contents("mock을 통한 게시판 내용입력")
+                .build();
 
-        resultActions
-            .andExpect(status().isCreated());
+        given(boardService.insertBoard(any())).willReturn(reqDto.toEntity());
+        given(userDetailsService.loadUserByUsername(any())).willReturn(new CustomUserDetails(normalUserDto));
+
+        mockMvc.perform(TestUtils.addParamFromDto(multipart(BOARD_API), reqDto)
+                //.file(mockFile)
+                //.content(OBJECT_MAPPER.writeValueAsString(postReq))
+                //.param("subject", "mock를 통한 게시판 제목 입력")
+                //.param("contents", "mock를 통한 게시판 내용 입력")
+                .characterEncoding("utf-8").headers(getHeaderWithAuthToken()))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.subject", is(reqDto.getSubject())))
+                .andExpect(jsonPath("$.data.contents", is(reqDto.getContents())));
+    }
+
+    @Test
+    @DisplayName("만료된 토큰으로 글쓰기 테스트")
+    public void registWithExpiredToken() throws Exception {
+
+        BoardWriteRequestDto reqDto = BoardWriteRequestDto.builder()
+                .subject("mock을 통한 게시판 제목 입력")
+                .contents("mock을 통한 게시판 내용입력")
+                .build();
+
+        given(boardService.insertBoard(any())).willReturn(reqDto.toEntity());
+
+        mockMvc.perform(TestUtils.addParamFromDto(multipart(BOARD_API), reqDto)
+                .characterEncoding("utf-8").headers(getHeaderWithExpiredToken()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+                //.andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     @DisplayName("정상적인 게시물 리스트 검색 테스트")
     public void search() throws Exception {
 
-        String normalBoardListAPI = BOARD_API + "?searchCondition=subject&searchKeyWord=name";
+
+        BoardSearchDto boardSearchDto = BoardSearchDto.builder()
+                .searchCondition("subject")
+                .searchKeyWord("name")
+                .build();
+
+        String queryStr = TestUtils.dtoToQueryStr(boardSearchDto) + "&pageIdx=1";
+        String normalBoardListAPI = BOARD_API + queryStr;
+        //Pageable pageable = PageRequest.of(0,10, Sort.Direction.DESC, "idx");
 
         MvcResult result =
             this.mockMvc.perform(get(normalBoardListAPI))
@@ -119,11 +197,13 @@ public class BoardControllerTest extends AbstractControllerTest{
                 .andExpect(status().isOk())
                 //.andExpect(model().attributeExists("모델로 보낸 attribute 명"))
                 .andReturn();
-
     }
 
 
     private ResultActions requestRegistWithAuthToken(BoardDto boardDto) throws Exception {
+
+        ResultActions target = mockMvc.perform(multipart(BOARD_API));
+
         return mockMvc.perform(multipart(BOARD_API)
                 //.file(mockFile)
                 //.content(OBJECT_MAPPER.writeValueAsString(postReq))
@@ -180,5 +260,4 @@ public class BoardControllerTest extends AbstractControllerTest{
         CustomUserDetails customUserDetails = new CustomUserDetails(userDto);
         return this.tokenUtils.createToken(customUserDetails);
     }
-
 }

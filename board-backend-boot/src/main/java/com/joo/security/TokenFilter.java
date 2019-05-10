@@ -28,16 +28,16 @@ public class TokenFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenFilter.class);
 
-    @Autowired
-    private TokenUtils tokenUtils;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-
+    private final TokenUtils tokenUtils;
+    private final UserDetailsService userDetailsService;
     private final String tokenHeader;
+
     private final String TOKEN_PREFIX = "Bearer ";
 
-    public TokenFilter(@Value("${jwt.header}")String tokenHeader) {
+
+    public TokenFilter(TokenUtils tokenUtils, UserDetailsService userDetailsService, @Value("${jwt.header}")String tokenHeader) {
+        this.tokenUtils = tokenUtils;
+        this.userDetailsService = userDetailsService;
         this.tokenHeader = tokenHeader;
     }
 
@@ -59,10 +59,11 @@ public class TokenFilter extends OncePerRequestFilter {
                 //토큰 정보가 있지만 spring context에 올려져 있지 않을 시 올려놓는다.
                 setAuthInfo(request, response, token);
             }catch (UsernameNotFoundException e){
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "사용자 정보를 찾을 수 없음");
+                logger.debug("DB 내 사용자 정보 없음 ", e);
+                //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "사용자 정보를 찾을 수 없음");
             }
         }else {
-            logger.debug("사용자 정보 없음");
+            logger.debug("token 내 사용자 정보 없음");
         }
         filterChain.doFilter(request, response);
     }
@@ -97,7 +98,7 @@ public class TokenFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } else if(tokenStatus == TOKEN_STATUS.EXPIRED){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 토큰");
+            //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 토큰");
         } else{
             logger.debug("validate 통과 실패! "+userDetails.toString());
         }

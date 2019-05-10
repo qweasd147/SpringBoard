@@ -5,12 +5,14 @@ import com.joo.common.state.CommonState;
 import com.joo.model.dto.UserDto;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class UserEntity extends BaseEntity<String> {
 
     @Id

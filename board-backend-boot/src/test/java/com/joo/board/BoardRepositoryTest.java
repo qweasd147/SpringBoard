@@ -29,6 +29,7 @@ public class BoardRepositoryTest {
 
     @After
     public void deleteAll(){
+        //TODO : 차후 테스트 한 데이터만 삭제 or use in memory DB
         boardRepository.deleteAll();
     }
 

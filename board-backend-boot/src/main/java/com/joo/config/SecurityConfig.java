@@ -6,6 +6,7 @@ import com.joo.security.EntryPointHandler;
 import com.joo.security.TokenFilter;
 import com.joo.security.TokenUtils;
 import com.joo.security.oauth.client.*;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,19 +43,12 @@ import java.util.*;
 @Configuration
 @EnableWebSecurity
 @EnableOAuth2Client
+@AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     private EntryPointHandler entryPointHandler;
-
-    @Autowired
     private TokenFilter tokenFilter;
-
-    @Autowired
-    private TokenUtils tokenUtils;
-
-    @Autowired
-    ClientResourceHandler clientResourceHandler;
+    private ClientResourceHandler clientResourceHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
