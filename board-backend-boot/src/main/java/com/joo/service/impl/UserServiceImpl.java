@@ -27,7 +27,9 @@ public class UserServiceImpl extends BaseService implements UserService {
         UserEntity userEntity = userRepository.findByServiceNameAndId(userDto.getServiceName(), userDto.getId());
 
         if(userEntity == null){
-            return userRepository.save(userDto.toEntity());
+            UserEntity newUser = userDto.toEntity();
+            newUser.initUser();
+            return userRepository.save(newUser);
         }else {
             return userEntity;
         }

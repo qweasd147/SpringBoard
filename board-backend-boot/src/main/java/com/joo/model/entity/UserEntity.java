@@ -2,7 +2,6 @@ package com.joo.model.entity;
 
 import com.joo.common.converter.CommonStateImpl;
 import com.joo.common.state.CommonState;
-import com.joo.model.dto.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,5 +56,9 @@ public class UserEntity extends BaseEntity<String> {
         this.email = email;
         this.thirdPartyToken = thirdPartyToken;
         this.state = state;
+    }
+
+    public void initUser(){
+        this.state = CommonState.ENABLE;
     }
 }

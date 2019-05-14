@@ -1,7 +1,8 @@
 package com.joo.config;
 
+import com.joo.security.CustomUserDetails;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManager;
@@ -20,6 +23,7 @@ import java.util.Optional;
 
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
+@Slf4j
 public class JPAConfig {
 
     @PersistenceContext
@@ -27,8 +31,11 @@ public class JPAConfig {
 
     @Bean
     public AuditorAware auditorAware(){
-        //TODO : spring security 와 연동해서 현재 로그인한 사용자 가져오기
-        return () -> Optional.of("TestAccount");
+        return () -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+            return Optional.of(user.getNickName());
+        };
     }
 
     /*
