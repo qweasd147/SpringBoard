@@ -1,12 +1,12 @@
 package com.joo.security;
 
 import com.joo.common.state.CommonState;
-import com.joo.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -22,8 +22,14 @@ public class TokenUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenUtils.class);
 
-    private final static String secret = "wngudWkdWkd";
-    public final static Integer expiration = 86400;        //기간. 단위 초 => 하루
+    private final String secret;
+    public final Integer expiration;  //단위 초
+
+
+    public TokenUtils(@Value("${security.token.secret}")String secret, @Value("${security.token.expiration}")Integer expiration) {
+        this.secret = secret;
+        this.expiration = expiration;
+    }
 
     public enum TOKEN_STATUS {
         ENABLED(0), INVALID(1), EXPIRED(2);
