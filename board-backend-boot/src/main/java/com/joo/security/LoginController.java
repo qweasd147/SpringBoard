@@ -20,7 +20,7 @@ public class LoginController implements BaseController{
     @GetMapping("/logout")
     public ResponseEntity selectBoardList(@AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        CookieUtils.removeCookie(tokenHeader);
+        //CookieUtils.removeCookie(tokenHeader);
         //SecurityContextHolder.getContext().setAuthentication(null);
 
         return successRespResult();
