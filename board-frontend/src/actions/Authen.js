@@ -15,7 +15,7 @@ import cookieUtils from '../utils/cookieUtils';
 //TODO : action에서 다른 작업(toast) 하는게 맞는건가 고민중
 import { Materialize } from '../utils/thirdPartyLib';
 
-const LOG_OUT_API = "/api/authen/logout/";
+const LOG_OUT_API = "/api/v1/authen/logout/";
 const USER_INFO = "/api/authen/userInfo";
 const LOGIN_THIRD_PARTY_URL_API = "/api/authen/loginURL";       //third party 로그인 url 목록 요청
 
