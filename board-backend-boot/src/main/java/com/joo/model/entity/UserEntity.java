@@ -1,6 +1,6 @@
 package com.joo.model.entity;
 
-import com.joo.common.converter.CommonStateImpl;
+import com.joo.common.converter.CommonStateConverterImpl;
 import com.joo.common.state.CommonState;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,7 +44,7 @@ public class UserEntity extends BaseEntity<String> {
     @Transient
     private String thirdPartyToken;
 
-    @Convert(converter = CommonStateImpl.class)
+    @Convert(converter = CommonStateConverterImpl.class)
     private CommonState state;
 
     @Builder

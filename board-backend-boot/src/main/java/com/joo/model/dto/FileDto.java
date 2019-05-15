@@ -1,6 +1,7 @@
 package com.joo.model.dto;
 
 import com.joo.common.state.CommonState;
+import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,6 +50,11 @@ public class FileDto extends BaseDto<String> implements Serializable{
 
     @Override
     public FileEntity toEntity(){
+
+        BoardEntity boardEntity = null;
+        if(this.boardDto != null)
+            boardEntity = this.boardDto.toEntity();
+        
         return FileEntity.builder()
             .contentType(this.contentType)
             .filePath(this.filePath)
@@ -56,7 +62,7 @@ public class FileDto extends BaseDto<String> implements Serializable{
             .saveFileName(this.saveFileName)
             .fileSize(this.fileSize)
             .state(this.state)
-            .boardEntity(this.boardDto.toEntity())
+            .boardEntity(boardEntity)
             .build();
     }
 }

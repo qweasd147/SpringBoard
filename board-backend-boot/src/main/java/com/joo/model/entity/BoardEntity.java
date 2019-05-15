@@ -1,6 +1,6 @@
 package com.joo.model.entity;
 
-import com.joo.common.converter.CommonStateImpl;
+import com.joo.common.converter.CommonStateConverterImpl;
 import com.joo.common.state.CommonState;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class BoardEntity extends BaseEntity<String>{
     private String contents;
     private int hits;
 
-    @Convert(converter = CommonStateImpl.class)
+    @Convert(converter = CommonStateConverterImpl.class)
     private CommonState state = CommonState.ENABLE;
 
     //board 조회 시 file도 같이 조회, save 시 하위 객체로 insert, boardEntity 변수로 맵핑
@@ -74,6 +74,7 @@ public class BoardEntity extends BaseEntity<String>{
     private FileEntity initFileEntityWithThis(FileEntity fileEntity){
         return fileEntity.toBuilder()
             .boardEntity(this)
+            .state(CommonState.ENABLE)
             .build();
     }
 
