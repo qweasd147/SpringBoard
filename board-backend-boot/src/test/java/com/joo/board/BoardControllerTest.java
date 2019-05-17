@@ -2,6 +2,7 @@ package com.joo.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joo.board.config.SpringSecurityTestConfig;
 import com.joo.common.state.CommonState;
 import com.joo.config.SecurityConfig;
 import com.joo.model.dto.BoardDto;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
@@ -58,7 +61,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 //@RunWith(MockitoJUnitRunner.class)
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = SpringSecurityTestConfig.class)
 @AutoConfigureMockMvc
 public class BoardControllerTest extends AbstractControllerTest{
 
@@ -74,11 +77,8 @@ public class BoardControllerTest extends AbstractControllerTest{
     @Mock
     private BoardService boardService;
 
-    @Mock
-    private CustomUserDetailsService userDetailsService;
-
-    private UserDto normalUserDto;
-    private UserDto invalidUserDto;
+    //@MockBean(name="mockUserDetailsService")
+    //private CustomUserDetailsService userDetailsService;
 
     @Value("${jwt.header}")
     private String tokenHeader;
@@ -92,42 +92,34 @@ public class BoardControllerTest extends AbstractControllerTest{
     @Autowired
     private UserRepository userRepository;
 
+    private final UserDto normalUserDto = UserDto.builder()
+            .id("mockID")
+            .name("mockName")
+            .nickName("mockNickName")
+            .email("mockEmail@email.com")
+            .serviceName("mockService")
+            .state(CommonState.ENABLE)
+            .build();
+
+    private final UserDto invalidUserDto = UserDto.builder()
+            .id("invalidMockID")
+            .name("invalidMockName")
+            .nickName("invalidMockNickName")
+            .email("mockEmail@email.com")
+            .serviceName("invalidMockService")
+            .state(CommonState.EXPIRED)
+            .build();
+
 
     @Override
     public void handleBefore() {
-
-        UserDto normalReqUserDto = UserDto.builder()
-                .id("mockID")
-                .name("mockName")
-                .nickName("mockNickName")
-                .email("mockEmail@email.com")
-                .serviceName("mockService")
-                .state(CommonState.ENABLE)
-                .build();
-
-        UserDto invalidReqUserDto = UserDto.builder()
-                .id("invalidMockID")
-                .name("invalidMockName")
-                .nickName("invalidMockNickName")
-                .email("mockEmail@email.com")
-                .serviceName("invalidMockService")
-                .state(CommonState.EXPIRED)
-                .build();
-
-        //내부 spring security에서 검색 할 수 있게 등록
-        UserEntity normalUserEntity = userService.insertIfNotExist(normalReqUserDto);
-        UserEntity invalidUserEntity = userService.insertIfNotExist(invalidReqUserDto);
-
-        normalUserDto = UserDto.of(normalUserEntity);
-        invalidUserDto = UserDto.of(invalidUserEntity);
-
     }
 
 
     @Override
     public void handleAfter() {
-        userRepository.deleteById(normalUserDto.getIdx());
-        userRepository.deleteById(invalidUserDto.getIdx());
+        //userRepository.deleteById(normalUserDto.getIdx());
+        //userRepository.deleteById(invalidUserDto.getIdx());
     }
 
     @Override
@@ -145,14 +137,14 @@ public class BoardControllerTest extends AbstractControllerTest{
                 .build();
 
         given(boardService.insertBoard(any())).willReturn(reqDto.toEntity());
-        given(userDetailsService.loadUserByUsername(any())).willReturn(new CustomUserDetails(normalUserDto));
 
         mockMvc.perform(TestUtils.addParamFromDto(multipart(BOARD_API), reqDto)
                 //.file(mockFile)
                 //.content(OBJECT_MAPPER.writeValueAsString(postReq))
                 //.param("subject", "mock를 통한 게시판 제목 입력")
                 //.param("contents", "mock를 통한 게시판 내용 입력")
-                .characterEncoding("utf-8").headers(getHeaderWithAuthToken()))
+                .characterEncoding("utf-8")
+                .headers(getHeaderWithAuthToken()))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.subject", is(reqDto.getSubject())))
@@ -201,9 +193,6 @@ public class BoardControllerTest extends AbstractControllerTest{
 
 
     private ResultActions requestRegistWithAuthToken(BoardDto boardDto) throws Exception {
-
-        ResultActions target = mockMvc.perform(multipart(BOARD_API));
-
         return mockMvc.perform(multipart(BOARD_API)
                 //.file(mockFile)
                 //.content(OBJECT_MAPPER.writeValueAsString(postReq))

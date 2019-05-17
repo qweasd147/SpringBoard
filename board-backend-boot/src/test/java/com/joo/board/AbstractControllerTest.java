@@ -28,7 +28,7 @@ public abstract class AbstractControllerTest {
         mockMvc = MockMvcBuilders
                 //.webAppContextSetup(wc)
                 .standaloneSetup(getTargetControllers())
-                .addFilter(springSecurityFilterChain)
+                //.addFilter(springSecurityFilterChain)
                 //.apply(springSecurity())
                 .setControllerAdvice(new ControllerExceptionHandler())
                 .setControllerAdvice(new WebControllerAdvice())
