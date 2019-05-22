@@ -6,22 +6,31 @@ import com.joo.model.dto.BoardWriteRequestDto;
 import com.joo.model.entity.BoardEntity;
 import com.joo.model.entity.FileEntity;
 import com.joo.repository.BoardRepository;
-import org.junit.After;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@DataJpaTest
+@EnableJpaAuditing
 public class BoardRepositoryTest {
 
     @Autowired
@@ -29,15 +38,29 @@ public class BoardRepositoryTest {
 
     private BoardEntity saveNormalBoard;
 
-    @After
-    public void deleteAll(){
-        //TODO : 차후 테스트 한 데이터만 삭제 or use in memory DB
-        boardRepository.deleteAll();
+
+    @TestConfiguration
+    static class TestConfig {
+
+        @PersistenceContext
+        private EntityManager entityManager;
+
+        @Bean
+        public JPAQueryFactory jpaQueryFactory() {
+            return new JPAQueryFactory(entityManager);
+        }
+
+        @Bean
+        public AuditorAware auditorAware(){
+            return () -> Optional.of("jpaTestAccount");
+        }
     }
+
+
 
     @Test
     @DisplayName("정상적인 게시물 입력 테스트")
-    @WithUserDetails("customUsername")
+    //@WithUserDetails("customUsername")
     public void a_registBoard(){
         BoardWriteRequestDto normalBoardWriteRequestDto = BoardWriteRequestDto.builder()
                 .subject("Board Repository test subject")
@@ -47,21 +70,11 @@ public class BoardRepositoryTest {
 
         //temp file
         ImmutableList<FileEntity> tempFileList = ImmutableList.of(
-                FileEntity.builder()
-                        .state(CommonState.ENABLE)
-                        .build()
-                , FileEntity.builder()
-                        .state(CommonState.DELETE)
-                        .build()
-                , FileEntity.builder()
-                        .state(CommonState.ENABLE)
-                        .build()
-                , FileEntity.builder()
-                        .state(CommonState.ENABLE)
-                        .build()
-                , FileEntity.builder()
-                        .state(CommonState.DELETE)
-                        .build()
+                FileEntity.builder().build()
+                , FileEntity.builder().build()
+                , FileEntity.builder().build()
+                , FileEntity.builder().build()
+                , FileEntity.builder().build()
         );
 
 
@@ -70,13 +83,25 @@ public class BoardRepositoryTest {
 
         boardEntity.addFiles(tempFileList);
 
+        List<FileEntity> saveFileList = boardEntity.getFileList();
+
+        IntStream.range(0, tempFileList.size())
+                .filter(idx -> idx % 2 == 0)
+                .mapToObj(idx -> saveFileList.get(idx))
+                .forEach(fileEntity -> fileEntity.delete());
+
         saveNormalBoard = boardRepository.save(boardEntity);
+
+        BoardEntity saveBoardEntity = boardRepository.findById(saveNormalBoard.getIdx()).get();
+
+        assertNotNull(saveBoardEntity);
+
     }
     
 
     @Test
     @DisplayName("정상적으로 사용가능한 게시물 검색 테스트")
-    @WithUserDetails("customUsername")
+    //@WithUserDetails("customUsername")
     public void b_findEnableBoardTest(){
 
         a_registBoard();
