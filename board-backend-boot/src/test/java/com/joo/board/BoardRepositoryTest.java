@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,9 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -35,9 +36,6 @@ public class BoardRepositoryTest {
 
     @Autowired
     private BoardRepository boardRepository;
-
-    private BoardEntity saveNormalBoard;
-
 
     @TestConfiguration
     static class TestConfig {
@@ -67,7 +65,6 @@ public class BoardRepositoryTest {
                 .contents("Board Repository test Contents")
                 .build();
 
-
         //temp file
         ImmutableList<FileEntity> tempFileList = ImmutableList.of(
                 FileEntity.builder().build()
@@ -76,8 +73,6 @@ public class BoardRepositoryTest {
                 , FileEntity.builder().build()
                 , FileEntity.builder().build()
         );
-
-
 
         BoardEntity boardEntity = normalBoardWriteRequestDto.toEntity();
 
@@ -90,31 +85,54 @@ public class BoardRepositoryTest {
                 .mapToObj(idx -> saveFileList.get(idx))
                 .forEach(fileEntity -> fileEntity.delete());
 
-        saveNormalBoard = boardRepository.save(boardEntity);
+        BoardEntity saveNormalBoard = boardRepository.save(boardEntity);
 
         BoardEntity saveBoardEntity = boardRepository.findById(saveNormalBoard.getIdx()).get();
 
         assertNotNull(saveBoardEntity);
 
     }
-    
 
+
+    /**
+     * entity manager에서 수정된 사항을 바로 적용 하기 위하여 transaction을 해제한다.
+     */
     @Test
     @DisplayName("정상적으로 사용가능한 게시물 검색 테스트")
     //@WithUserDetails("customUsername")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void b_findEnableBoardTest(){
 
-        a_registBoard();
+        BoardWriteRequestDto normalBoardWriteRequestDto = BoardWriteRequestDto.builder()
+                .subject("Board Repository test subject")
+                .contents("Board Repository test Contents")
+                .build();
 
-        BoardEntity searchBoardEntity = boardRepository.findEnableBoardByBoardIdx(saveNormalBoard.getIdx())
-                .orElse(BoardEntity.builder().build());
+        BoardEntity boardEntity = normalBoardWriteRequestDto.toEntity();
 
-        assertThat(searchBoardEntity.getIdx()).isEqualTo(saveNormalBoard.getIdx());
-        assertThat(searchBoardEntity.getState()).isEqualTo(CommonState.ENABLE);
+        //temp file
+        ImmutableList<FileEntity> tempFileList = ImmutableList.of(
+                FileEntity.builder().build()
+                , FileEntity.builder().build()
+                , FileEntity.builder().build()
+                , FileEntity.builder().build()
+                , FileEntity.builder().build()
+        );
 
-        assertThat(searchBoardEntity.getSubject()).isEqualTo(saveNormalBoard.getSubject());
-        assertThat(searchBoardEntity.getContents()).isEqualTo(saveNormalBoard.getContents());
+        boardEntity.addFiles(tempFileList);
 
+        List<FileEntity> saveFileList = boardEntity.getFileList();
+        IntStream.range(0, tempFileList.size())
+                .filter(idx -> idx % 2 == 0)
+                .mapToObj(idx -> saveFileList.get(idx))
+                .forEach(fileEntity -> fileEntity.delete());
+
+        BoardEntity boardEntityFromMemory = boardRepository.save(boardEntity);
+
+        BoardEntity searchBoardEntity = boardRepository.findEnableBoardByBoardIdx(boardEntityFromMemory.getIdx())
+                .orElse(null);
+
+        assertNotNull(searchBoardEntity);
 
         List<FileEntity> fileList = searchBoardEntity.getFileList();
 
@@ -124,6 +142,8 @@ public class BoardRepositoryTest {
                 .filter(fileState -> fileState != CommonState.ENABLE)
                 .findAny().isPresent();
 
+
         assertFalse(isDisableFileExist);
+        assertThat(fileList.size(), is(2));
     }
 }
