@@ -2,6 +2,7 @@ package com.joo.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.joo.board.config.SpringSecurityTestConfig;
 import com.joo.common.state.CommonState;
 import com.joo.config.SecurityConfig;
@@ -179,7 +180,7 @@ public class BoardControllerTest extends AbstractControllerTest{
                 .searchKeyWord("name")
                 .build();
 
-        String queryStr = TestUtils.dtoToQueryStr(boardSearchDto) + "&pageIdx=1";
+        String queryStr = TestUtils.dtoToQueryStr(boardSearchDto, ImmutableList.of("boardIdx")) + "&pageIdx=1";
         String normalBoardListAPI = BOARD_API + queryStr;
         //Pageable pageable = PageRequest.of(0,10, Sort.Direction.DESC, "idx");
 

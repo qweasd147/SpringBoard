@@ -1,11 +1,15 @@
 package com.joo.board;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -44,19 +48,23 @@ public class TestUtils {
         return requestBuilder;
     }
 
-    public static String dtoToQueryStr(Object dto){
+    public static String dtoToQueryStr(Object dto, List<String> ignoreField){
         Class<?> target = dto.getClass();
 
         String queryStr = Arrays.stream(target.getDeclaredFields())
-                .filter(field -> !field.isAccessible())
+                .filter(field -> !field.isAccessible())                     //기본적으로 private만 값을 가져옴
+                .filter(field -> !ignoreField.contains(field.getName()))    //무시할 프로퍼티 filter
+                .filter(field -> {                                          //getter 메소드가 존재하는 프로퍼티만 filter
+                    String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(field.getName());
+                    return ReflectionUtils.findMethod(target, getterMethodName) != null;
+                })
                 .map(field -> {
-                    try {
-                        return field.getName() + "=" + field.get(dto);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }).collect(Collectors.joining("&"));
+                    String value = ReflectionTestUtils.invokeGetterMethod(dto, field.getName()).toString();
+                    return Pair.of(field.getName(), value);
+                })
+                .filter(pair -> Objects.nonNull(pair.getValue()))
+                .map(pair -> pair.getKey() + "=" + pair.getValue())
+                .collect(Collectors.joining("&"));
 
         return "?" + queryStr;
     }
