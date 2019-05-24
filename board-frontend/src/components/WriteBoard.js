@@ -101,7 +101,7 @@ class WriteBoard extends React.Component {
         });
 
         $.each(_deleteFiles,function(idx,item){
-            formData.append('deleteFile[]',_deleteFiles[idx]);
+            formData.append('deleteFiles',_deleteFiles[idx]);
         });
         
         /*
