@@ -4,6 +4,8 @@ import com.joo.common.state.CommonState;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,18 +33,12 @@ public class TokenUtils {
         this.expiration = expiration;
     }
 
-    public enum TOKEN_STATUS {
+    @AllArgsConstructor
+    @Getter
+    public enum TokenStatus {
         ENABLED(0), INVALID(1), EXPIRED(2);
 
         private int state;
-
-        TOKEN_STATUS(int state) {
-            this.state = state;
-        }
-
-        public int getState() {
-            return state;
-        }
 
         /**
          * 토큰 상태값으로 계정 상태값을 찾는다.
@@ -62,11 +58,11 @@ public class TokenUtils {
          * @param userState 사용자 상태값(CommonState 사용)
          * @return
          */
-        public static TOKEN_STATUS getTokenStatusFromUserState(CommonState userState){
-            return Arrays.stream(TokenUtils.TOKEN_STATUS.values())
+        public static TokenStatus getTokenStatusFromUserState(CommonState userState){
+            return Arrays.stream(TokenUtils.TokenStatus.values())
                     .filter((tokenStatus)-> userState.getState() == tokenStatus.getState())
                     .findAny()
-                    .orElse(TOKEN_STATUS.INVALID);
+                    .orElse(TokenStatus.INVALID);
         }
     }
 
@@ -147,7 +143,7 @@ public class TokenUtils {
      * @return
      */
     public Date getExpirationDateFromToken(String token) {
-        return this.getCreatedDateFromToken(this.getClaimsFromToken(token));
+        return this.getExpirationDateFromToken(this.getClaimsFromToken(token));
     }
 
     /**
@@ -293,8 +289,8 @@ public class TokenUtils {
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
 
-        TOKEN_STATUS tokenStatus = getTokenStatus(token, userDetails);
-        return tokenStatus == TOKEN_STATUS.ENABLED;
+        TokenStatus tokenStatus = getTokenStatus(token, userDetails);
+        return tokenStatus == TokenStatus.ENABLED;
     }
 
     /**
@@ -303,8 +299,8 @@ public class TokenUtils {
      * @param userDetails
      * @return
      */
-    public TOKEN_STATUS getTokenStatus(String token, UserDetails userDetails){
-        if(token == null || userDetails == null)    return TOKEN_STATUS.INVALID;
+    public TokenStatus getTokenStatus(String token, UserDetails userDetails){
+        if(token == null || userDetails == null)    return TokenStatus.INVALID;
 
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
 
@@ -313,12 +309,12 @@ public class TokenUtils {
         //final String password = this.getPasswordFromToken(claims);
 
         //잘못된 토큰 정보(파싱 불가)
-        if(StringUtils.isEmpty(userNameFromToken))                     return TOKEN_STATUS.INVALID;
+        if(StringUtils.isEmpty(userNameFromToken))                     return TokenStatus.INVALID;
         //토큰 만료
-        if(this.isTokenExpired(token))                                  return TOKEN_STATUS.EXPIRED;
+        if(this.isTokenExpired(token))                                  return TokenStatus.EXPIRED;
         //그 외 사용할 수 있는지
-        if(userNameFromToken.equals(customUserDetails.getUsername()))   return TOKEN_STATUS.ENABLED;        //비밀번호도 할꺼면 여기서 userDetails랑 토큰에서 뽑아서 검사해야함
+        if(userNameFromToken.equals(customUserDetails.getUsername()))   return TokenStatus.ENABLED;        //비밀번호도 할꺼면 여기서 userDetails랑 토큰에서 뽑아서 검사해야함
 
-        return TOKEN_STATUS.INVALID;
+        return TokenStatus.INVALID;
     }
 }

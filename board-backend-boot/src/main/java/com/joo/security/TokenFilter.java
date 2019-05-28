@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 
-import static com.joo.security.TokenUtils.TOKEN_STATUS;
+import static com.joo.security.TokenUtils.TokenStatus;
 
 @Component
 public class TokenFilter extends OncePerRequestFilter {
@@ -76,7 +76,7 @@ public class TokenFilter extends OncePerRequestFilter {
         if(Objects.isNull(thirdPartyToken)) logger.debug("not found third party token from token. "+token);
 
         CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(userName);
-        TOKEN_STATUS tokenStatus = tokenUtils.getTokenStatus(token, userDetails);
+        TokenStatus tokenStatus = tokenUtils.getTokenStatus(token, userDetails);
 
         Objects.requireNonNull(tokenStatus, "not found token status from token. "+token);
 
@@ -87,7 +87,7 @@ public class TokenFilter extends OncePerRequestFilter {
 
         userDetails = new CustomUserDetails(userDto);
 
-        if(tokenStatus == TOKEN_STATUS.ENABLED){
+        if(tokenStatus == TokenStatus.ENABLED){
             logger.debug("pass validate");
             //토큰 유효성을 체크한다.
             UsernamePasswordAuthenticationToken authToken
@@ -96,7 +96,7 @@ public class TokenFilter extends OncePerRequestFilter {
             //사용자 정보를 spring context에 올려 놓는다.
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
-        } else if(tokenStatus == TOKEN_STATUS.EXPIRED){
+        } else if(tokenStatus == TokenStatus.EXPIRED){
             //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "만료된 토큰");
         } else{
             logger.debug("validate 통과 실패! "+userDetails.toString());

@@ -49,9 +49,7 @@ public class BoardController implements BaseController{
 
         //전체 정보가 아닌 제한된 정보만 넘겨준다.
         //LimitedBoardDto limitedBoardDto = modelMapper.map(boardEntity, LimitedBoardDto.class);
-        LimitedBoardDto limitedBoardDto = LimitedBoardDto.of(boardEntity);
-
-        return successRespResult(limitedBoardDto);
+        return successRespResult(LimitedBoardDto.of(boardEntity));
     }
 
     //@PostMapping(value = "/board")
@@ -64,9 +62,9 @@ public class BoardController implements BaseController{
             ){
 
         //boardEntity.setWriter(customUserDetails.getNickName());
-        boardService.insertBoard(boardWriteRequestDto);
+        BoardEntity boardEntity = boardService.insertBoard(boardWriteRequestDto);
 
-        return createRespResult();
+        return createRespResult(LimitedBoardDto.of(boardEntity));
     }
 
     @PostMapping(value = "/board/{idx}", headers = "content-type=multipart/*")

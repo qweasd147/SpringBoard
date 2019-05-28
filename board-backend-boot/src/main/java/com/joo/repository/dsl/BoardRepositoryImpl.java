@@ -26,11 +26,12 @@ public class BoardRepositoryImpl extends QuerydslRepositorySupport implements Bo
 
     private static final Logger logger = LoggerFactory.getLogger(BoardRepositoryImpl.class);
 
-    @Autowired
     private JPAQueryFactory queryFactory;
 
-    public BoardRepositoryImpl() {
+    public BoardRepositoryImpl(JPAQueryFactory queryFactory) {
         super(BoardEntity.class);
+        this.queryFactory = queryFactory;
+        //super(BoardEntity.class);
     }
 
     @Override
