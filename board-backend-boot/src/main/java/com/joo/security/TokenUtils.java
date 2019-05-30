@@ -313,7 +313,8 @@ public class TokenUtils {
         //토큰 만료
         if(this.isTokenExpired(token))                                  return TokenStatus.EXPIRED;
         //그 외 사용할 수 있는지
-        if(userNameFromToken.equals(customUserDetails.getUsername()))   return TokenStatus.ENABLED;        //비밀번호도 할꺼면 여기서 userDetails랑 토큰에서 뽑아서 검사해야함
+        if(userNameFromToken.equals(customUserDetails.getUsername()) && customUserDetails.isEnabled())   return TokenStatus.ENABLED;        //비밀번호도 할꺼면 여기서 userDetails랑 토큰에서 뽑아서 검사해야함
+
 
         return TokenStatus.INVALID;
     }
