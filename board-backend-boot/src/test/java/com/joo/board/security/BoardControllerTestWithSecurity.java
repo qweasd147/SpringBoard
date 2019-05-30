@@ -20,19 +20,20 @@ import org.springframework.security.authentication.AuthenticationManager;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+/**
+ * 테스트 대상 : spring security
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class BoardControllerTestWithSecurity {
@@ -66,7 +67,7 @@ public class BoardControllerTestWithSecurity {
     }
 
     @Test
-    public void write() throws Exception {
+    public void a_정상적인_토큰으로_글쓰기_요청() throws Exception {
 
         UserDto normalReqUserDto = UserDto.builder()
                 .idx(335L)
@@ -87,7 +88,7 @@ public class BoardControllerTestWithSecurity {
 
         given(customUserDetailsService.loadUserByUsername(any())).willReturn(userDetails);
         given(tokenUtils.getUsernameFromToken((String) any())).willReturn(String.valueOf(normalReqUserDto.getIdx()));
-        given(tokenUtils.getTokenStatus(any(), any())).willReturn(TokenUtils.TOKEN_STATUS.ENABLED);
+        given(tokenUtils.getTokenStatus(any(), any())).willReturn(TokenUtils.TokenStatus.ENABLED);
 
 
         mockMvc.perform(TestUtils.addParamFromDto(multipart(BOARD_API), reqDto)
@@ -100,6 +101,40 @@ public class BoardControllerTestWithSecurity {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.subject", is(reqDto.getSubject())))
                 .andExpect(jsonPath("$.data.contents", is(reqDto.getContents())));
+    }
+
+    @Test
+    public void b_잘못된_토큰으로_글쓰기_요청() throws Exception {
+        UserDto normalReqUserDto = UserDto.builder()
+                .idx(335L)
+                .id("mockID")
+                .name("mockName")
+                .nickName("mockNickName")
+                .email("mockEmail@email.com")
+                .serviceName("mockService")
+                .state(CommonState.ENABLE)
+                .build();
+
+        BoardWriteRequestDto reqDto = BoardWriteRequestDto.builder()
+                .subject("mock을 통한 게시판 제목 입력")
+                .contents("mock을 통한 게시판 내용입력")
+                .build();
+
+        CustomUserDetails userDetails = new CustomUserDetails(normalReqUserDto);
+
+        given(customUserDetailsService.loadUserByUsername(any())).willReturn(userDetails);
+        given(tokenUtils.getUsernameFromToken((String) any())).willReturn(String.valueOf(normalReqUserDto.getIdx()));
+        given(tokenUtils.getTokenStatus(any(), any())).willReturn(TokenUtils.TokenStatus.EXPIRED);
+
+
+        mockMvc.perform(TestUtils.addParamFromDto(multipart(BOARD_API), reqDto)
+                //.file(mockFile)
+                //.content(OBJECT_MAPPER.writeValueAsString(postReq))
+                //.param("subject", "mock를 통한 게시판 제목 입력")
+                //.param("contents", "mock를 통한 게시판 내용 입력")
+                .characterEncoding("utf-8").headers(getHeaderWithAuthToken()))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 
     private HttpHeaders getHeaderWithAuthToken(){
