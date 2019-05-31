@@ -5,11 +5,13 @@ google:
     accessTokenUri: https://accounts.google.com/o/oauth2/token
     userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
     scope: email, profile
+    useCurrentUri: true
+    preEstablishedRedirectUri: http://localhost:8080/api/authen/login/page/google
   resource:
 #    userInfoUri: https://www.googleapis.com/plus/v1/people/me
     userInfoUri: https://www.googleapis.com/oauth2/v2/userinfo
     tokenRevoke: https://kapi.kakao.com/v1/user/logout
-  loginRequestPage: /api/authen/login/page/google
+    loginRequestPage: /api/authen/login/page/google
 
 kakao :
   client:
@@ -17,10 +19,12 @@ kakao :
     clientSecret: xxxx
     accessTokenUri: https://kauth.kakao.com/oauth/token
     userAuthorizationUri: https://kauth.kakao.com/oauth/authorize
+    useCurrentUri: true
+    preEstablishedRedirectUri: http://localhost:8080/api/authen/login/page/kakao
   resource:
     userInfoUri: https://kapi.kakao.com/v1/user/me
     tokenRevoke: https://kapi.kakao.com/v1/user/logout
-  loginRequestPage: /api/authen/login/page/kakao
+    loginRequestPage: /api/authen/login/page/kakao
 
 naver:
   client:
@@ -28,7 +32,9 @@ naver:
     clientSecret: xxxx
     accessTokenUri: https://nid.naver.com/oauth2.0/token?grant_type=authorization_code
     userAuthorizationUri: https://nid.naver.com/oauth2.0/authorize
+    useCurrentUri: true
+    preEstablishedRedirectUri: http://localhost:8080/api/authen/login/page/naver
   resource:
     userInfoUri: https://openapi.naver.com/v1/nid/me
     tokenRevoke: https://nid.naver.com/oauth2.0/token?grant_type=delete&service_provider=NAVER
-  loginRequestPage: /api/authen/login/page/naver
+    loginRequestPage: /api/authen/login/page/naver
