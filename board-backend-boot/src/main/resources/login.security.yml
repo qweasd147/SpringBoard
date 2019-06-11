@@ -8,9 +8,9 @@ google:
     useCurrentUri: true
     preEstablishedRedirectUri: http://localhost:8080/api/authen/login/page/google
   resource:
-#    userInfoUri: https://www.googleapis.com/plus/v1/people/me
+    #    userInfoUri: https://www.googleapis.com/plus/v1/people/me
     userInfoUri: https://www.googleapis.com/oauth2/v2/userinfo
-    tokenRevoke: https://kapi.kakao.com/v1/user/logout
+    tokenRevoke: https://accounts.google.com/o/oauth2/revoke
     loginRequestPage: /api/authen/login/page/google
 
 kakao :
