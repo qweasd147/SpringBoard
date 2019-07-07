@@ -5,6 +5,7 @@ import com.joo.model.dto.BoardSearchDto;
 import com.joo.model.dto.BoardUpdateRequestDto;
 import com.joo.model.dto.BoardWriteRequestDto;
 import com.joo.model.entity.BoardEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,7 @@ public interface BoardService {
      * @param boardSearchDto
      * @return
      */
-    Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable);
+    Page<BoardEntity> selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable);
 
     /**
      * 게시물 리스트 전체 개수를 조회한다.

@@ -32,19 +32,11 @@ public class BoardServiceImpl extends BaseService implements BoardService{
     private FileUtils fileUtils;
 
     @Override
-    public Map selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
+    public Page<BoardEntity> selectBoardList(BoardSearchDto boardSearchDto, Pageable pageable) {
 
-        //Page<BoardEntity> boardList = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);                //내가 원하는 컬럼만 추출할수 없음
-        //Page<BoardEntity> boardList = boardRepository.findAllWithFiles(CommonState.ENABLE,pageable);                  //검색 조건을 동적으로 만들 수 없음
-        Page<BoardEntity> boardList = boardRepository.findAllDynamic(boardSearchDto, CommonState.ENABLE, pageable); //결국 query dsl
-
-        Map<String, Object> listData = new HashMap<>();
-
-        listData.put("boardList", boardList.getContent());
-        listData.put("count", boardList.getTotalElements());    //전체 데이터 수
-        listData.put("page", boardList.getNumber()+1);          //현재 페이지
-
-        return listData;
+        //Page<BoardEntity> boardList1 = boardRepository.findAll(getBoardSpec(boardSearchDto), pageable);                //내가 원하는 컬럼만 추출할수 없음
+        Page<BoardEntity> boardList2 = boardRepository.findAllWithFiles(CommonState.ENABLE,pageable);                  //검색 조건을 동적으로 만들 수 없음
+        return boardRepository.findAllDynamic(boardSearchDto, CommonState.ENABLE, pageable); //결국 query dsl
     }
 
     @Override

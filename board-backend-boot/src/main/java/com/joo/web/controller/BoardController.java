@@ -12,12 +12,14 @@ import com.joo.web.controller.common.BaseController;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +38,14 @@ public class BoardController implements BaseController{
     @GetMapping("/board")
     public ResponseEntity selectBoardList(@Valid BoardSearchDto searchDto, Pageable pageable){
 
-        Map<String, ?> listData = boardService.selectBoardList(searchDto, pageable);
+        Page<LimitedBoardDto> boardPage = boardService.selectBoardList(searchDto, pageable)
+                .map(LimitedBoardDto::of);
+
+        Map<String, Object> listData = new HashMap<>();
+
+        listData.put("boardList", boardPage.getContent());
+        listData.put("count", boardPage.getTotalElements());    //전체 데이터 수
+        listData.put("page", boardPage.getNumber()+1);          //현재 페이지
 
         return successRespResult(listData);
     }
