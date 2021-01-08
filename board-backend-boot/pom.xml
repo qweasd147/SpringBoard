@@ -139,7 +139,7 @@
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
-			<version>2.3.3.RELEASE</version>
+			<version>2.3.6.RELEASE</version>
 		</dependency>
 
 		<!-- spring boot 2.x대 버전부터 마이그레이션 되면서 security autoconfigure 빠진거 추가 -->
